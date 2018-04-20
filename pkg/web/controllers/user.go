@@ -21,10 +21,11 @@ import (
 	"time"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hiboot/pkg/utils"
+	"os"
 )
 
 type UserRequest struct {
-	Url      string `json:"url" validate:"required"`
+	Url      string `json:"url"`
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
@@ -55,25 +56,33 @@ func (c *UserController) Login(ctx iris.Context) {
 		application.ResponseError(ctx, err.Error(), iris.StatusBadRequest)
 		return
 	}
-
-	// invoke models
-	user := &auth.User{}
-	_, message, err := user.Login(request.Url, request.Username, request.Password)
-	if err == nil {
-
-		//log.Debug(token)
-
-		jwtToken, err := application.GenerateJwtToken(application.MapJwt{
-			"url": request.Url,
-			"username": request.Username,
-			"password": request.Password, // TODO: token is not working?
-		}, 24, time.Hour)
+	//log.Debug(token)
+	var url string
+	url = request.Url
+	if url == "" {
+		url = os.Getenv("SCM_URL")
+	}
+	if url == "" {
+		application.ResponseError(ctx, err.Error(), iris.StatusInternalServerError)
+	}else {
+		// invoke models
+		user := &auth.User{}
+		_, message, err := user.Login(url, request.Username, request.Password)
 		if err == nil {
-			application.Response(ctx, message, &jwtToken)
+
+				jwtToken, err := application.GenerateJwtToken(application.MapJwt{
+					"url": url,
+					"username": request.Username,
+					"password": request.Password, // TODO: token is not working?
+				}, 24, time.Hour)
+				if err == nil {
+					application.Response(ctx, message, &jwtToken)
+				} else {
+					application.ResponseError(ctx, err.Error(), iris.StatusInternalServerError)
+				}
+
 		} else {
-			application.ResponseError(ctx, err.Error(), iris.StatusInternalServerError)
+			application.ResponseError(ctx, err.Error(), iris.StatusForbidden)
 		}
-	} else {
-		application.ResponseError(ctx, err.Error(), iris.StatusForbidden)
 	}
 }
