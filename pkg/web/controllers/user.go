@@ -16,11 +16,11 @@ package controllers
 
 import (
 	"github.com/kataras/iris"
-	"github.com/hidevopsio/hi/cicd/pkg/auth"
-	"github.com/hidevopsio/hi/boot/pkg/application"
+	"github.com/hidevopsio/hicicd/pkg/auth"
+	"github.com/hidevopsio/hiboot/pkg/application"
 	"time"
-	"github.com/hidevopsio/hi/boot/pkg/log"
-	"github.com/hidevopsio/hi/boot/pkg/utils"
+	"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hiboot/pkg/utils"
 	"os"
 )
 
