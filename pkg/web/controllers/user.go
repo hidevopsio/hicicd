@@ -82,7 +82,7 @@ func (c *UserController) Login(ctx iris.Context) {
 				}
 
 		} else {
-			application.ResponseError(ctx, err.Error(), iris.StatusForbidden)
+			application.ResponseError(ctx, err.Error(), iris.StatusInternalServerError)
 		}
 	}
 }
