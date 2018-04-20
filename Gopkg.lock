@@ -130,8 +130,14 @@
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
-  packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
+  packages = [".","hcl/ast","hcl/parser","hcl/printer","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
   revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hidevopsio/hiboot"
+  packages = ["pkg/application","pkg/log","pkg/model","pkg/system","pkg/utils"]
+  revision = "bdc01a32f7c32a5f2a8278285e2c890f5b6e2071"
 
 [[projects]]
   branch = "master"
@@ -142,8 +148,8 @@
 [[projects]]
   name = "github.com/imdario/mergo"
   packages = ["."]
-  revision = "163f41321a19dd09362d4c63cc2489db2015f1f4"
-  version = "0.3.2"
+  revision = "9d5f1277e9a8ed20c3684bda8fde67c05628518c"
+  version = "v0.3.4"
 
 [[projects]]
   name = "github.com/imkira/go-interpol"
@@ -202,8 +208,8 @@
 [[projects]]
   name = "github.com/kataras/iris"
   packages = [".","cache","cache/cfg","cache/client","cache/client/rule","cache/entry","cache/ruleset","cache/uri","context","core/errors","core/handlerconv","core/host","core/maintenance","core/maintenance/version","core/memstore","core/netutil","core/router","core/router/macro","core/router/macro/interpreter/ast","core/router/macro/interpreter/lexer","core/router/macro/interpreter/parser","core/router/macro/interpreter/token","core/router/node","httptest","middleware/logger","middleware/recover","view"]
-  revision = "0c841013385c284695f2336b672101168d748480"
-  version = "v10.3.0"
+  revision = "41b17aca9ec493f6eedf17c0e5545cf134f2d445"
+  version = "v10.5.0"
 
 [[projects]]
   branch = "master"
@@ -376,8 +382,8 @@
 [[projects]]
   name = "github.com/spf13/viper"
   packages = ["."]
-  revision = "25b30aa063fc18e48662b86996252eabdcf2f0c7"
-  version = "v1.0.0"
+  revision = "b5e8006cbee93ec955a89ab31e0e3ce3204f3736"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -496,6 +502,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "72e3fc5ad49c567427551228d144a51265092fd5671740a01312bb853cbc0074"
+  inputs-digest = "869b0efc8c8102222252a9c7812aa56ee07b8ca4dad7d0e1a28d353842911b1d"
   solver-name = "gps-cdcl"
   solver-version = 1
