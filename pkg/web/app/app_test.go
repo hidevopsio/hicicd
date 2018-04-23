@@ -144,7 +144,7 @@ func TestCicdRunNodejs(t *testing.T) {
 			Name:    "nodejs",
 			Project: "demo",
 			Profile: "dev",
-			App:     "ngx-admin",
+			App:     "hello-angular",
 		})
 	}
 }
