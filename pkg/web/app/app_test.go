@@ -12,6 +12,7 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/application"
 	"github.com/hidevopsio/hicicd/pkg/ci"
 	"time"
+	"github.com/stretchr/testify/assert"
 )
 
 var userRequest controllers.UserRequest
@@ -82,6 +83,7 @@ func TestCicdRunWithExpiredToken(t *testing.T) {
 	e := newTestServer(t)
 
 	jwtToken, err := login(500, time.Millisecond)
+	assert.Equal(t, nil, err)
 
 	if err == nil {
 		time.Sleep(1000 * time.Millisecond)
@@ -115,6 +117,7 @@ func TestCicdRunJava(t *testing.T) {
 	e := newTestServer(t)
 
 	jwtToken, err := login(24, time.Hour)
+	assert.Equal(t, nil, err)
 
 	if err == nil {
 		requestCicdPipeline(e, jwtToken, http.StatusOK, &ci.Pipeline{
@@ -122,6 +125,8 @@ func TestCicdRunJava(t *testing.T) {
 			Project: "demo",
 			Profile: "dev",
 			App:     "hello-world",
+			//BuildConfigs: ci.BuildConfigs{Skip: true},
+			//DeploymentConfigs: ci.DeploymentConfigs{Skip: true},
 		})
 	}
 }
@@ -132,6 +137,7 @@ func TestCicdRunNodejs(t *testing.T) {
 	e := newTestServer(t)
 
 	jwtToken, err := login(24, time.Hour)
+	assert.Equal(t, nil, err)
 
 	if err == nil {
 		requestCicdPipeline(e, jwtToken, http.StatusOK, &ci.Pipeline{
