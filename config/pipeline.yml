@@ -2,6 +2,7 @@
 
 pipeline:
   profile: ${profile}
+  version: v1
   scm:
     type: git
     url: http://github.com
@@ -9,7 +10,6 @@ pipeline:
   dockerRegistry: docker-registry.default.svc:5000
   buildConfigs:
     skip: false
-    tag: latest
   deploymentConfigs:
     skip: false
     forceUpdate: false

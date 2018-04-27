@@ -28,9 +28,9 @@ func TestImageStreamCrud(t *testing.T) {
 		Name: imageStreamName,
 		Namespace: namespace,
 	}
-
+	version := "v1"
 	// create imagestream
-	is, err := imageStream.Create()
+	is, err := imageStream.Create(version)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, imageStreamName, is.ObjectMeta.Name)
 
@@ -53,7 +53,7 @@ func TestImageStreamCreation(t *testing.T) {
 	imageStream, err := NewImageStreamFromSource(name, namespace, source)
 
 	// create imagestream
-	is, err := imageStream.Create()
+	is, err := imageStream.Create("v1")
 	assert.Equal(t, nil, err)
 	assert.Equal(t, name, is.ObjectMeta.Name)
 }
