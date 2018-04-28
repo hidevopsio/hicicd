@@ -65,6 +65,10 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 	copier.Copy(&p, ports)
 
 	cfg := &v1.DeploymentConfig{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "apps.openshift.io/v1",
+			Kind: "DeploymentConfig",
+		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: dc.FullName,
 			Labels: map[string]string{
