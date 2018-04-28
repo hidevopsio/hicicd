@@ -58,7 +58,7 @@ func NewImageStreamFromSource(name, namespace, source string) (*ImageStream, err
 // @Description create imagestream
 // @Param
 // @Return v1.ImageStream, error
-func (is *ImageStream) Create() (*v1.ImageStream, error) {
+func (is *ImageStream) Create(version string) (*v1.ImageStream, error) {
 	log.Debug("ImageStream.Create()")
 
 	imageStream := &v1.ImageStream{
@@ -67,6 +67,7 @@ func (is *ImageStream) Create() (*v1.ImageStream, error) {
 			Namespace: is.Namespace,
 			Labels: map[string]string{
 				"app": is.Name,
+				"version": version,
 			},
 		},
 	}
@@ -75,7 +76,7 @@ func (is *ImageStream) Create() (*v1.ImageStream, error) {
 		imageStream.Spec = v1.ImageStreamSpec{
 			Tags: []v1.TagReference{
 				{
-					Name: "latest",
+					Name: version,
 					From: &corev1.ObjectReference{
 						Kind: "DockerImage",
 						Name: is.Source,

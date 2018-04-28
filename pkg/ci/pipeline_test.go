@@ -17,14 +17,23 @@ package ci
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/hidevopsio/hiboot/pkg/log"
+	"os"
+	"github.com/hidevopsio/hicicd/pkg/ci/impl"
 )
 
 func TestPipelineInit(t *testing.T) {
-	p := &Pipeline{
-		Name: string("nodeJs"),
-		App:  string(""),
-	}
-	log.Info()
-	assert.Equal(t, Pipeline{}, p)
+	java := &impl.JavaPipeline{}
+	java.Init(&Pipeline{
+		Name: "java",
+		Profile: "dev",
+		App: "demo-provider",
+		Project: "demo",
+		Scm: Scm{Url: os.Getenv("SCM_URL")},
+		DeploymentConfigs: DeploymentConfigs{
+			ForceUpdate: true,
+		},
+	})
+
+
+	assert.Equal(t, Pipeline{}, java)
 }

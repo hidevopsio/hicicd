@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 package openshift
 
 import (
@@ -29,9 +28,9 @@ import (
 	"fmt"
 )
 
-type Scm struct{
-	Url string
-	Ref string
+type Scm struct {
+	Url    string
+	Ref    string
 	Secret string
 }
 
@@ -39,66 +38,25 @@ type BuildConfig struct {
 	Name      string
 	Namespace string
 	Scm       Scm
-	ImageTag  string
-
+	Version   string
 	// use NewFrom when creating new buildConfig
-	NewFrom corev1.ObjectReference
 	From corev1.ObjectReference
 
 	BuildConfigs buildv1.BuildConfigInterface
-	Builds buildv1.BuildInterface
+	Builds       buildv1.BuildInterface
 }
 
 // @Title NewBuildConfig
 // @Description Create new BuildConfig Instance
 // @Param namespace, appName, gitUrl, imageTag, s2iImageStream string
 // @Return *BuildConfig, error
-func NewBuildConfig(namespace, appName, scmUrl, scmRef, scmSecret, imageTag, s2iImageStream string) (*BuildConfig, error) {
+func NewBuildConfig(namespace, name, scmUrl, scmRef, scmSecret, version, s2iImageStream string) (*BuildConfig, error) {
 
 	log.Debug("NewBuildConfig()")
 
-	clientSet, err := buildv1.NewForConfig(k8s.Config)
-	buildConfig := &BuildConfig{
-		BuildConfigs: clientSet.BuildConfigs(namespace),
-		Builds:       clientSet.Builds(namespace),
-
-		NewFrom: corev1.ObjectReference{
-			Kind:      "ImageStreamTag",
-			Name:      s2iImageStream,
-			Namespace: "openshift",
-		},
-
-		From: corev1.ObjectReference{
-			Kind:      "ImageStreamTag",
-			Name:      appName + ":" + imageTag,
-			Namespace: namespace,
-		},
-
-		Name:      appName,
-		Namespace: namespace,
-		Scm: Scm{
-			Url:    scmUrl,
-			Ref:    scmRef,
-			Secret: scmSecret,
-		},
-
-		ImageTag: imageTag,
-
-	}
-	return buildConfig, err
-}
-
-
-// @Title Create
-// @Description Create new BuildConfig
-// @Param
-// @Return *v1.BuildConfig, error
-func (b *BuildConfig) Create() (*v1.BuildConfig, error) {
-	log.Debug("BuildConfig.Create()")
-
 	// TODO: for the sake of decoupling, the image stream creation should be here or not?
 	// create imagestream
-	imageStream, err := NewImageStream(b.Name, b.Namespace)
+	imageStream, err := NewImageStream(name, namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -107,21 +65,55 @@ func (b *BuildConfig) Create() (*v1.BuildConfig, error) {
 	is, err := imageStream.Get()
 
 	// the images stream is exist with 0 tags, then delete it
-	if len(is.Status.Tags) ==0 {
+	if len(is.Status.Tags) == 0 {
 		imageStream.Delete()
 		is, err = imageStream.Get()
 	}
 
 	// create new images stream if it is not found
 	if errors.IsNotFound(err) {
-		_, err := imageStream.Create()
+		_, err := imageStream.Create(version)
 		if err != nil {
 			return nil, err
 		}
-		from = b.NewFrom
+		from = corev1.ObjectReference{
+			Kind:      "ImageStreamTag",
+			Name:      s2iImageStream,
+			Namespace: "openshift",
+		}
 	} else {
-		from = b.From
+		from = corev1.ObjectReference{
+			Kind:      "ImageStreamTag",
+			Name:      name + ":" + is.Status.Tags[0].Tag,
+			Namespace: namespace,
+		}
 	}
+
+	clientSet, err := buildv1.NewForConfig(k8s.Config)
+	buildConfig := &BuildConfig{
+		BuildConfigs: clientSet.BuildConfigs(namespace),
+		Builds:       clientSet.Builds(namespace),
+
+		From:      from,
+		Name:      name,
+		Namespace: namespace,
+		Scm: Scm{
+			Url:    scmUrl,
+			Ref:    scmRef,
+			Secret: scmSecret,
+		},
+
+		Version: version,
+	}
+	return buildConfig, err
+}
+
+// @Title Create
+// @Description Create new BuildConfig
+// @Param
+// @Return *v1.BuildConfig, error
+func (b *BuildConfig) Create() (*v1.BuildConfig, error) {
+	log.Debug("BuildConfig.Create()")
 
 	// buildConfig
 	buildConfig := &v1.BuildConfig{
@@ -132,7 +124,6 @@ func (b *BuildConfig) Create() (*v1.BuildConfig, error) {
 			},
 		},
 		Spec: v1.BuildConfigSpec{
-
 			// The runPolicy field controls whether builds created from this build configuration can be run simultaneously.
 			// The default value is Serial, which means new builds will run sequentially, not simultaneously.
 			RunPolicy: v1.BuildRunPolicy("Serial"),
@@ -151,13 +142,13 @@ func (b *BuildConfig) Create() (*v1.BuildConfig, error) {
 				Strategy: v1.BuildStrategy{
 					Type: v1.BuildStrategyType(v1.SourceBuildStrategyType),
 					SourceStrategy: &v1.SourceBuildStrategy{
-						From: from,
+						From: b.From,
 					},
 				},
 				Output: v1.BuildOutput{
 					To: &corev1.ObjectReference{
 						Kind: "ImageStreamTag",
-						Name: b.Name + ":" + b.ImageTag,
+						Name: b.Name + ":" + b.Version,
 					},
 				},
 			},
@@ -181,7 +172,6 @@ func (b *BuildConfig) Create() (*v1.BuildConfig, error) {
 	return bc, err
 }
 
-
 // @Title Get
 // @Description Get BuildConfig
 // @Param
@@ -199,7 +189,6 @@ func (b *BuildConfig) Delete() error {
 	log.Debug("BuildConfig.Delet()")
 	return b.BuildConfigs.Delete(b.Name, &metav1.DeleteOptions{})
 }
-
 
 // @Title Build
 // @Description Start build according to previous build config settings, it will produce new image build
@@ -221,7 +210,8 @@ func (b *BuildConfig) Build(env []system.Env) (*v1.Build, error) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: b.Name,
 			Labels: map[string]string{
-				"app": b.Name,
+				"app":     b.Name,
+				"version": b.Version,
 			},
 		},
 		TriggeredBy: append([]v1.BuildTriggerCause{},
@@ -232,7 +222,7 @@ func (b *BuildConfig) Build(env []system.Env) (*v1.Build, error) {
 		SourceStrategyOptions: &v1.SourceStrategyOptions{
 			Incremental: &incremental,
 		},
-		Env: e,
+		Env:  e,
 		From: &b.From,
 	}
 
@@ -247,7 +237,7 @@ func (b *BuildConfig) Build(env []system.Env) (*v1.Build, error) {
 func (b *BuildConfig) Watch(build *v1.Build, completedHandler func() error) error {
 	w, err := b.Builds.Watch(metav1.ListOptions{
 		LabelSelector: "app=" + b.Name,
-		Watch: true,
+		Watch:         true,
 	})
 
 	if nil != err {
@@ -304,7 +294,6 @@ func (b *BuildConfig) GetBuild() (*v1.Build, error) {
 	log.Debug("BuildConfig.GetBuild()")
 	return b.Builds.Get(b.Name, metav1.GetOptions{})
 }
-
 
 // @Title GetBuildStatus
 // @Description Get current build status

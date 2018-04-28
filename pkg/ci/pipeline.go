@@ -134,7 +134,7 @@ func (p *Pipeline) Build(secret string, completedHandler func() error) error {
 	}
 
 	scmUrl := p.CombineScmUrl()
-	buildConfig, err := openshift.NewBuildConfig(p.Namespace, p.App, scmUrl, p.Scm.Ref, secret, p.BuildConfigs.Tag, p.BuildConfigs.ImageStream)
+	buildConfig, err := openshift.NewBuildConfig(p.Namespace, p.App, scmUrl, p.Scm.Ref, secret, p.Version, p.BuildConfigs.ImageStream)
 	if err != nil {
 		return err
 	}
@@ -178,7 +178,7 @@ func (p *Pipeline) CreateDeploymentConfig(force bool) error {
 	log.Debug("Pipeline.CreateDeploymentConfig()")
 
 	// new dc instance
-	dc, err := openshift.NewDeploymentConfig(p.App, p.Namespace)
+	dc, err := openshift.NewDeploymentConfig(p.App, p.Namespace, p.Version)
 	if err != nil {
 		return err
 	}
@@ -200,7 +200,7 @@ func (p *Pipeline) Deploy() error {
 	log.Debug("Pipeline.Deploy()")
 
 	// new dc instance
-	dc, err := openshift.NewDeploymentConfig(p.App, p.Namespace)
+	dc, err := openshift.NewDeploymentConfig(p.App, p.Namespace, p.Version)
 	if err != nil {
 		return err
 	}

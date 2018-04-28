@@ -39,9 +39,13 @@ func TestJavaPipeline(t *testing.T)  {
 	java.Init(&ci.Pipeline{
 		Name: "java",
 		Profile: "dev",
-		App: "hello-world",
+		App: "demo-consumer",
 		Project: "demo",
-		Scm: ci.Scm{Url: os.Getenv("SCM_URL")},
+		Version: "v1",
+		Scm: ci.Scm{
+			Url: os.Getenv("SCM_URL"),
+			Ref: "v1",
+			},
 		DeploymentConfigs: ci.DeploymentConfigs{
 			ForceUpdate: true,
 		},

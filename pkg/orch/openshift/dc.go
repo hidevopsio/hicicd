@@ -31,22 +31,25 @@ import (
 type DeploymentConfig struct {
 	Name      string
 	Namespace string
-	ImageTag  string
-
+	FullName  string
+	Version   string
 	Interface appsv1.DeploymentConfigInterface
 }
 
-func NewDeploymentConfig(name, namespace string) (*DeploymentConfig, error) {
+func NewDeploymentConfig(name, namespace, version string) (*DeploymentConfig, error) {
 	log.Debug("NewDeploymentConfig()")
 
 	clientSet, err := appsv1.NewForConfig(k8s.Config)
 	if err != nil {
 		return nil, err
 	}
+	fullName := name + "-" + version
+
 	return &DeploymentConfig{
 		Name:      name,
 		Namespace: namespace,
-
+		FullName:  fullName,
+		Version: version,
 		Interface: clientSet.DeploymentConfigs(namespace),
 	}, nil
 }
@@ -63,9 +66,10 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 
 	cfg := &v1.DeploymentConfig{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: dc.Name,
+			Name: dc.FullName,
 			Labels: map[string]string{
 				"app": dc.Name,
+				"version": dc.Version,
 			},
 		},
 		Spec: v1.DeploymentConfigSpec{
@@ -73,6 +77,7 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 
 			Selector: map[string]string{
 				"app": dc.Name,
+				"version": dc.Version,
 			},
 
 			Strategy: v1.DeploymentStrategy{
@@ -84,6 +89,7 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 					Name: dc.Name,
 					Labels: map[string]string{
 						"app":  dc.Name,
+						"version": dc.Version,
 					},
 				},
 				Spec: corev1.PodSpec{
@@ -144,7 +150,7 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 						},
 						From: corev1.ObjectReference{
 							Kind:      "ImageStreamTag",
-							Name:      dc.Name + ":" + dc.ImageTag,
+							Name:      dc.Name + ":" + dc.Version,
 							Namespace: dc.Namespace,
 						},
 					},
@@ -155,7 +161,7 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 
 	// inject side car here
 
-	result, err := dc.Interface.Get(dc.Name, metav1.GetOptions{})
+	result, err := dc.Interface.Get(dc.FullName, metav1.GetOptions{})
 	switch {
 	case err == nil:
 		// select update or patch according to the user's request
@@ -168,7 +174,7 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 				return err
 			}
 		}
-	case errors.IsNotFound(err):
+	case errors.IsNotFound(err) :
 		d, err := dc.Interface.Create(cfg)
 		if err != nil {
 			return err

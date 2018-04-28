@@ -38,7 +38,7 @@ func TestBuildCreation(t *testing.T) {
 	scmUrl := os.Getenv("SCM_URL") + "/" + project + "/" + appName + ".git"
 	scmRef := "master"
 	secret := "test-secret"
-	imageTag := "latest"
+	version := "v1"
 	s2iImageStream := "s2i-java:latest"
 	repoUrl := os.Getenv("MAVEN_MIRROR_URL")
 	env := []system.Env{
@@ -56,7 +56,7 @@ func TestBuildCreation(t *testing.T) {
 
 	log.Debugf("workDir: %v", os.Getenv("PWD"))
 
-	buildConfig, err := NewBuildConfig(namespace, appName, scmUrl, scmRef, secret, imageTag, s2iImageStream)
+	buildConfig, err := NewBuildConfig(namespace, appName, scmUrl, scmRef, secret, version, s2iImageStream)
 	assert.Equal(t, nil, err)
 
 	bc, err := buildConfig.Create()
