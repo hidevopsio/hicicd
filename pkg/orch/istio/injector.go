@@ -17,7 +17,7 @@ package istio
 import (
 	"istio.io/istio/pilot/pkg/kube/inject"
 	"istio.io/istio/pilot/pkg/model"
-	"k8s.io/apimachinery/pkg/runtime"
+	"github.com/openshift/api/apps/v1"
 )
 
 type Injector struct {
@@ -27,7 +27,7 @@ type Injector struct {
 	DebugMode bool
 }
 
-func (i *Injector) Inject(in runtime.Object) (interface{}, error)  {
+func (i *Injector) Inject(in interface{}) (interface{}, error)  {
 	mesh := model.DefaultMeshConfig()
 	params := &inject.Params{
 		InitImage:           inject.InitImageName(i.Hub, i.Tag, i.DebugMode),
@@ -46,6 +46,6 @@ func (i *Injector) Inject(in runtime.Object) (interface{}, error)  {
 		return nil, err
 	}
 
-	out, err := inject.IntoObject(sidecarTemplate, &mesh, in)
+	out, err := inject.IntoObject(sidecarTemplate, &mesh, in.(*v1.DeploymentConfig))
 	return out, err
 }

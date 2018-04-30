@@ -23,6 +23,7 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
 	"github.com/hidevopsio/hicicd/pkg/orch/openshift"
 	"github.com/hidevopsio/hicicd/pkg/orch"
+	"github.com/hidevopsio/hicicd/pkg/orch/istio"
 )
 
 
@@ -174,7 +175,7 @@ func (p *Pipeline) Analysis() error {
 	return nil
 }
 
-func (p *Pipeline) CreateDeploymentConfig(force bool) error {
+func (p *Pipeline) CreateDeploymentConfig(force bool, injectSidecar func(in interface{}) (interface{}, error)) error {
 	log.Debug("Pipeline.CreateDeploymentConfig()")
 
 	// new dc instance
@@ -183,16 +184,11 @@ func (p *Pipeline) CreateDeploymentConfig(force bool) error {
 		return err
 	}
 
-	err = dc.Create(&p.DeploymentConfigs.Env, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint)
+	err = dc.Create(&p.DeploymentConfigs.Env, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, injectSidecar)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func (p *Pipeline) InjectSideCar() error {
-	log.Debug("Pipeline.InjectSideCar()")
 	return nil
 }
 
@@ -258,7 +254,16 @@ func (p *Pipeline) Run(username, password string, isToken bool) error {
 		if !p.DeploymentConfigs.Skip {
 
 			// create dc - deployment config
-			err = p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate)
+			err = p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate, func(in interface{}) (interface{}, error) {
+				// TODO: define istio tag in pipeline
+				injector := &istio.Injector{
+					Hub: "docker.io/istio",
+					Tag: "0.7.1",
+					Version: p.Version,
+					DebugMode: false,
+				}
+				return injector.Inject(in)
+			})
 			if err != nil {
 				log.Error(err.Error())
 				return fmt.Errorf("failed on CreateDeploymentConfig! %s", err.Error())
@@ -281,13 +286,6 @@ func (p *Pipeline) Run(username, password string, isToken bool) error {
 				log.Error(err.Error())
 				return fmt.Errorf("failed on watch rc! %s", err.Error())
 			}
-		}
-
-		// inject side car
-		err = p.InjectSideCar()
-		if err != nil {
-			log.Error(err.Error())
-			return fmt.Errorf("failed on InjectSideCar! %s", err.Error())
 		}
 
 		// create service

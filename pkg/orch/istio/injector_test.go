@@ -121,9 +121,9 @@ func TestIntoObject(t *testing.T) {
 		},
 	}
 	log.Print(cfg)
+	assert.Equal(t, 1, len(cfg.Spec.Template.Spec.Containers))
 
 	// inject side car
-
 	injector := &Injector{
 		Hub: unitTestHub,
 		Tag: unitTestTag,
@@ -135,6 +135,7 @@ func TestIntoObject(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	dc := out.(*v1.DeploymentConfig)
+	assert.Equal(t, 2, len(dc.Spec.Template.Spec.Containers))
 
 	log.Print(dc)
 }
