@@ -1,4 +1,4 @@
-// Copyright 2018 Istio Authors
+// Copyright 2018 John Deng (hi.devops.io@gmail.com).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,47 +19,16 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/openshift/api/apps/v1"
 	"testing"
-	"istio.io/istio/pilot/pkg/model"
 	"github.com/stretchr/testify/assert"
-	"istio.io/istio/pilot/pkg/kube/inject"
-
 	"github.com/hidevopsio/hiboot/pkg/log"
 )
 
 
-const (
-	// This is the hub to expect in
-	// platform/kube/inject/testdata/frontend.yaml.injected and the
-	// other .injected "want" YAMLs
-	unitTestHub = "docker.io/istio"
-
-	// Tag name should be kept in sync with value in
-	// platform/kube/inject/refresh.sh
-	unitTestTag = "unittest"
-)
-
 func TestIntoObject(t *testing.T) {
-	debugMode := true
-	mesh := model.DefaultMeshConfig()
-	params := &inject.Params{
-		InitImage:           inject.InitImageName(unitTestHub, unitTestTag, debugMode),
-		ProxyImage:          inject.ProxyImageName(unitTestHub, unitTestTag, debugMode),
-		ImagePullPolicy:     "IfNotPresent",
-		Verbosity:           inject.DefaultVerbosity,
-		SidecarProxyUID:     inject.DefaultSidecarProxyUID,
-		Version:             "12345678",
-		EnableCoreDump:      false,
-		Mesh:                &mesh,
-		DebugMode:           debugMode,
-	}
-
-	sidecarTemplate, err := inject.GenerateTemplateFromParams(params)
-	assert.Equal(t, nil, err)
-	log.Debug(sidecarTemplate)
-	if err != nil {
-		t.Fatalf("GenerateTemplateFromParams(%v) failed: %v", params, err)
-	}
+	var unitTestHub = "docker.io/istio"
+	var unitTestTag = "unittest"
 	name := "foo"
+
 	cfg := &v1.DeploymentConfig{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
@@ -152,11 +121,20 @@ func TestIntoObject(t *testing.T) {
 		},
 	}
 	log.Print(cfg)
-	//
-	//out, err := inject.IntoObject(sidecarTemplate, &mesh, cfg)
-	//assert.Equal(t, nil, err)
-	//
-	//dc := out.(*v1.DeploymentConfig)
-	//
-	//log.Print(dc)
+
+	// inject side car
+
+	injector := &Injector{
+		Hub: unitTestHub,
+		Tag: unitTestTag,
+		Version: "v1",
+		DebugMode: false,
+	}
+
+	out, err := injector.Inject(cfg)
+	assert.Equal(t, nil, err)
+
+	dc := out.(*v1.DeploymentConfig)
+
+	log.Print(dc)
 }
