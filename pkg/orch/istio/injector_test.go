@@ -182,8 +182,10 @@ func TestInjectorInject(t *testing.T) {
 	out, err := injector.Inject(cfg)
 	assert.Equal(t, nil, err)
 
-	dc := out.(*v1.DeploymentConfig)
-	assert.Equal(t, 2, len(dc.Spec.Template.Spec.Containers))
+	if err == nil {
+		dc := out.(*v1.DeploymentConfig)
+		assert.Equal(t, 2, len(dc.Spec.Template.Spec.Containers))
 
-	log.Print(dc)
+		log.Print(dc)
+	}
 }
