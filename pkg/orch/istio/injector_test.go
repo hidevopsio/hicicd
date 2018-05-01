@@ -197,14 +197,37 @@ func TestInjectorInject(t *testing.T) {
 	injector := &Injector{
 		Version: "0.7.1",
 		Namespace: "istio-system",
+		DockerHub: "docker.io/istio",
 		MeshConfigMapName: "istio",
-		InjectConfigMapName: "istio-inject-test",
 		DebugMode: true,
 		SidecarProxyUID: uint64(1337),
 		Verbosity: 2,
 		ImagePullPolicy: "IfNotPresent",
 		IncludeIPRanges: "*",
 		IncludeInboundPorts: "*",
+	}
+
+	cfg := getDeploymentConfig()
+	out, err := injector.Inject(cfg)
+	assert.Equal(t, nil, err)
+
+	if err == nil {
+		dc := out.(*v1.DeploymentConfig)
+		assert.Equal(t, 2, len(dc.Spec.Template.Spec.Containers))
+
+		log.Print(dc)
+	}
+}
+
+
+// TODO: unit test failed, fix below issue
+func TestInjectorInjectWithIstioInjectConfigMap(t *testing.T) {
+
+	injector := &Injector{
+		Version: "0.7.1",
+		Namespace: "istio-system",
+		MeshConfigMapName: "istio",
+		InjectConfigMapName: "istio-inject",
 	}
 
 	cfg := getDeploymentConfig()

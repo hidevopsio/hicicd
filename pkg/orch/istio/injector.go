@@ -31,8 +31,7 @@ import (
 type Injector struct {
 	Version             string `json:"version"`
 	Namespace           string `json:"namespace"`
-	Hub                 string `json:"hub"`
-	Tag                 string `json:"tag"`
+	DockerHub           string `json:"docker_hub"`
 	MeshConfigFile      string `json:"mesh_config_file"`
 	InjectConfigFile    string `json:"inject_config_file"`
 	MeshConfigMapName   string `json:"mesh_config_map_name"`
@@ -147,8 +146,8 @@ func (i *Injector) Inject(in interface{}) (interface{}, error)  {
 		}
 	} else {
 		if sidecarTemplate, err = inject.GenerateTemplateFromParams(&inject.Params{
-			InitImage:           inject.InitImageName(i.Hub, i.Tag, i.DebugMode),
-			ProxyImage:          inject.ProxyImageName(i.Hub, i.Tag, i.DebugMode),
+			InitImage:           inject.InitImageName(i.DockerHub, i.Version, i.DebugMode),
+			ProxyImage:          inject.ProxyImageName(i.DockerHub, i.Version, i.DebugMode),
 			Verbosity:           i.Verbosity,
 			SidecarProxyUID:     i.SidecarProxyUID,
 			Version:             i.Version,

@@ -20,8 +20,8 @@ pipeline:
   istioConfigs:
     version: 0.7.1  # use env variable instead ?
     namespace: istio-system
+    dockerHub: docker.io/istio
     meshConfigMapName: istio
-    injectConfigMapName: istio-inject
     debugMode: true
     sidecarProxyUID: 1337
     verbosity: 2
