@@ -25,14 +25,14 @@ import (
 	"istio.io/istio/pilot/pkg/model"
 )
 
+const (
+	unitTestHub = "docker.io/istio"
+	unitTestTag = "unittest"
+	name = "foo"
+)
 
-func TestIntoObject(t *testing.T) {
-
-	var unitTestHub = "docker.io/istio"
-	var unitTestTag = "unittest"
-	var name = "foo"
-
-	cfg := &v1.DeploymentConfig{
+func getDeploymentConfig() *v1.DeploymentConfig  {
+	return &v1.DeploymentConfig{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 			Labels: map[string]string{
@@ -123,6 +123,13 @@ func TestIntoObject(t *testing.T) {
 			},
 		},
 	}
+}
+
+
+
+func TestIntoObject(t *testing.T) {
+
+	cfg := getDeploymentConfig()
 	log.Print(cfg)
 	assert.Equal(t, 1, len(cfg.Spec.Template.Spec.Containers))
 
@@ -147,6 +154,32 @@ func TestIntoObject(t *testing.T) {
 	sidecarTemplate, err := inject.GenerateTemplateFromParams(params)
 
 	out, err := inject.IntoObject(sidecarTemplate, &mesh, cfg)
+	assert.Equal(t, nil, err)
+
+	dc := out.(*v1.DeploymentConfig)
+	assert.Equal(t, 2, len(dc.Spec.Template.Spec.Containers))
+
+	log.Print(dc)
+}
+
+
+func TestInjectorInject(t *testing.T) {
+
+	injector := &Injector{
+		Version: "0.7.1",
+		Namespace: "istio-system",
+		MeshConfigMapName: "istio",
+		InjectConfigMapName: "istio-inject",
+		DebugMode: false,
+		SidecarProxyUID: uint64(1337),
+		Verbosity: 2,
+		ImagePullPolicy: "IfNotPresent",
+		IncludeIPRanges: "*",
+		IncludeInboundPorts: "*",
+	}
+
+	cfg := getDeploymentConfig()
+	out, err := injector.Inject(cfg)
 	assert.Equal(t, nil, err)
 
 	dc := out.(*v1.DeploymentConfig)
