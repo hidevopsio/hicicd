@@ -204,7 +204,9 @@ func TestInjectorInject(t *testing.T) {
 		Verbosity: 2,
 		ImagePullPolicy: "IfNotPresent",
 		IncludeIPRanges: "*",
+		ExcludeIPRanges: "",
 		IncludeInboundPorts: "*",
+		ExcludeInboundPorts: "",
 	}
 
 	cfg := getDeploymentConfig()

@@ -52,8 +52,7 @@ type BuildConfigs struct {
 type IstioConfigs struct {
 	Version             string `json:"version"`
 	Namespace           string `json:"namespace"`
-	Hub                 string `json:"hub"`
-	Tag                 string `json:"tag"`
+	DockerHub           string `json:"docker_hub"`
 	MeshConfigFile      string `json:"mesh_config_file"`
 	InjectConfigFile    string `json:"inject_config_file"`
 	MeshConfigMapName   string `json:"mesh_config_map_name"`
