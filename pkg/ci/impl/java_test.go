@@ -52,18 +52,6 @@ func TestJavaPipeline(t *testing.T)  {
 		DeploymentConfigs: ci.DeploymentConfigs{
 			ForceUpdate: true,
 		},
-		IstioConfigs: ci.IstioConfigs{
-			Version: "0.7.1",
-			Namespace: "istio-system",
-			MeshConfigMapName: "istio",
-			//InjectConfigMapName: "istio-inject",
-			DebugMode: false,
-			SidecarProxyUID: uint64(1337),
-			Verbosity: 2,
-			ImagePullPolicy: "IfNotPresent",
-			IncludeIPRanges: "*",
-			IncludeInboundPorts: "*",
-		},
 	})
 	err := java.Run(username, password, false)
 	assert.Equal(t, nil, err)
