@@ -46,6 +46,7 @@ type Injector struct {
 	ExcludeIPRanges     string `json:"exclude_ip_ranges"`
 	IncludeInboundPorts string `json:"include_inbound_ports"`
 	ExcludeInboundPorts string `json:"exclude_inbound_ports"`
+	SidecarTemplate     string `json:"sidecar_template"`
 }
 
 const (
@@ -128,7 +129,9 @@ func (i *Injector) Inject(in interface{}) (interface{}, error)  {
 
 	// get sidecar template from user's input, or get it from config map if user input is empty
 	var sidecarTemplate string
-	if i.InjectConfigFile != "" {
+	if i.SidecarTemplate != "" {
+		sidecarTemplate = i.SidecarTemplate
+	} else if i.InjectConfigFile != "" {
 		injectionConfig, err := ioutil.ReadFile(i.InjectConfigFile) // nolint: vetshadow
 		if err != nil {
 			return nil, err

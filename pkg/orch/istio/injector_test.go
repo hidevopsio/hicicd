@@ -23,6 +23,7 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"istio.io/istio/pilot/pkg/kube/inject"
 	"istio.io/istio/pilot/pkg/model"
+	meshconfig "istio.io/api/mesh/v1alpha1"
 )
 
 const (
@@ -135,23 +136,7 @@ func TestIntoObject(t *testing.T) {
 
 	mesh := model.DefaultMeshConfig()
 
-	params := &inject.Params{
-		InitImage:           inject.InitImageName(unitTestHub, unitTestTag, true),
-		ProxyImage:          inject.ProxyImageName(unitTestHub, unitTestTag, true),
-		ImagePullPolicy:     "IfNotPresent",
-		Verbosity:           inject.DefaultVerbosity,
-		SidecarProxyUID:     inject.DefaultSidecarProxyUID,
-		Version:             "v1",
-		EnableCoreDump:      false,
-		Mesh:                &mesh,
-		DebugMode:           true,
-		IncludeIPRanges:     inject.DefaultIncludeIPRanges,
-		ExcludeIPRanges:     "",
-		IncludeInboundPorts: inject.DefaultIncludeInboundPorts,
-		ExcludeInboundPorts: "",
-	}
-
-	sidecarTemplate, err := inject.GenerateTemplateFromParams(params)
+	sidecarTemplate, err := getSidecarTemplate(&mesh)
 
 	out, err := inject.IntoObject(sidecarTemplate, &mesh, cfg)
 	assert.Equal(t, nil, err)
@@ -162,6 +147,50 @@ func TestIntoObject(t *testing.T) {
 	log.Print(dc)
 }
 
+func getSidecarTemplate(mesh *meshconfig.MeshConfig) (string, error) {
+	params := &inject.Params{
+		InitImage:           inject.InitImageName(unitTestHub, unitTestTag, true),
+		ProxyImage:          inject.ProxyImageName(unitTestHub, unitTestTag, true),
+		ImagePullPolicy:     "IfNotPresent",
+		Verbosity:           inject.DefaultVerbosity,
+		SidecarProxyUID:     inject.DefaultSidecarProxyUID,
+		Version:             "v1",
+		EnableCoreDump:      false,
+		Mesh:                mesh,
+		DebugMode:           true,
+		IncludeIPRanges:     inject.DefaultIncludeIPRanges,
+		ExcludeIPRanges:     "",
+		IncludeInboundPorts: inject.DefaultIncludeInboundPorts,
+		ExcludeInboundPorts: "",
+	}
+	sidecarTemplate, err := inject.GenerateTemplateFromParams(params)
+	return sidecarTemplate, err
+}
+
+
+func TestInjectorInjectWithMockTemplate(t *testing.T) {
+	mesh := model.DefaultMeshConfig()
+	sidecarTemplate, err := getSidecarTemplate(&mesh)
+
+	injector := &Injector{
+		Version: "0.7.1",
+		Namespace: "istio-system",
+		MeshConfigMapName: "istio",
+		SidecarTemplate: sidecarTemplate,
+	}
+
+	cfg := getDeploymentConfig()
+	out, err := injector.Inject(cfg)
+	assert.Equal(t, nil, err)
+
+	if err == nil {
+		dc := out.(*v1.DeploymentConfig)
+		assert.Equal(t, 2, len(dc.Spec.Template.Spec.Containers))
+
+		log.Print(dc)
+	}
+}
+
 
 func TestInjectorInject(t *testing.T) {
 
@@ -169,8 +198,8 @@ func TestInjectorInject(t *testing.T) {
 		Version: "0.7.1",
 		Namespace: "istio-system",
 		MeshConfigMapName: "istio",
-		InjectConfigMapName: "istio-inject",
-		DebugMode: false,
+		InjectConfigMapName: "istio-inject-test",
+		DebugMode: true,
 		SidecarProxyUID: uint64(1337),
 		Verbosity: 2,
 		ImagePullPolicy: "IfNotPresent",
