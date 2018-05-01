@@ -7,6 +7,7 @@ import (
 	"k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"fmt"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 type ReplicationController struct{
@@ -20,7 +21,7 @@ func NewReplicationController(name string, namespace string) *ReplicationControl
 	return &ReplicationController{
 		Name: name,
 		Namespace: namespace,
-		Interface: ClientSet.CoreV1().ReplicationControllers(namespace),
+		Interface: orch.ClientSet.CoreV1().ReplicationControllers(namespace),
 	}
 }
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-package k8s
+package orch
 
 
 import (
@@ -32,7 +32,7 @@ var (
 	Config     *rest.Config
 	ClientSet  *kubernetes.Clientset
 
-	kubeconfig *string
+	Kubeconfig *string
 )
 
 
@@ -43,11 +43,11 @@ func init() {
 	if os.Getenv("KUBERNETES_SERVICE_HOST") == "" {
 		log.Info("Kubernetes External Client Mode")
 		if home := homedir.HomeDir(); home != "" {
-			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+			Kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 		} else {
-			kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+			Kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 		}
-		Config, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
+		Config, err = clientcmd.BuildConfigFromFlags("", *Kubeconfig)
 		if err != nil {
 			panic(err.Error())
 		}

@@ -24,8 +24,9 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/orch/openshift"
 	"github.com/hidevopsio/hicicd/pkg/orch"
 	"github.com/hidevopsio/hicicd/pkg/orch/istio"
+	"github.com/jinzhu/copier"
+	"path/filepath"
 )
-
 
 type Scm struct {
 	Type string `json:"type"`
@@ -34,18 +35,38 @@ type Scm struct {
 }
 
 type DeploymentConfigs struct {
-	HealthEndPoint  string 		 `json:"health_end_point"`
-	Skip            bool          `json:"skip"`
-	ForceUpdate 	bool          `json:"force_update"`
-	Replicas    	int32         `json:"replicas"`
-	Env         	[]system.Env  `json:"env"`
+	HealthEndPoint string       `json:"health_end_point"`
+	Skip           bool         `json:"skip"`
+	ForceUpdate    bool         `json:"force_update"`
+	Replicas       int32        `json:"replicas"`
+	Env            []system.Env `json:"env"`
 }
 
 type BuildConfigs struct {
-	Skip        bool         `json:"skip"`
+	Skip        bool         `json:"skip"` // TODO: ? Always, IfNotPresent, Never
 	Tag         string       `json:"tag"`
 	ImageStream string       `json:"image_stream"`
 	Env         []system.Env `json:"env"`
+}
+
+type IstioConfigs struct {
+	Version             string `json:"version"`
+	Namespace           string `json:"namespace"`
+	Hub                 string `json:"hub"`
+	Tag                 string `json:"tag"`
+	MeshConfigFile      string `json:"mesh_config_file"`
+	InjectConfigFile    string `json:"inject_config_file"`
+	MeshConfigMapName   string `json:"mesh_config_map_name"`
+	InjectConfigMapName string `json:"inject_config_map_name"`
+	DebugMode           bool   `json:"debug_mode"`
+	SidecarProxyUID     uint64 `json:"sidecar_proxy_uid"`
+	Verbosity           int    `json:"verbosity"`
+	EnableCoreDump      bool   `json:"enable_core_dump"`
+	ImagePullPolicy     string `json:"image_pull_policy"`
+	IncludeIPRanges     string `json:"includeIPRanges"`
+	ExcludeIPRanges     string `json:"exclude_ip_ranges"`
+	IncludeInboundPorts string `json:"include_inbound_ports"`
+	ExcludeInboundPorts string `json:"exclude_inbound_ports"`
 }
 
 type Pipeline struct {
@@ -62,6 +83,7 @@ type Pipeline struct {
 	Ports             []orch.Ports      `json:"ports"`
 	BuildConfigs      BuildConfigs      `json:"build_configs"`
 	DeploymentConfigs DeploymentConfigs `json:"deployment_configs"`
+	IstioConfigs      IstioConfigs      `json:"istio_configs"`
 }
 
 type Configuration struct {
@@ -81,7 +103,7 @@ func (p *Pipeline) Init(pl *Pipeline) {
 				c := builder.Build(pl.Name)*/
 
 		b := &system.Builder{
-			Path:       utils.GetWorkingDir("/pkg/ci/pipeline.go") + "/config",
+			Path:       filepath.Join(utils.GetWorkingDir("/pkg/ci/pipeline.go"), "config"),
 			Name:       "pipeline",
 			FileType:   "yaml",
 			Profile:    pl.Name,
@@ -256,12 +278,9 @@ func (p *Pipeline) Run(username, password string, isToken bool) error {
 			// create dc - deployment config
 			err = p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate, func(in interface{}) (interface{}, error) {
 				// TODO: define istio tag in pipeline
-				injector := &istio.Injector{
-					Hub: "docker.io/istio",
-					Tag: "0.7.1",
-					Version: p.Version,
-					DebugMode: false,
-				}
+				injector := &istio.Injector{}
+				copier.Copy(injector, p.IstioConfigs)
+
 				return injector.Inject(in)
 			})
 			if err != nil {

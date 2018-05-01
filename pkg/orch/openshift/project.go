@@ -19,8 +19,8 @@ import (
 	"github.com/openshift/api/project/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	projectv1 "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
-	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
 	"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 type Project struct{
@@ -33,7 +33,7 @@ type Project struct{
 
 func NewProject(name, displayName, desc string) (*Project, error)  {
 
-	clientSet, err := projectv1.NewForConfig(k8s.Config)
+	clientSet, err := projectv1.NewForConfig(orch.Config)
 	if err != nil {
 		return nil, err
 	}

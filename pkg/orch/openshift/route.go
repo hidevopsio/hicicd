@@ -19,11 +19,11 @@ import (
 	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/openshift/api/route/v1"
-	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"fmt"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 
@@ -37,7 +37,7 @@ type Route struct{
 
 func NewRoute(name, namespace string) (*Route, error)  {
 	log.Debug("NewRoute()")
-	clientSet, err := routev1.NewForConfig(k8s.Config)
+	clientSet, err := routev1.NewForConfig(orch.Config)
 	if err != nil {
 		return nil, err
 	}

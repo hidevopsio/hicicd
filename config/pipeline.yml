@@ -17,6 +17,18 @@ pipeline:
     env:
     - name: TZ
       value: Asia/Shanghai
+  istioConfigs:
+    version: 0.7.1  # use env variable instead ?
+    namespace: istio-system
+    meshConfigMapName: istio
+    injectConfigMapName: istio-inject
+    debugMode: true
+    sidecarProxyUID: 1337
+    verbosity: 2
+    enableCoreDump: true
+    imagePullPolicy: IfNotPresent
+    includeIPRanges: "*"
+    includeInboundPorts: "*"
   ports:
   - name: http-8080
     port: 8080

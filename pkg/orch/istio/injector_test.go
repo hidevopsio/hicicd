@@ -21,13 +21,16 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/hidevopsio/hiboot/pkg/log"
+	"istio.io/istio/pilot/pkg/kube/inject"
+	"istio.io/istio/pilot/pkg/model"
 )
 
 
 func TestIntoObject(t *testing.T) {
+
 	var unitTestHub = "docker.io/istio"
 	var unitTestTag = "unittest"
-	name := "foo"
+	var name = "foo"
 
 	cfg := &v1.DeploymentConfig{
 		ObjectMeta: metav1.ObjectMeta{
@@ -123,15 +126,27 @@ func TestIntoObject(t *testing.T) {
 	log.Print(cfg)
 	assert.Equal(t, 1, len(cfg.Spec.Template.Spec.Containers))
 
-	// inject side car
-	injector := &Injector{
-		Hub: unitTestHub,
-		Tag: unitTestTag,
-		Version: "v1",
-		DebugMode: false,
+	mesh := model.DefaultMeshConfig()
+
+	params := &inject.Params{
+		InitImage:           inject.InitImageName(unitTestHub, unitTestTag, true),
+		ProxyImage:          inject.ProxyImageName(unitTestHub, unitTestTag, true),
+		ImagePullPolicy:     "IfNotPresent",
+		Verbosity:           inject.DefaultVerbosity,
+		SidecarProxyUID:     inject.DefaultSidecarProxyUID,
+		Version:             "v1",
+		EnableCoreDump:      false,
+		Mesh:                &mesh,
+		DebugMode:           true,
+		IncludeIPRanges:     inject.DefaultIncludeIPRanges,
+		ExcludeIPRanges:     "",
+		IncludeInboundPorts: inject.DefaultIncludeInboundPorts,
+		ExcludeInboundPorts: "",
 	}
 
-	out, err := injector.Inject(cfg)
+	sidecarTemplate, err := inject.GenerateTemplateFromParams(params)
+
+	out, err := inject.IntoObject(sidecarTemplate, &mesh, cfg)
 	assert.Equal(t, nil, err)
 
 	dc := out.(*v1.DeploymentConfig)

@@ -21,11 +21,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	appsv1 "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	"github.com/openshift/api/apps/v1"
-	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"fmt"
 	"github.com/jinzhu/copier"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 type DeploymentConfig struct {
@@ -39,7 +39,7 @@ type DeploymentConfig struct {
 func NewDeploymentConfig(name, namespace, version string) (*DeploymentConfig, error) {
 	log.Debug("NewDeploymentConfig()")
 
-	clientSet, err := appsv1.NewForConfig(k8s.Config)
+	clientSet, err := appsv1.NewForConfig(orch.Config)
 	if err != nil {
 		return nil, err
 	}
@@ -173,6 +173,9 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 		}
 		cfg = out.(*v1.DeploymentConfig)
 
+		// TODO: patch to fix CrashLoopBackOff issue
+		privileged := true
+		cfg.Spec.Template.Spec.InitContainers[0].SecurityContext.Privileged = &privileged
 	}
 
 	result, err := dc.Interface.Get(dc.FullName, metav1.GetOptions{})

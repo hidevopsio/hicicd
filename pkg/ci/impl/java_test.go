@@ -46,8 +46,23 @@ func TestJavaPipeline(t *testing.T)  {
 			Url: os.Getenv("SCM_URL"),
 			Ref: "master",
 		},
+		BuildConfigs: ci.BuildConfigs{
+			Skip: true,
+		},
 		DeploymentConfigs: ci.DeploymentConfigs{
 			ForceUpdate: true,
+		},
+		IstioConfigs: ci.IstioConfigs{
+			Version: "0.7.1",
+			Namespace: "istio-system",
+			MeshConfigMapName: "istio",
+			//InjectConfigMapName: "istio-inject",
+			DebugMode: false,
+			SidecarProxyUID: uint64(1337),
+			Verbosity: 2,
+			ImagePullPolicy: "IfNotPresent",
+			IncludeIPRanges: "*",
+			IncludeInboundPorts: "*",
 		},
 	})
 	err := java.Run(username, password, false)
