@@ -50,6 +50,7 @@ type BuildConfigs struct {
 }
 
 type IstioConfigs struct {
+	Skip                bool   `json:"skip"`
 	Version             string `json:"version"`
 	Namespace           string `json:"namespace"`
 	DockerHub           string `json:"docker_hub"`
@@ -276,10 +277,12 @@ func (p *Pipeline) Run(username, password string, isToken bool) error {
 
 			// create dc - deployment config
 			err = p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate, func(in interface{}) (interface{}, error) {
-				// TODO: define istio tag in pipeline
+				if p.IstioConfigs.Skip {
+					return in, nil
+				}
+				
 				injector := &istio.Injector{}
 				copier.Copy(injector, p.IstioConfigs)
-
 				return injector.Inject(in)
 			})
 			if err != nil {
