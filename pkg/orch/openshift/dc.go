@@ -174,8 +174,10 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 		cfg = out.(*v1.DeploymentConfig)
 
 		// TODO: patch to fix CrashLoopBackOff issue
-		privileged := true
-		cfg.Spec.Template.Spec.InitContainers[0].SecurityContext.Privileged = &privileged
+		if len(cfg.Spec.Template.Spec.InitContainers) != 0 {
+			privileged := true
+			cfg.Spec.Template.Spec.InitContainers[0].SecurityContext.Privileged = &privileged
+		}
 	}
 
 	result, err := dc.Interface.Get(dc.FullName, metav1.GetOptions{})
