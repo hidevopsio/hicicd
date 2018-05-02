@@ -26,6 +26,8 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hicicd/pkg/orch"
 	"io/ioutil"
+	"bytes"
+	"text/template"
 )
 
 type Injector struct {
@@ -52,22 +54,6 @@ const (
 	configMapKey       = "mesh"
 	injectConfigMapKey = "config"
 )
-
-//
-//var (
-//	hub                 string
-//	tag                 string
-//	sidecarProxyUID     uint64
-//	verbosity           int
-//	versionStr          string // override build version
-//	enableCoreDump      bool
-//	imagePullPolicy     string
-//	includeIPRanges     string
-//	excludeIPRanges     string
-//	includeInboundPorts string
-//	excludeInboundPorts string
-//	debugMode           bool
-//)
 
 
 func (i *Injector) getMeshConfigFromConfigMap(kubeconfig string) (*meshconfig.MeshConfig, error) {
@@ -119,6 +105,18 @@ func (i *Injector) getInjectConfigFromConfigMap(kubeconfig string) (string, erro
 	return injectConfig.Template, nil
 }
 
+
+// GenerateTemplateFromParams generates a sidecar template from the legacy injection parameters
+func (i *Injector) generateTemplateFromParams(params *inject.Params) (string, error) {
+	// Validate the parameters before we go any farther.
+	if err := params.Validate(); err != nil {
+		return "", err
+	}
+	var tmp bytes.Buffer
+	err := template.Must(template.New("inject").Parse(parameterizedTemplate)).Execute(&tmp, params)
+	return tmp.String(), err
+}
+
 func (i *Injector) Inject(in interface{}) (interface{}, error)  {
 
 	mesh, err := i.getMeshConfigFromConfigMap(*orch.Kubeconfig)
@@ -145,7 +143,7 @@ func (i *Injector) Inject(in interface{}) (interface{}, error)  {
 			return nil, err
 		}
 	} else {
-		if sidecarTemplate, err = inject.GenerateTemplateFromParams(&inject.Params{
+		if sidecarTemplate, err = i.generateTemplateFromParams(&inject.Params{
 			InitImage:           inject.InitImageName(i.DockerHub, i.Version, i.DebugMode),
 			ProxyImage:          inject.ProxyImageName(i.DockerHub, i.Version, i.DebugMode),
 			Verbosity:           i.Verbosity,

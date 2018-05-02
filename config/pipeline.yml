@@ -23,7 +23,7 @@ pipeline:
     namespace: istio-system
     dockerHub: docker.io/istio
     meshConfigMapName: istio
-    debugMode: true
+    debugMode: false
     sidecarProxyUID: 1337
     verbosity: 2
     enableCoreDump: true
