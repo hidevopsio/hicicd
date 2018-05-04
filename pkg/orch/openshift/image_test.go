@@ -23,11 +23,9 @@ import (
 func TestImageStreamCrud(t *testing.T) {
 	imageStreamName := "is-test"
 	namespace := "openshift"
+	imageStream, err := NewImageStream(imageStreamName, namespace)
+	assert.Equal(t, nil, err)
 
-	imageStream := &ImageStream{
-		Name: imageStreamName,
-		Namespace: namespace,
-	}
 	version := "v1"
 	// create imagestream
 	is, err := imageStream.Create(version)

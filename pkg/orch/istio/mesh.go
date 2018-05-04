@@ -35,6 +35,7 @@ initContainers:
     capabilities:
       add:
       - NET_ADMIN
+    privileged: true
     {{ if eq .DebugMode true -}}
     privileged: true
     {{ end -}}

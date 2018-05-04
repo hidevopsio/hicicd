@@ -328,6 +328,9 @@ func (p *Pipeline) Run(username, password string, isToken bool) error {
 		return fmt.Errorf("failed on Build! %s", err.Error())
 	}
 
+	// interact with developer
+	// deploy to test ? yes/no
+
 	// finally, all steps are done well, let tell the client ...
 	return nil
 }

@@ -229,7 +229,7 @@ func TestInjectorInjectWithIstioInjectConfigMap(t *testing.T) {
 		Version: "0.7.1",
 		Namespace: "istio-system",
 		MeshConfigMapName: "istio",
-		InjectConfigMapName: "istio-inject",
+		InjectConfigMapName: "istio-inject-test",
 	}
 
 	cfg := getDeploymentConfig()
