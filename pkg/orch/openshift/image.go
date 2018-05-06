@@ -19,9 +19,9 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	imagev1 "github.com/openshift/client-go/image/clientset/versioned/typed/image/v1"
-	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 type ImageStreamInterface interface {
@@ -39,7 +39,7 @@ type ImageStream struct{
 }
 
 func NewImageStream(name, namespace string) (*ImageStream, error) {
-	clientSet, err := imagev1.NewForConfig(k8s.Config)
+	clientSet, err := imagev1.NewForConfig(orch.Config)
 
 	return &ImageStream{
 		Name:      name,

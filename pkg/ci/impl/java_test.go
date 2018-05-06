@@ -46,6 +46,9 @@ func TestJavaPipeline(t *testing.T)  {
 			Url: os.Getenv("SCM_URL"),
 			Ref: "master",
 		},
+		BuildConfigs: ci.BuildConfigs{
+			Skip: true,
+		},
 		DeploymentConfigs: ci.DeploymentConfigs{
 			ForceUpdate: true,
 		},

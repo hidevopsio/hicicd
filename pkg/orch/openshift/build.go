@@ -19,13 +19,13 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	buildv1 "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
-	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/watch"
 	"github.com/hidevopsio/hiboot/pkg/system"
 	"github.com/jinzhu/copier"
 	"fmt"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 type Scm struct {
@@ -89,7 +89,7 @@ func NewBuildConfig(namespace, name, scmUrl, scmRef, scmSecret, version, s2iImag
 		}
 	}
 
-	clientSet, err := buildv1.NewForConfig(k8s.Config)
+	clientSet, err := buildv1.NewForConfig(orch.Config)
 	buildConfig := &BuildConfig{
 		BuildConfigs: clientSet.BuildConfigs(namespace),
 		Builds:       clientSet.Builds(namespace),

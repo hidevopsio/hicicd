@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 type Deployment struct {
@@ -103,7 +104,7 @@ func (d *Deployment) Deploy() (string, error) {
 
 	// Create Deployment
 	//Client.ClientSet.ExtensionsV1beta1().Deployments()
-	deployments := ClientSet.AppsV1beta1().Deployments(d.Project)
+	deployments := orch.ClientSet.AppsV1beta1().Deployments(d.Project)
 	log.Info("Update or Create Deployment...")
 	result, err := deployments.Update(deploySpec)
 	var retVal string

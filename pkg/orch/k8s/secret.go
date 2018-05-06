@@ -21,6 +21,7 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"strings"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 type Secret struct {
@@ -43,7 +44,7 @@ func NewSecret(name, username, password, namespace string, isToken bool) (*Secre
 		Name:      name,
 		Password:  password,
 		Namespace: namespace,
-		Interface: ClientSet.CoreV1().Secrets(namespace),
+		Interface: orch.ClientSet.CoreV1().Secrets(namespace),
 	}
 	if !isToken {
 		s.Username = username
