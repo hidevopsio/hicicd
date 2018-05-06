@@ -31,3 +31,12 @@ func TestGetTags(t *testing.T) {
 	assert.Equal(t, nil, err)
 	fmt.Print(img)
 }
+
+func TestDeleteTag(t *testing.T)  {
+	name := "demo-consumer:v2"
+	namespace := "demo-test"
+	tag, err := NewImageStreamTags(name, namespace)
+	assert.Equal(t, nil, err)
+	err = tag.Delete()
+	assert.Equal(t, nil, err)
+}

@@ -67,26 +67,26 @@ func (tag *ImageStreamTag) Get() (*v1.ImageStreamTag, error) {
 	return image1, nil
 }
 
-func (tag *ImageStreamTag) Delete() error {
+func (ist *ImageStreamTag) Delete() error {
 	log.Debug("ImageStreamTag Delete")
 	meta := &metav1.DeleteOptions{
 	}
-	err := tag.Interface.Delete(tag.Name, meta)
+	err := ist.Interface.Delete(ist.Name, meta)
 	return err
 }
 
-func (tag *ImageStreamTag) Update() (*v1.ImageStreamTag, error) {
+func (ist *ImageStreamTag) Update() (*v1.ImageStreamTag, error) {
 	image := &v1.ImageStreamTag{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      tag.Name,
-			Namespace: tag.Namespace,
+			Name:      ist.Name,
+			Namespace: ist.Namespace,
 			Labels: map[string]string{
-				"app":     tag.Name,
-				"version": tag.Version,
+				"app":     ist.Name,
+				"version": ist.Version,
 			},
 		},
 	}
-	img, err := tag.Interface.Update(image)
+	img, err := ist.Interface.Update(image)
 	return img, err
 }
 
