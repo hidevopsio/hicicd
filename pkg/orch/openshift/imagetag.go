@@ -30,7 +30,7 @@ type ImageStreamTag struct {
 	Interface    image.ImageStreamTagInterface
 }
 
-func (imageStreamTag *ImageStreamTag) Create(tag Tag) (*v1.ImageStreamTag, error) {
+func (ist *ImageStreamTag) Create(tag Tag) (*v1.ImageStreamTag, error) {
 	imageTag := &v1.ImageStreamTag{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      tag.NewName + ":" + tag.NewVersion,
@@ -44,7 +44,7 @@ func (imageStreamTag *ImageStreamTag) Create(tag Tag) (*v1.ImageStreamTag, error
 			},
 		},
 	}
-	img, err := imageStreamTag.Interface.Create(imageTag)
+	img, err := ist.Interface.Create(imageTag)
 	if err != nil {
 		return nil, err
 	}
