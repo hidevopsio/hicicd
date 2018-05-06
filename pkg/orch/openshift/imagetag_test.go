@@ -3,40 +3,36 @@ package openshift
 import (
 	"testing"
 	"github.com/magiconair/properties/assert"
-	"fmt"
-	"log"
 )
 
+const (
+	name = "hello-world"
+	namespace = "demo-test"
+	fromNamespace = "demo-dev"
+	version = "v1"
+	fullName = name + ":" + version
+)
+
+
 func TestCreateTags(t *testing.T) {
-	tag := Tag{
-		Name:        "demo-consumer",
-		Namespace:   "demo-dev",
-		NewName:     "demo-consumer",
-		NewNamespce: "demo-test",
-		Version:     "v1",
-		NewVersion:  "v2",
-	}
-	name := tag.Name + ":" + tag.Version
-	imageStreamtags, err := NewImageStreamTags(name, tag.NewNamespce)
-	img, err := imageStreamtags.Create(tag)
+	ist, err := NewImageStreamTags(name, version, namespace)
 	assert.Equal(t, nil, err)
-	log.Printf("imageTag", img)
+	is, err := ist.Create(fromNamespace)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, fullName, is.Name)
 }
 
 func TestGetTags(t *testing.T) {
-	name := "hello-world:v1"
-	namespace := "demo-dev"
-	tag, err := NewImageStreamTags(name, namespace)
-	img, err := tag.Get()
+	ist, err := NewImageStreamTags(name, version, namespace)
 	assert.Equal(t, nil, err)
-	fmt.Print(img)
+	is, err := ist.Get()
+	assert.Equal(t, nil, err)
+	assert.Equal(t, fullName, is.Name)
 }
 
 func TestDeleteTag(t *testing.T)  {
-	name := "demo-consumer:v2"
-	namespace := "demo-test"
-	tag, err := NewImageStreamTags(name, namespace)
+	ist, err := NewImageStreamTags(name, version, namespace)
 	assert.Equal(t, nil, err)
-	err = tag.Delete()
+	err = ist.Delete()
 	assert.Equal(t, nil, err)
 }

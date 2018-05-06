@@ -5,8 +5,8 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 	image "github.com/openshift/client-go/image/clientset/versioned/typed/image/v1"
 	"github.com/openshift/api/image/v1"
-	"github.com/hidevopsio/hicicd/pkg/orch"
 	corev1 "k8s.io/api/core/v1"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 const (
@@ -14,32 +14,36 @@ const (
 	Kind       = "ImageStreamTag"
 )
 
-type Tag struct {
-	Name string
-	Namespace string
-	NewName string
-	NewNamespce string
-	Version string
-	NewVersion string
-}
-
 type ImageStreamTag struct {
-	Name         string
-	Namespace    string
-	Version      string
-	Interface    image.ImageStreamTagInterface
+	Name      string
+	FullName  string
+	Namespace string
+	Version   string
+	Interface image.ImageStreamTagInterface
 }
 
-func (ist *ImageStreamTag) Create(tag Tag) (*v1.ImageStreamTag, error) {
+func NewImageStreamTags(name, version, namespace string) (*ImageStreamTag, error) {
+	clientSet, err := image.NewForConfig(orch.Config)
+	return &ImageStreamTag{
+		Name:      name,
+		Namespace: namespace,
+		Version:   version,
+		FullName:  name + ":" + version,
+		Interface: clientSet.ImageStreamTags(namespace),
+	}, err
+}
+
+func (ist *ImageStreamTag) Create(fromNamespace string) (*v1.ImageStreamTag, error) {
+	log.Debug("ImageStreamTag Create")
 	imageTag := &v1.ImageStreamTag{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      tag.NewName + ":" + tag.NewVersion,
-			Namespace: tag.NewNamespce,
+			Name:      ist.FullName,
+			Namespace: ist.Namespace,
 		},
 		Tag: &v1.TagReference{
 			From: &corev1.ObjectReference{
-				Name:      tag.Name + ":" + tag.Version,
-				Namespace: tag.Namespace,
+				Name:      ist.FullName,
+				Namespace: fromNamespace,
 				Kind:      Kind,
 			},
 		},
@@ -51,7 +55,8 @@ func (ist *ImageStreamTag) Create(tag Tag) (*v1.ImageStreamTag, error) {
 	return img, nil
 }
 
-func (tag *ImageStreamTag) Get() (*v1.ImageStreamTag, error) {
+func (ist *ImageStreamTag) Get() (*v1.ImageStreamTag, error) {
+	log.Debug("ImageStreamTag Get")
 	option := metav1.GetOptions{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: ApiVersion,
@@ -59,24 +64,24 @@ func (tag *ImageStreamTag) Get() (*v1.ImageStreamTag, error) {
 		},
 		IncludeUninitialized: true,
 	}
-	image1, err := tag.Interface.Get(tag.Name, option)
+	img, err := ist.Interface.Get(ist.FullName, option)
 	if err != nil {
 		log.Println("imageStreamTag get", err)
 		return nil, err
 	}
-	return image1, nil
+	return img, nil
 }
 
 func (ist *ImageStreamTag) Delete() error {
 	log.Debug("ImageStreamTag Delete")
 	meta := &metav1.DeleteOptions{
 	}
-	err := ist.Interface.Delete(ist.Name, meta)
+	err := ist.Interface.Delete(ist.FullName, meta)
 	return err
 }
 
 func (ist *ImageStreamTag) Update() (*v1.ImageStreamTag, error) {
-	image := &v1.ImageStreamTag{
+	img := &v1.ImageStreamTag{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      ist.Name,
 			Namespace: ist.Namespace,
@@ -86,16 +91,5 @@ func (ist *ImageStreamTag) Update() (*v1.ImageStreamTag, error) {
 			},
 		},
 	}
-	img, err := ist.Interface.Update(image)
-	return img, err
-}
-
-func NewImageStreamTags(name, namespace string) (*ImageStreamTag, error) {
-	clientSet, err := image.NewForConfig(orch.Config)
-	tag := clientSet.ImageStreamTags(namespace)
-	return &ImageStreamTag{
-		Name:      name,
-		Namespace: namespace,
-		Interface: tag,
-	}, err
+	return ist.Interface.Update(img)
 }
