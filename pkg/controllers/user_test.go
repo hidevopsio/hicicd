@@ -4,7 +4,6 @@ import (
 	"testing"
 	"os"
 	"net/http"
-	"github.com/stretchr/testify/assert"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
 )
@@ -23,10 +22,10 @@ func init() {
 func TestUserLogin(t *testing.T) {
 	log.Println("TestUserLogin()")
 
-	e, err := web.NewTestServer(t, &UserController{})
-	assert.Equal(t, nil, err)
+	ta := web.NewTestApplication(t, &UserController{})
 
-	response := e.Request("POST", "/user/login", ).WithJSON(
+	response := ta.Request("POST", "/user/login", ).WithJSON(
 		userRequest).Expect().Status(http.StatusOK).JSON().Object()
+
 	response.Value("message").Equal("Success")
 }

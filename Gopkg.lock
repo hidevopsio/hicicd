@@ -176,10 +176,10 @@
   revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
+  branch = "master"
   name = "github.com/hidevopsio/hiboot"
   packages = ["pkg/log","pkg/model","pkg/starter/web","pkg/system","pkg/utils"]
-  revision = "4ed1d3912bdfd357f0bd9bec0beec1921e45b406"
-  version = "v0.1.0"
+  revision = "7267706a8b51a580395932c005f3b0b2417d3197"
 
 [[projects]]
   name = "github.com/howeyc/fsnotify"
@@ -664,6 +664,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e4c54be0bbb59af38c66c32b0bd1432cfcd059e32c7d968963be92256ebb49fd"
+  inputs-digest = "6b00171ee14c6a8e3ffe1959703df8df12cac4aaa1aff58dbbddbd2748c5dd39"
   solver-name = "gps-cdcl"
   solver-version = 1

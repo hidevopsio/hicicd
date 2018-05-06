@@ -15,12 +15,12 @@
 package controllers
 
 import (
-	"github.com/kataras/iris"
 	"github.com/hidevopsio/hicicd/pkg/auth"
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
 	"time"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"os"
+	"net/http"
 )
 
 type UserRequest struct {
@@ -35,6 +35,11 @@ type UserController struct {
 	web.Controller
 }
 
+// new UserController instance
+func init() {
+	web.Add(new(UserController))
+}
+
 // @Title Login
 // @Description login
 // @Param	body
@@ -47,7 +52,6 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 
 	err := ctx.RequestBody(&request)
 	if err != nil {
-		ctx.ResponseError(err.Error(), iris.StatusInternalServerError)
 		return
 	}
 
@@ -57,7 +61,7 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 		url = os.Getenv("SCM_URL")
 	}
 	if url == "" {
-		ctx.ResponseError(err.Error(), iris.StatusInternalServerError)
+		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 	}else {
 		// invoke models
 		user := &auth.User{}
@@ -72,11 +76,11 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 				if err == nil {
 					ctx.ResponseBody("success", &jwtToken)
 				} else {
-					ctx.ResponseError(err.Error(), iris.StatusInternalServerError)
+					ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 				}
 
 		} else {
-			ctx.ResponseError(err.Error(), iris.StatusForbidden)
+			ctx.ResponseError(err.Error(), http.StatusForbidden)
 		}
 	}
 }

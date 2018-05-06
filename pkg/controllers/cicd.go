@@ -15,17 +15,15 @@
 package controllers
 
 import (
-	"github.com/kataras/iris"
-
-	"github.com/dgrijalva/jwt-go"
-	"github.com/hidevopsio/hiboot/pkg/log"
-	"github.com/hidevopsio/hicicd/pkg/ci/factories"
-	"github.com/hidevopsio/hicicd/pkg/ci"
 	"fmt"
 	"strings"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hiboot/pkg/model"
-	"github.com/hidevopsio/hiboot/pkg/utils"
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hicicd/pkg/ci/factories"
+	"github.com/hidevopsio/hicicd/pkg/ci"
+	"net/http"
 )
 
 type CicdResponse struct {
@@ -33,12 +31,8 @@ type CicdResponse struct {
 }
 
 // Operations about object
-type CicdController struct{
-	web.Controller
-}
-
-func init() {
-	log.SetLevel(log.DebugLevel)
+type CicdController struct {
+	web.JwtController
 }
 
 const (
@@ -47,7 +41,11 @@ const (
 	ScmPassword = "password"
 )
 
-func (c *CicdController) Before(ctx iris.Context) {
+func init() {
+	web.Add(new(CicdController))
+}
+
+func (c *CicdController) Before(ctx *web.Context) {
 	ctx.Application().Logger().Infof("Path: %s | IP: %s", ctx.Path(), ctx.RemoteAddr())
 
 	// .Next is required to move forward to the chain of handlers,
@@ -64,20 +62,18 @@ func (c *CicdController) Before(ctx iris.Context) {
 func (c *CicdController) PostRun(ctx *web.Context) {
 	log.Debug("CicdController.Run()")
 	var pl ci.Pipeline
-	err := ctx.ReadJSON(&pl)
+	err := ctx.RequestBody(&pl)
 	if err != nil {
-		ctx.ResponseError(err.Error(), iris.StatusInternalServerError)
-		return
-	}
-
-	err = utils.Validate.Struct(&pl)
-	if err != nil {
-		ctx.ResponseError(err.Error(), iris.StatusBadRequest)
 		return
 	}
 
 	// decrypt jwt token
-	token := ctx.Values().Get("jwt").(*jwt.Token)
+	ti := ctx.Values().Get("jwt")
+	if ti == nil {
+		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
+		return
+	}
+	token := ti.(*jwt.Token)
 	var username, password string
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 
