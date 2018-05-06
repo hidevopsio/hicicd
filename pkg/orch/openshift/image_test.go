@@ -47,13 +47,9 @@ func TestImageStreamCreation(t *testing.T) {
 	name := "s2i-java-test"
 	namespace := "openshift"
 	source := "docker.io/hidevops/s2i-java:latest"
-
 	imageStream, err := NewImageStreamFromSource(name, namespace, source)
-
 	// create imagestream
 	is, err := imageStream.Create("v1")
 	assert.Equal(t, nil, err)
 	assert.Equal(t, name, is.ObjectMeta.Name)
 }
-
-
