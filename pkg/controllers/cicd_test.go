@@ -1,94 +1,71 @@
-package app
+package controllers
 
 import (
 	"testing"
-	"github.com/kataras/iris/httptest"
-	"github.com/hidevopsio/hiboot/pkg/log"
-	"github.com/hidevopsio/hicicd/pkg/web/controllers"
 	"os"
+	"time"
 	"net/http"
 	"github.com/iris-contrib/httpexpect"
-	"github.com/hidevopsio/hicicd/pkg/auth"
-	"github.com/hidevopsio/hiboot/pkg/application"
-	"github.com/hidevopsio/hicicd/pkg/ci"
-	"time"
 	"github.com/stretchr/testify/assert"
+	"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hicicd/pkg/auth"
+	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hicicd/pkg/ci"
+	"github.com/hidevopsio/hiboot/pkg/utils"
 )
 
-var userRequest controllers.UserRequest
 
 func init() {
-	log.SetLevel(log.DebugLevel)
+	utils.ChangeWorkDir("../../")
 
-	userRequest = controllers.UserRequest{
+	userRequest = UserRequest{
 		Url:      os.Getenv("SCM_URL"),
 		Username: os.Getenv("SCM_USERNAME"),
 		Password: os.Getenv("SCM_PASSWORD"),
 	}
 }
 
+
 func newTestServer(t *testing.T) *httpexpect.Expect {
-	boot := NewBoot()
-	return httptest.New(t, boot.App())
+	e, err := web.NewTestServer(t, &CicdController{})
+	assert.Equal(t, nil, err)
+
+	return e
 }
 
-func login(expired int64, unit time.Duration) (application.JwtToken, error) {
+func login(expired int64, unit time.Duration) (*web.Token, error) {
 	u := &auth.User{}
 	_, _, err := u.Login(userRequest.Url, userRequest.Username, userRequest.Password)
 	if err != nil {
-		return application.JwtToken(""), err
+		return nil, err
 	}
-	jwtToken, err := application.GenerateJwtToken(application.MapJwt{
+	token, err := web.GenerateJwtToken(web.JwtMap{
 		"url":      userRequest.Url,
 		"username": userRequest.Username,
 		"password": userRequest.Password,
 	}, expired, unit)
-	return jwtToken, err
+	return token, err
 }
 
-func requestCicdPipeline(e *httpexpect.Expect, jwtToken application.JwtToken, statusCode int, pl *ci.Pipeline) {
+func requestCicdPipeline(e *httpexpect.Expect, token *web.Token, statusCode int, pl *ci.Pipeline) {
 	e.Request("POST", "/cicd/run").WithHeader(
-		"Authorization", "Bearer "+string(jwtToken),
+		"Authorization", "Bearer "+ string(*token),
 	).WithJSON(pl).Expect().Status(statusCode)
 }
 
-func TestUserLogin(t *testing.T) {
-	log.Println("TestUserLogin()")
-
-	e := newTestServer(t)
-
-	response := e.Request("POST", "/user/login", ).WithJSON(
-		userRequest).Expect().Status(http.StatusOK).JSON().Object()
-	response.Value("message").Equal("Login successful.")
-}
-
-func TestUserLoginWithWrongCredentials(t *testing.T) {
-	log.Println("TestUserLoginWithWrongCredentials()")
-
-	e := newTestServer(t)
-
-	request := controllers.UserRequest{
-		Url:      os.Getenv("SCM_URL"),
-		Username: "xxx",
-		Password: "xxx",
-	}
-
-	e.Request("POST", "/user/login", ).WithJSON(
-		request).Expect().Status(http.StatusForbidden)
-}
 
 func TestCicdRunWithExpiredToken(t *testing.T) {
 	log.Println("TestCicdRunWithExpiredToken()")
 
 	e := newTestServer(t)
 
-	jwtToken, err := login(500, time.Millisecond)
+	token, err := login(500, time.Millisecond)
 	assert.Equal(t, nil, err)
 
 	if err == nil {
 		time.Sleep(1000 * time.Millisecond)
 
-		requestCicdPipeline(e, jwtToken, http.StatusUnauthorized, &ci.Pipeline{
+		requestCicdPipeline(e, token, http.StatusUnauthorized, &ci.Pipeline{
 			Name:    "java",
 			Project: "demo",
 			Profile: "dev",

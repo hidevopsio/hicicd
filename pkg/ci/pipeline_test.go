@@ -15,25 +15,10 @@
 package ci
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
-	"os"
-	"github.com/hidevopsio/hicicd/pkg/ci/impl"
 )
 
+
 func TestPipelineInit(t *testing.T) {
-	java := &impl.JavaPipeline{}
-	java.Init(&Pipeline{
-		Name: "java",
-		Profile: "dev",
-		App: "demo-provider",
-		Project: "demo",
-		Scm: Scm{Url: os.Getenv("SCM_URL")},
-		DeploymentConfigs: DeploymentConfigs{
-			ForceUpdate: true,
-		},
-	})
 
-
-	assert.Equal(t, Pipeline{}, java)
 }

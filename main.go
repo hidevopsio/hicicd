@@ -15,9 +15,10 @@
 package main
 
 import (
-	"github.com/hidevopsio/hicicd/pkg/web/app"
+	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	_ "github.com/hidevopsio/hicicd/pkg/controllers"
 )
 
 func main() {
-	app.Run()
+	web.NewApplication().Run()
 }

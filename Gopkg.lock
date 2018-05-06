@@ -56,6 +56,12 @@
   revision = "cdade1c073850f4ffc70a829e31235ea6892853b"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/fatih/camelcase"
+  packages = ["."]
+  revision = "44e46d280b43ec1531bb25252440e34f1b800b65"
+
+[[projects]]
   name = "github.com/fatih/structs"
   packages = ["."]
   revision = "a720dfa8df582c51dee1b36feabb906bde1588bd"
@@ -170,10 +176,10 @@
   revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
-  branch = "master"
   name = "github.com/hidevopsio/hiboot"
-  packages = ["pkg/application","pkg/log","pkg/model","pkg/system","pkg/utils"]
-  revision = "2071aff9ffdfb7baa64ee26bb3667b0901b35114"
+  packages = ["pkg/log","pkg/model","pkg/starter/web","pkg/system","pkg/utils"]
+  revision = "4ed1d3912bdfd357f0bd9bec0beec1921e45b406"
+  version = "v0.1.0"
 
 [[projects]]
   name = "github.com/howeyc/fsnotify"
@@ -218,6 +224,12 @@
   revision = "ebe99fcebbcedf6e7916320cce24c3e1832766ac"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/iris-contrib/i18n"
+  packages = ["."]
+  revision = "987a633949d087ba52207b587792e8c67d65780b"
+
+[[projects]]
   name = "github.com/iris-contrib/middleware"
   packages = ["jwt"]
   revision = "1060fbb0ce08a72c50c612e8e5bdc8076c28343d"
@@ -255,7 +267,7 @@
 
 [[projects]]
   name = "github.com/kataras/iris"
-  packages = [".","cache","cache/cfg","cache/client","cache/client/rule","cache/entry","cache/ruleset","cache/uri","context","core/errors","core/handlerconv","core/host","core/maintenance","core/maintenance/version","core/memstore","core/netutil","core/router","core/router/macro","core/router/macro/interpreter/ast","core/router/macro/interpreter/lexer","core/router/macro/interpreter/parser","core/router/macro/interpreter/token","core/router/node","httptest","middleware/logger","middleware/recover","view"]
+  packages = [".","cache","cache/cfg","cache/client","cache/client/rule","cache/entry","cache/ruleset","cache/uri","context","core/errors","core/handlerconv","core/host","core/maintenance","core/maintenance/version","core/memstore","core/netutil","core/router","core/router/macro","core/router/macro/interpreter/ast","core/router/macro/interpreter/lexer","core/router/macro/interpreter/parser","core/router/macro/interpreter/token","core/router/node","httptest","middleware/i18n","middleware/logger","middleware/recover","view"]
   revision = "f85b10ec72337c117d2844e441795b0f070b45ca"
   version = "v10.6.0"
 
@@ -584,6 +596,12 @@
   version = "v0.9.1"
 
 [[projects]]
+  name = "gopkg.in/ini.v1"
+  packages = ["."]
+  revision = "6529cf7c58879c08d927016dde4477f18a0634cb"
+  version = "v1.36.0"
+
+[[projects]]
   branch = "v2"
   name = "gopkg.in/russross/blackfriday.v2"
   packages = ["."]
@@ -646,6 +664,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c42e5e92661f719ecbe9788a378bb3302183d70c746f1b7ed9c2774c6e3e2eed"
+  inputs-digest = "e4c54be0bbb59af38c66c32b0bd1432cfcd059e32c7d968963be92256ebb49fd"
   solver-name = "gps-cdcl"
   solver-version = 1

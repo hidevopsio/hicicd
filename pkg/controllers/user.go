@@ -17,10 +17,9 @@ package controllers
 import (
 	"github.com/kataras/iris"
 	"github.com/hidevopsio/hicicd/pkg/auth"
-	"github.com/hidevopsio/hiboot/pkg/application"
+	"github.com/hidevopsio/hiboot/pkg/starter/web"
 	"time"
 	"github.com/hidevopsio/hiboot/pkg/log"
-	"github.com/hidevopsio/hiboot/pkg/utils"
 	"os"
 )
 
@@ -33,6 +32,7 @@ type UserRequest struct {
 
 // Operations about object
 type UserController struct {
+	web.Controller
 }
 
 // @Title Login
@@ -41,48 +41,42 @@ type UserController struct {
 // @Success 200 {string}
 // @Failure 403 body is empty
 // @router / [post]
-func (c *UserController) Login(ctx iris.Context) {
+func (c *UserController) PostLogin(ctx *web.Context) {
 	log.Debug("UserController.Login()")
 	var request UserRequest
 
-	err := ctx.ReadJSON(&request)
+	err := ctx.RequestBody(&request)
 	if err != nil {
-		application.ResponseError(ctx, err.Error(), iris.StatusInternalServerError)
+		ctx.ResponseError(err.Error(), iris.StatusInternalServerError)
 		return
 	}
 
-	err = utils.Validate.Struct(&request)
-	if err != nil {
-		application.ResponseError(ctx, err.Error(), iris.StatusBadRequest)
-		return
-	}
-	//log.Debug(token)
 	var url string
 	url = request.Url
 	if url == "" {
 		url = os.Getenv("SCM_URL")
 	}
 	if url == "" {
-		application.ResponseError(ctx, err.Error(), iris.StatusInternalServerError)
+		ctx.ResponseError(err.Error(), iris.StatusInternalServerError)
 	}else {
 		// invoke models
 		user := &auth.User{}
-		_, message, err := user.Login(url, request.Username, request.Password)
+		_, _, err := user.Login(url, request.Username, request.Password)
 		if err == nil {
 
-				jwtToken, err := application.GenerateJwtToken(application.MapJwt{
+				jwtToken, err := web.GenerateJwtToken(web.JwtMap{
 					"url": url,
 					"username": request.Username,
 					"password": request.Password, // TODO: token is not working?
 				}, 24, time.Hour)
 				if err == nil {
-					application.Response(ctx, message, &jwtToken)
+					ctx.ResponseBody("success", &jwtToken)
 				} else {
-					application.ResponseError(ctx, err.Error(), iris.StatusInternalServerError)
+					ctx.ResponseError(err.Error(), iris.StatusInternalServerError)
 				}
 
 		} else {
-			application.ResponseError(ctx, err.Error(), iris.StatusForbidden)
+			ctx.ResponseError(err.Error(), iris.StatusForbidden)
 		}
 	}
 }

@@ -103,7 +103,7 @@ func (p *Pipeline) Init(pl *Pipeline) {
 				c := builder.Build(pl.Name)*/
 
 		b := &system.Builder{
-			Path:       filepath.Join(utils.GetWorkingDir("/pkg/ci/pipeline.go"), "config"),
+			Path:       filepath.Join(utils.GetWorkDir(), "config"),
 			Name:       "pipeline",
 			FileType:   "yaml",
 			Profile:    pl.Name,

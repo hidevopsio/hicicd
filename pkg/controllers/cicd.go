@@ -25,7 +25,7 @@ import (
 	"strings"
 	"github.com/hidevopsio/hiboot/pkg/model"
 	"github.com/hidevopsio/hiboot/pkg/utils"
-	"github.com/hidevopsio/hiboot/pkg/application"
+	"github.com/hidevopsio/hiboot/pkg/starter/web"
 )
 
 type CicdResponse struct {
@@ -33,7 +33,9 @@ type CicdResponse struct {
 }
 
 // Operations about object
-type CicdController struct{}
+type CicdController struct{
+	web.Controller
+}
 
 func init() {
 	log.SetLevel(log.DebugLevel)
@@ -59,18 +61,18 @@ func (c *CicdController) Before(ctx iris.Context) {
 // @Success 200 {string}
 // @Failure 403 body is empty
 // @router / [post]
-func (c *CicdController) Run(ctx iris.Context) {
+func (c *CicdController) PostRun(ctx *web.Context) {
 	log.Debug("CicdController.Run()")
 	var pl ci.Pipeline
 	err := ctx.ReadJSON(&pl)
 	if err != nil {
-		application.ResponseError(ctx, err.Error(), iris.StatusInternalServerError)
+		ctx.ResponseError(err.Error(), iris.StatusInternalServerError)
 		return
 	}
 
 	err = utils.Validate.Struct(&pl)
 	if err != nil {
-		application.ResponseError(ctx, err.Error(), iris.StatusBadRequest)
+		ctx.ResponseError(err.Error(), iris.StatusBadRequest)
 		return
 	}
 
@@ -89,13 +91,10 @@ func (c *CicdController) Run(ctx iris.Context) {
 		log.Debug(err)
 	}
 
-	// verify scm token
-	// TODO:
-
 	// invoke models
 	pipelineFactory := new(factories.PipelineFactory)
 	pipeline, err := pipelineFactory.New(pl.Name)
-	message := "Successful."
+	message := "success"
 	if err == nil {
 		// Run Pipeline, password is a token, no need to pass username to pipeline
 		pipeline.Init(&pl)
@@ -104,10 +103,10 @@ func (c *CicdController) Run(ctx iris.Context) {
 			message = err.Error()
 		}
 	} else {
-		message = "Failed, " + err.Error()
+		message = "failed, " + err.Error()
 	}
 
-	application.Response(ctx, message, nil)
+	ctx.ResponseBody(message, nil)
 }
 
 func parseToken(claims jwt.MapClaims, prop string) string {
