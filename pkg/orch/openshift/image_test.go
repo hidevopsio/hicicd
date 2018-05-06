@@ -23,11 +23,9 @@ import (
 func TestImageStreamCrud(t *testing.T) {
 	imageStreamName := "is-test"
 	namespace := "openshift"
+	imageStream, err := NewImageStream(imageStreamName, namespace)
+	assert.Equal(t, nil, err)
 
-	imageStream := &ImageStream{
-		Name: imageStreamName,
-		Namespace: namespace,
-	}
 	version := "v1"
 	// create imagestream
 	is, err := imageStream.Create(version)
@@ -49,13 +47,9 @@ func TestImageStreamCreation(t *testing.T) {
 	name := "s2i-java-test"
 	namespace := "openshift"
 	source := "docker.io/hidevops/s2i-java:latest"
-
 	imageStream, err := NewImageStreamFromSource(name, namespace, source)
-
 	// create imagestream
 	is, err := imageStream.Create("v1")
 	assert.Equal(t, nil, err)
 	assert.Equal(t, name, is.ObjectMeta.Name)
 }
-
-
