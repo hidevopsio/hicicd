@@ -8,7 +8,7 @@ import (
 )
 
 func TestCreate(t *testing.T) {
-	rule := &Client{
+	client := &Client{
 		Labels:          map[string]string{"label": "value"},
 		Annotations:     map[string]string{"annotation": "value"},
 		Name:            "hello-world",
@@ -19,9 +19,9 @@ func TestCreate(t *testing.T) {
 		},
 	}
 	config, err := NewClient()
-	rule.crd =config
+	client.crd =config
 	assert.Equal(t, nil, err)
-	resourceVersion, err := rule.Create()
+	resourceVersion, err := client.Create()
 	assert.Equal(t, nil, err)
 	log.Info("create rule:", resourceVersion)
 }
@@ -29,12 +29,12 @@ func TestCreate(t *testing.T) {
 func TestGet(t *testing.T) {
 	config, err := NewClient()
 	assert.Equal(t, nil, err)
-	rule := Client{
+	client := Client{
 		Name:      "hello-world",
 		Namespace: "demo-dev",
 	}
-	rule.crd =config
-	con, flag := rule.Get()
+	client.crd =config
+	con, flag := client.Get()
 	log.Info("get rule :", con)
 	resoureceVersion := con.ResourceVersion
 	assert.Equal(t, true, flag)
@@ -42,7 +42,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	rule := &Client{
+	client := &Client{
 		Labels:          map[string]string{"label": "value"},
 		Annotations:     map[string]string{"annotation": "value"},
 		Name:            "hello-world",
@@ -54,9 +54,9 @@ func TestUpdate(t *testing.T) {
 		},
 	}
 	config, err := NewClient()
-	rule.crd =config
+	client.crd =config
 	assert.Equal(t, nil, err)
-	resourceVersion, err := rule.Update()
+	resourceVersion, err := client.Update()
 	assert.Equal(t, nil, err)
 	log.Info("update rule:", resourceVersion)
 }
@@ -64,11 +64,11 @@ func TestUpdate(t *testing.T) {
 func TestDelete(t *testing.T) {
 	config, err := NewClient()
 	assert.Equal(t, nil, err)
-	rule := Client{
+	client := Client{
 		Name:      "hello-world",
 		Namespace: "demo-dev",
 	}
-	rule.crd =config
-	err = rule.Delete()
+	client.crd =config
+	err = client.Delete()
 	assert.Equal(t, nil, err)
 }
