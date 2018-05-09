@@ -2,14 +2,13 @@ package istio
 
 import (
 	"testing"
-	"github.com/hidevopsio/hicicd/pkg/orch"
 	"github.com/stretchr/testify/assert"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	routing "istio.io/api/routing/v1alpha1"
 )
 
 func TestCreate(t *testing.T) {
-	rule := &Rule{
+	rule := &Client{
 		Labels:          map[string]string{"label": "value"},
 		Annotations:     map[string]string{"annotation": "value"},
 		Name:            "hello-world",
@@ -19,22 +18,23 @@ func TestCreate(t *testing.T) {
 			{Weight: 20, Labels: map[string]string{"version": "v3"}},
 		},
 	}
-	config, err := NewClient(*orch.Kubeconfig)
+	config, err := NewClient()
+	rule.crd =config
 	assert.Equal(t, nil, err)
-	resourceVersion, err := rule.Create(config)
+	resourceVersion, err := rule.Create()
 	assert.Equal(t, nil, err)
 	log.Info("create rule:", resourceVersion)
 }
 
 func TestGet(t *testing.T) {
-	config, err := NewClient(*orch.Kubeconfig)
+	config, err := NewClient()
 	assert.Equal(t, nil, err)
-	rule := Rule{
+	rule := Client{
 		Name:      "hello-world",
 		Namespace: "demo-dev",
 	}
-
-	con, flag := rule.Get(config)
+	rule.crd =config
+	con, flag := rule.Get()
 	log.Info("get rule :", con)
 	resoureceVersion := con.ResourceVersion
 	assert.Equal(t, true, flag)
@@ -42,32 +42,33 @@ func TestGet(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	rule := &Rule{
+	rule := &Client{
 		Labels:          map[string]string{"label": "value"},
 		Annotations:     map[string]string{"annotation": "value"},
 		Name:            "hello-world",
 		Namespace:       "demo-dev",
-		ResourceVersion: "3897304",
+		ResourceVersion: "3944181",
 		Route: []*routing.DestinationWeight{
 			{Weight: 80, Labels: map[string]string{"version": "v1"}},
 			{Weight: 20, Labels: map[string]string{"version": "v2"}},
 		},
 	}
-	config, err := NewClient(*orch.Kubeconfig)
+	config, err := NewClient()
+	rule.crd =config
 	assert.Equal(t, nil, err)
-	resourceVersion, err := rule.Update(config)
+	resourceVersion, err := rule.Update()
 	assert.Equal(t, nil, err)
 	log.Info("update rule:", resourceVersion)
 }
 
 func TestDelete(t *testing.T) {
-	config, err := NewClient(*orch.Kubeconfig)
+	config, err := NewClient()
 	assert.Equal(t, nil, err)
-	rule := Rule{
+	rule := Client{
 		Name:      "hello-world",
 		Namespace: "demo-dev",
 	}
-
-	err = rule.Delete(config)
+	rule.crd =config
+	err = rule.Delete()
 	assert.Equal(t, nil, err)
 }

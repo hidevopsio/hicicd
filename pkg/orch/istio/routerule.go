@@ -5,9 +5,10 @@ import (
 	"istio.io/istio/pilot/pkg/model"
 	"istio.io/istio/pilot/pkg/config/kube/crd"
 	routing "istio.io/api/routing/v1alpha1"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
-type Rule struct {
+type Client struct {
 	Type            string
 	Version         string
 	Name            string
@@ -18,6 +19,7 @@ type Rule struct {
 	Domain          string
 	ResourceVersion string
 	Route           []*routing.DestinationWeight
+	crd             *crd.Client
 }
 
 const (
@@ -48,63 +50,63 @@ func newClient(kubeconfig string) (*crd.Client, error) {
 	return crd.NewClient(kubeconfig, config, "")
 }
 
-func (rule *Rule) Create(configClient *crd.Client) (string, error) {
-	log.Debug("create rule :", rule)
+func (client *Client) Create() (string, error) {
+	log.Debug("create rule :", client)
 	config := model.Config{
 		ConfigMeta: model.ConfigMeta{
 			Type:        Type,
 			Version:     Version,
 			Group:       Group,
-			Name:        rule.Name,
-			Namespace:   rule.Namespace,
+			Name:        client.Name,
+			Namespace:   client.Namespace,
 			Domain:      Domain,
-			Labels:      rule.Labels,
-			Annotations: rule.Annotations,
+			Labels:      client.Labels,
+			Annotations: client.Annotations,
 		},
 		Spec: &routing.RouteRule{
 			Destination: &routing.IstioService{
 				Name: "reviews",
 			},
-			Route: rule.Route,
+			Route: client.Route,
 		},
 	}
-	con, exists := rule.Get(configClient)
+	con, exists := client.Get()
 	log.Debug("config exists", exists)
 	if exists {
 		config.ResourceVersion = con.ResourceVersion
-		resourceVersion, err := configClient.Update(config)
+		resourceVersion, err := client.crd.Update(config)
 		if err != nil {
 			return "", err
 		}
 		return resourceVersion, nil
 	}
-	log.Debug("create router rule config ", config)
-	resourceVersion, err := configClient.Create(config)
+	log.Debug("create route rule config ", config)
+	resourceVersion, err := client.crd.Create(config)
 	if err != nil {
-		log.Error("create router rule error %v", err)
+		log.Error("create route rule error %v", err)
 		return "", err
 	}
 	return resourceVersion, nil
 }
 
-func (rule *Rule) Get(configClient *crd.Client) (*model.Config, bool) {
-	config, flag := configClient.Get(Type, rule.Name, rule.Namespace)
-	log.Debug("roter rule get config", flag)
+func (client *Client) Get() (*model.Config, bool) {
+	config, flag := client.crd.Get(Type, client.Name, client.Namespace)
+	log.Debug("route rule get config", flag)
 	return config, flag
 }
 
-func (rule *Rule) Delete(configClient *crd.Client) error {
-	err := configClient.Delete(Type, rule.Name, rule.Namespace)
+func (client *Client) Delete() error {
+	err := client.crd.Delete(Type, client.Name, client.Namespace)
 	if err != nil {
-		log.Error("roter rule delete config", err)
+		log.Error("route rule delete config", err)
 		return err
 	}
 	return nil
 }
 
-func NewClient(kubeconfig string) (*crd.Client, error) {
-	log.Debug("create config kubeconfig", kubeconfig)
-	configClient, err := newClient(kubeconfig)
+func NewClient() (*crd.Client, error) {
+	log.Debug("create config kubeconfig")
+	configClient, err := newClient(*orch.Kubeconfig)
 	if err != nil {
 		log.Error("create config configClient error", err)
 		return nil, err
@@ -112,31 +114,31 @@ func NewClient(kubeconfig string) (*crd.Client, error) {
 	return configClient, nil
 }
 
-func (rule *Rule) Update(configClient *crd.Client) (string, error) {
-	log.Debug("update rule :", rule)
+func (client *Client) Update() (string, error) {
+	log.Debug("update rule :", client)
 	config := model.Config{
 		ConfigMeta: model.ConfigMeta{
 			Type:            Type,
 			Version:         Version,
 			Group:           Group,
-			Name:            rule.Name,
-			Namespace:       rule.Namespace,
+			Name:            client.Name,
+			Namespace:       client.Namespace,
 			Domain:          Domain,
-			ResourceVersion: rule.ResourceVersion,
-			Labels:          rule.Labels,
-			Annotations:     rule.Annotations,
+			ResourceVersion: client.ResourceVersion,
+			Labels:          client.Labels,
+			Annotations:     client.Annotations,
 		},
 		Spec: &routing.RouteRule{
 			Destination: &routing.IstioService{
 				Name: "reviews",
 			},
-			Route: rule.Route,
+			Route: client.Route,
 		},
 	}
-	log.Debug("update router rule config ", config)
-	resourceVersion, err := configClient.Update(config)
+	log.Debug("update route rule config ", config)
+	resourceVersion, err := client.crd.Update(config)
 	if err != nil {
-		log.Error("update router rule error ", err)
+		log.Error("update route rule error ", err)
 		return "", err
 	}
 	return resourceVersion, nil
