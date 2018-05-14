@@ -4,12 +4,20 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"istio.io/istio/pilot/pkg/model"
 	"istio.io/istio/pilot/pkg/config/kube/crd"
-	routing "istio.io/api/routing/v1alpha1"
 	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
+type ClientInterface interface {
+	Create() (string, error)
+	Get() (*model.Config, bool)
+	Delete() error
+	Update() (string, error)
+	getConfig() (model.Config, error)
+}
+
 type Client struct {
 	Type            string
+	FullName        string
 	Version         string
 	Name            string
 	Namespace       string
@@ -18,7 +26,6 @@ type Client struct {
 	Annotations     map[string]string
 	Domain          string
 	ResourceVersion string
-	Route           []*routing.DestinationWeight
 	crd             *crd.Client
 }
 
@@ -50,44 +57,35 @@ func newClient(kubeconfig string) (*crd.Client, error) {
 	return crd.NewClient(kubeconfig, config, "")
 }
 
-func (client *Client) Create() (string, error) {
+func (client *Client) getConfig() (*model.Config, error) {
+	return nil, nil
+}
+
+/*func (client *Client) Create() (string, error) {
 	log.Debug("create rule :", client)
-	config := model.Config{
-		ConfigMeta: model.ConfigMeta{
-			Type:        Type,
-			Version:     Version,
-			Group:       Group,
-			Name:        client.Name,
-			Namespace:   client.Namespace,
-			Domain:      Domain,
-			Labels:      client.Labels,
-			Annotations: client.Annotations,
-		},
-		Spec: &routing.RouteRule{
-			Destination: &routing.IstioService{
-				Name: "reviews",
-			},
-			Route: client.Route,
-		},
+	config, err := client.getConfig()
+	if config == nil {
+		log.Error("client :{}", err)
+		return "", err
 	}
 	con, exists := client.Get()
 	log.Debug("config exists", exists)
 	if exists {
 		config.ResourceVersion = con.ResourceVersion
-		resourceVersion, err := client.crd.Update(config)
+		resourceVersion, err := client.crd.Update(*config)
 		if err != nil {
 			return "", err
 		}
 		return resourceVersion, nil
 	}
 	log.Debug("create route rule config ", config)
-	resourceVersion, err := client.crd.Create(config)
+	resourceVersion, err := client.crd.Create(*config)
 	if err != nil {
 		log.Error("create route rule error %v", err)
 		return "", err
 	}
 	return resourceVersion, nil
-}
+}*/
 
 func (client *Client) Get() (*model.Config, bool) {
 	config, flag := client.crd.Get(Type, client.Name, client.Namespace)
@@ -95,8 +93,8 @@ func (client *Client) Get() (*model.Config, bool) {
 	return config, flag
 }
 
-func (client *Client) Delete() error {
-	err := client.crd.Delete(Type, client.Name, client.Namespace)
+func (client *Client) Delete(typ string) error {
+	err := client.crd.Delete(typ, client.Name, client.Namespace)
 	if err != nil {
 		log.Error("route rule delete config", err)
 		return err
@@ -112,34 +110,4 @@ func NewClient() (*crd.Client, error) {
 		return nil, err
 	}
 	return configClient, nil
-}
-
-func (client *Client) Update() (string, error) {
-	log.Debug("update rule :", client)
-	config := model.Config{
-		ConfigMeta: model.ConfigMeta{
-			Type:            Type,
-			Version:         Version,
-			Group:           Group,
-			Name:            client.Name,
-			Namespace:       client.Namespace,
-			Domain:          Domain,
-			ResourceVersion: client.ResourceVersion,
-			Labels:          client.Labels,
-			Annotations:     client.Annotations,
-		},
-		Spec: &routing.RouteRule{
-			Destination: &routing.IstioService{
-				Name: "reviews",
-			},
-			Route: client.Route,
-		},
-	}
-	log.Debug("update route rule config ", config)
-	resourceVersion, err := client.crd.Update(config)
-	if err != nil {
-		log.Error("update route rule error ", err)
-		return "", err
-	}
-	return resourceVersion, nil
 }

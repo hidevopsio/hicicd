@@ -39,15 +39,15 @@ func TestJavaPipeline(t *testing.T)  {
 	java.Init(&ci.Pipeline{
 		Name: "java",
 		Profile: "dev",
-		App: "hello-world",
+		App: "demo-consumer",
 		Project: "demo",
-		Version: "v3",
+		Version: "v2",
 		Scm: ci.Scm{
 			Url: os.Getenv("SCM_URL"),
-			Ref: "master",
+			Ref: "v2",
 		},
 		BuildConfigs: ci.BuildConfigs{
-			Skip: true,
+			Skip: false,
 		},
 		DeploymentConfigs: ci.DeploymentConfigs{
 			ForceUpdate: true,
