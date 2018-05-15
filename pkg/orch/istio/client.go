@@ -16,7 +16,7 @@ type ClientInterface interface {
 }
 
 type Client struct {
-	Type            string `json:"type"`
+	Type            int64 `json:"type"`
 	FullName        string `json:"full_name"`
 	Version         string `json:"version"`
 	Name            string `json:"name"`
@@ -28,6 +28,8 @@ type Client struct {
 	ResourceVersion string `json:"resource_version"`
 	Crd             *crd.Client
 }
+
+var Typ = [5]string{"route-rule","egress-rule","destination-policy","quota-spec"}
 
 const (
 	Type    = "route-rule"
@@ -61,42 +63,16 @@ func (client *Client) getConfig() (*model.Config, error) {
 	return nil, nil
 }
 
-/*func (client *Client) Create() (string, error) {
-	log.Debug("create rule :", client)
-	config, err := client.getConfig()
-	if config == nil {
-		log.Error("client :{}", err)
-		return "", err
-	}
-	con, exists := client.Get()
-	log.Debug("config exists", exists)
-	if exists {
-		config.ResourceVersion = con.ResourceVersion
-		resourceVersion, err := client.crd.Update(*config)
-		if err != nil {
-			return "", err
-		}
-		return resourceVersion, nil
-	}
-	log.Debug("create route rule config ", config)
-	resourceVersion, err := client.crd.Create(*config)
-	if err != nil {
-		log.Error("create route rule error %v", err)
-		return "", err
-	}
-	return resourceVersion, nil
-}*/
-
 func (client *Client) Get(typ string) (*model.Config, bool) {
-	config, flag := client.Crd.Get(typ, client.Name, client.Namespace)
-	log.Debug("route rule get config", flag)
-	return config, flag
+	config, exists := client.Crd.Get(typ, client.Name, client.Namespace)
+	log.Debug("route rule get config", exists)
+	return config, exists
 }
 
 func (client *Client) Delete(typ string) error {
 	err := client.Crd.Delete(typ, client.Name, client.Namespace)
 	if err != nil {
-		log.Error("route rule delete config", err)
+		log.Error("type: "+ typ +" route rule delete config", err)
 		return err
 	}
 	return nil
