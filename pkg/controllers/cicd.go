@@ -16,14 +16,12 @@ package controllers
 
 import (
 	"fmt"
-	"strings"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hiboot/pkg/model"
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
 	"github.com/hidevopsio/hicicd/pkg/ci/factories"
 	"github.com/hidevopsio/hicicd/pkg/ci"
-	"net/http"
 )
 
 type CicdResponse struct {
@@ -32,7 +30,7 @@ type CicdResponse struct {
 
 // Operations about object
 type CicdController struct {
-	web.JwtController
+	BaseController
 }
 
 const (
@@ -46,11 +44,7 @@ func init() {
 }
 
 func (c *CicdController) Before(ctx *web.Context) {
-	ctx.Application().Logger().Infof("Path: %s | IP: %s", ctx.Path(), ctx.RemoteAddr())
-
-	// .Next is required to move forward to the chain of handlers,
-	// if missing then it stops the execution at this handler.
-	ctx.Next()
+	c.BaseController.Before(ctx)
 }
 
 // @Title Deploy
@@ -61,32 +55,12 @@ func (c *CicdController) Before(ctx *web.Context) {
 // @router / [post]
 func (c *CicdController) PostRun(ctx *web.Context) {
 	log.Debug("CicdController.Run()")
+
 	var pl ci.Pipeline
 	err := ctx.RequestBody(&pl)
 	if err != nil {
 		return
 	}
-
-	// decrypt jwt token
-	ti := ctx.Values().Get("jwt")
-	if ti == nil {
-		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
-		return
-	}
-	token := ti.(*jwt.Token)
-	var username, password string
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-
-		pl.Scm.Url = parseToken(claims, ScmUrl)
-		username = parseToken(claims, ScmUsername)
-		password = parseToken(claims, ScmPassword)
-
-		log.Debugf("url: %v, username: %v, password: %v", pl.Scm.Url, username, strings.Repeat("*", len(password)))
-
-	} else {
-		log.Debug(err)
-	}
-
 	// invoke models
 	pipelineFactory := new(factories.PipelineFactory)
 	pipeline, err := pipelineFactory.New(pl.Name)
@@ -94,7 +68,7 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 	if err == nil {
 		// Run Pipeline, password is a token, no need to pass username to pipeline
 		pipeline.Init(&pl)
-		err = pipeline.Run(username, password, false)
+		err = pipeline.Run(c.Username, c.Password, false)
 		if err != nil {
 			message = err.Error()
 		}

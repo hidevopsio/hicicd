@@ -16,7 +16,7 @@ func TestCreateQuota(t *testing.T) {
 		},
 	}
 	config, err := NewClient()
-	rule.crd = config
+	rule.Crd = config
 	assert.Equal(t, nil, err)
 	resourceVersion, err := rule.Create()
 	assert.Equal(t, nil, err)

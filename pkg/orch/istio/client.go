@@ -16,17 +16,17 @@ type ClientInterface interface {
 }
 
 type Client struct {
-	Type            string
-	FullName        string
-	Version         string
-	Name            string
-	Namespace       string
-	Group           string
-	Labels          map[string]string
-	Annotations     map[string]string
-	Domain          string
-	ResourceVersion string
-	crd             *crd.Client
+	Type            string `json:"type"`
+	FullName        string `json:"full_name"`
+	Version         string `json:"version"`
+	Name            string `json:"name"`
+	Namespace       string `json:"namespace"`
+	Group           string `json:"group"`
+	Labels          map[string]string `json:"labels"`
+	Annotations     map[string]string `json:"annotations"`
+	Domain          string `json:"domain"`
+	ResourceVersion string `json:"resource_version"`
+	Crd             *crd.Client
 }
 
 const (
@@ -87,14 +87,14 @@ func (client *Client) getConfig() (*model.Config, error) {
 	return resourceVersion, nil
 }*/
 
-func (client *Client) Get() (*model.Config, bool) {
-	config, flag := client.crd.Get(Type, client.Name, client.Namespace)
+func (client *Client) Get(typ string) (*model.Config, bool) {
+	config, flag := client.Crd.Get(typ, client.Name, client.Namespace)
 	log.Debug("route rule get config", flag)
 	return config, flag
 }
 
 func (client *Client) Delete(typ string) error {
-	err := client.crd.Delete(typ, client.Name, client.Namespace)
+	err := client.Crd.Delete(typ, client.Name, client.Namespace)
 	if err != nil {
 		log.Error("route rule delete config", err)
 		return err

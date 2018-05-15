@@ -15,7 +15,7 @@ func TestGet(t *testing.T) {
 		Name:      "handler",
 		Namespace: "istio-system",
 	}
-	rule.crd = config
+	rule.Crd = config
 	typ :=     "service-role-binding"
 	con, flag := rule.Get(typ)
 	log.Info("get rule :", con)
@@ -54,7 +54,7 @@ func TestDelete(t *testing.T) {
 		Namespace: "istio-system",
 	}
 	typ := EgressType
-	rule.crd = config
+	rule.Crd = config
 	err = rule.Delete(typ)
 	assert.Equal(t, nil, err)
 }

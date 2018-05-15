@@ -17,7 +17,7 @@ func TestCreateEgress(t *testing.T) {
 		Destination: "172.16.8.80",
 	}
 	config, err := NewClient()
-	rule.crd = config
+	rule.Crd = config
 	assert.Equal(t, nil, err)
 	resourceVersion, err := rule.Create()
 	assert.Equal(t, nil, err)

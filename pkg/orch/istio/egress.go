@@ -57,14 +57,14 @@ func (egress *Egress) Create() (string, error) {
 	log.Debug("config exists", exists)
 	if exists {
 		config.ResourceVersion = con.ResourceVersion
-		resourceVersion, err := egress.crd.Update(config)
+		resourceVersion, err := egress.Crd.Update(config)
 		if err != nil {
 			return "", err
 		}
 		return resourceVersion, nil
 	}
 	log.Debug("create route rule config ", config)
-	resourceVersion, err := egress.crd.Create(config)
+	resourceVersion, err := egress.Crd.Create(config)
 	if err != nil {
 		log.Error("create route rule error %v", err)
 		return "", err

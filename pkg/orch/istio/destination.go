@@ -71,14 +71,14 @@ func (b *Breaker) Create() (string, error) {
 	log.Debug("config exists", exists)
 	if exists {
 		config.ResourceVersion = con.ResourceVersion
-		resourceVersion, err := b.crd.Update(config)
+		resourceVersion, err := b.Crd.Update(config)
 		if err != nil {
 			return "", err
 		}
 		return resourceVersion, nil
 	}
 	log.Debug("create route rule config ", config)
-	resourceVersion, err := b.crd.Create(config)
+	resourceVersion, err := b.Crd.Create(config)
 	if err != nil {
 		log.Error("create route rule error %v", err)
 		return "", err

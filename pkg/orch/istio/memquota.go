@@ -54,14 +54,14 @@ func (memquota *Memquota) Create() (string, error) {
 	log.Debug("config exists", exists)
 	if exists {
 		config.ResourceVersion = con.ResourceVersion
-		resourceVersion, err := memquota.crd.Update(config)
+		resourceVersion, err := memquota.Crd.Update(config)
 		if err != nil {
 			return "", err
 		}
 		return resourceVersion, nil
 	}
 	log.Debug("create route rule config ", config)
-	resourceVersion, err := memquota.crd.Create(config)
+	resourceVersion, err := memquota.Crd.Create(config)
 	if err != nil {
 		log.Error("create route rule error %v", err)
 		return "", err
