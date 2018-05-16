@@ -15,7 +15,9 @@ func init() {
 	web.Add(new(IstioController))
 }
 
-
+type IResponse struct {
+	Version string `json:"version"`
+}
 
 
 func (c *IstioController) PostDelete(ctx *web.Context)  {

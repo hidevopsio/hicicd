@@ -14,7 +14,7 @@ const (
 	BreakDomain  = "cluster"
 )
 
-type Breaker struct {
+type Destination struct {
 	Client
 	MaxConnections               int32
 	HttpMaxPendingRequests       int32
@@ -25,7 +25,7 @@ type Breaker struct {
 	HttpMaxRequestsPerConnection int32
 }
 
-func (b *Breaker) getConfig() (model.Config, error) {
+func (b *Destination) getConfig() (model.Config, error) {
 	config := model.Config{
 		ConfigMeta: model.ConfigMeta{
 			Type:        BreakType,
@@ -64,7 +64,7 @@ func (b *Breaker) getConfig() (model.Config, error) {
 	return config, nil
 }
 
-func (b *Breaker) Create() (string, error) {
+func (b *Destination) Create() (string, error) {
 	log.Debug("create rule :", b)
 	config, err := b.getConfig()
 	con, exists := b.Get(BreakType)

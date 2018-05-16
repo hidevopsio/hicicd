@@ -18,9 +18,9 @@ var EgressProtocol = [...]string{"HTTP", "HTTPS", "GRPC", "HTTP2", "TCP", "MONGO
 
 type Egress struct {
 	Client
-	Destination string
-	Port        int32
-	Protocol    string
+	Destination string `json:"destination"`
+	Port        int32  `json:"port"`
+	Protocol    string `json:"protocol"`
 }
 
 func (e *Egress) getConfig() (model.Config, error) {

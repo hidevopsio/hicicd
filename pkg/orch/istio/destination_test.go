@@ -7,7 +7,7 @@ import (
 )
 
 func TestCreateBreaker(t *testing.T) {
-	rule := &Breaker{
+	rule := &Destination{
 		Client: Client{
 			Name:        "demo-provider",
 			Namespace:   "demo-dev",

@@ -39,6 +39,8 @@ func (c *BaseController) Before(ctx *web.Context) {
 		log.Debugf("url: %v, username: %v, password: %v", username, strings.Repeat("*", len(password)))
 	} else {
 		log.Debug("valid username  password   err")
+
+		return
 	}
 	ctx.Next()
 }

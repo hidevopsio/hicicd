@@ -10,23 +10,23 @@ import (
 
 
 // Operations about object
-type RouteruleController struct {
+type EgressController struct {
 	BaseController
 }
 
 func init() {
-	web.Add(new(RouteruleController))
+	web.Add(new(EgressController))
 }
 
 
-func (c *RouteruleController) Before(ctx *web.Context) {
+func (c *EgressController) Before(ctx *web.Context) {
 	c.BaseController.Before(ctx)
 }
 
-func (c *RouteruleController) PostAdd(ctx *web.Context) {
-	log.Debug("route rule  add:{}")
-	var rule  istio.RouterRule
-	err := ctx.RequestBody(&rule)
+func (c *EgressController) PostAdd(ctx *web.Context) {
+	log.Debug("egress  add:{}")
+	var egress  istio.Egress
+	err := ctx.RequestBody(&egress)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusUnavailableForLegalReasons)
 		return
@@ -35,13 +35,13 @@ func (c *RouteruleController) PostAdd(ctx *web.Context) {
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusRequestedRangeNotSatisfiable)
 	}
-	rule.Crd = config
-	version, err := rule.Create()
+	egress.Crd = config
+	version, err := egress.Create()
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusServiceUnavailable)
 		return
 	}
-	log.Debug("route rule create success get resource version:{}",version)
+	log.Debug("egress create success get resource version:{}",version)
 	r := IResponse{
 		Version:version,
 	}
