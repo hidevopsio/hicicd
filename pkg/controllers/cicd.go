@@ -37,6 +37,7 @@ const (
 	ScmUrl      = "url"
 	ScmUsername = "username"
 	ScmPassword = "password"
+	ScmToken    = "scmToken"
 )
 
 func init() {

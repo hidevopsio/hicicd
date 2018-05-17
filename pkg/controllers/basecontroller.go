@@ -26,6 +26,7 @@ type BaseController struct {
 	Username string
 	Password string
 	Url      string
+	ScmToken string
 }
 
 func (c *BaseController) Before(ctx *web.Context) {
@@ -36,6 +37,7 @@ func (c *BaseController) Before(ctx *web.Context) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		c.Username = parseToken(claims, ScmUsername)
 		c.Password = parseToken(claims, ScmPassword)
+		c.ScmToken = parseToken(claims, ScmToken)
 		log.Debugf("url: %v, username: %v, password: %v", username, strings.Repeat("*", len(password)))
 	} else {
 		log.Debug("valid username  password   err")

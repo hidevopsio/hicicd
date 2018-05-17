@@ -13,7 +13,7 @@ func TestPolicy_Create(t *testing.T) {
 	namespace := ""
 	policy, err := NewPolicy(name, namespace)
 	assert.Equal(t, err, nil)
-	po := &v1.Role{
+	po := &v1.ClusterPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: namespace,

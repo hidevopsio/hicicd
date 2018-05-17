@@ -65,13 +65,14 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 	}else {
 		// invoke models
 		user := &auth.User{}
-		_, _, err := user.Login(url, request.Username, request.Password)
+		privateToken, _, err := user.Login(url, request.Username, request.Password)
 		if err == nil {
 
 				jwtToken, err := web.GenerateJwtToken(web.JwtMap{
 					"url": url,
 					"username": request.Username,
 					"password": request.Password, // TODO: token is not working?
+					"scmToken": privateToken,
 				}, 24, time.Hour)
 				if err == nil {
 					ctx.ResponseBody("success", &jwtToken)

@@ -15,7 +15,7 @@ type Policy struct{
 	Name string
 	Namespace string
 
-	Interface policyv1.RoleInterface
+	Interface policyv1.ClusterPolicyInterface
 }
 
 func NewPolicy(name, namespace string) (*Policy, error)  {
@@ -27,12 +27,12 @@ func NewPolicy(name, namespace string) (*Policy, error)  {
 	r := &Policy{
 		Name:      name,
 		Namespace: namespace,
-		Interface: client.Roles(namespace),
+		Interface: client.ClusterPolicies(),
 	}
 	return r, nil
 }
 
-func (p *Policy) Create(policy *v1.Role) (*v1.Role, error){
+func (p *Policy) Create(policy *v1.ClusterPolicy) (*v1.ClusterPolicy, error){
 	log.Debug("create policy:", policy)
 	po, err := p.Interface.Create(policy)
 	if err != nil {
@@ -41,7 +41,7 @@ func (p *Policy) Create(policy *v1.Role) (*v1.Role, error){
 	return po, nil
 }
 
-func (p *Policy) Get() (*v1.Role, error){
+func (p *Policy) Get() (*v1.ClusterPolicy, error){
 	log.Debug("get policy:")
 	po, err:= p.Interface.Get(p.Name, meta_v1.GetOptions{})
 	if err != nil {

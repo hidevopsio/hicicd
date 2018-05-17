@@ -8,7 +8,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func TestConfigMaps_Create(t *testing.T) {
+func TestConfigMapsCreate(t *testing.T) {
 	name := "test"
 	namespace := "demo-dev"
 	config := NewConfigMaps(name, namespace)
@@ -19,7 +19,7 @@ func TestConfigMaps_Create(t *testing.T) {
 	log.Info("", result)
 }
 
-func TestConfigMaps_Get(t *testing.T) {
+func TestConfigMapsGet(t *testing.T) {
 	name := "test1"
 	namespace := "demo-dev"
 	config := NewConfigMaps(name, namespace)
@@ -28,7 +28,7 @@ func TestConfigMaps_Get(t *testing.T) {
 	log.Info(result)
 }
 
-func TestConfigMaps_Delete(t *testing.T) {
+func TestConfigMapsDelete(t *testing.T) {
 	name := "test"
 	namespace := "demo-dev"
 	config := NewConfigMaps(name, namespace)
@@ -36,7 +36,7 @@ func TestConfigMaps_Delete(t *testing.T) {
 	assert.Equal(t, nil, err)
 }
 
-func TestConfigMaps_Update(t *testing.T) {
+func TestConfigMapsUpdate(t *testing.T) {
 	name := "test"
 	namespace := "demo-dev"
 	config := NewConfigMaps(name, namespace)
