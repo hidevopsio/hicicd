@@ -55,8 +55,7 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 		return
 	}
 
-	var url string
-	url = request.Url
+	url := request.Url
 	if url == "" {
 		url = os.Getenv("SCM_URL")
 	}

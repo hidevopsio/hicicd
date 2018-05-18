@@ -22,6 +22,8 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
 	"github.com/hidevopsio/hicicd/pkg/ci/factories"
 	"github.com/hidevopsio/hicicd/pkg/ci"
+	"github.com/hidevopsio/hicicd/pkg/scm/gitlab"
+	"net/http"
 )
 
 type CicdResponse struct {
@@ -56,7 +58,6 @@ func (c *CicdController) Before(ctx *web.Context) {
 // @router / [post]
 func (c *CicdController) PostRun(ctx *web.Context) {
 	log.Debug("CicdController.Run()")
-
 	var pl ci.Pipeline
 	err := ctx.RequestBody(&pl)
 	if err != nil {
@@ -69,6 +70,18 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 	if err == nil {
 		// Run Pipeline, password is a token, no need to pass username to pipeline
 		pipeline.Init(&pl)
+		//权限
+		product := &gitlab.Product{
+			BaseUrl:   pl.Scm.Url,
+			Name:      pl.Name,
+			Namespace: pl.Namespace,
+		}
+		exists := product.GetUserProject()
+		if exists {
+			ctx.ResponseError("unauthorized", http.StatusUnauthorized)
+			return
+		}
+
 		err = pipeline.Run(c.Username, c.Password, false)
 		if err != nil {
 			message = err.Error()

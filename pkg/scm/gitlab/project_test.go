@@ -8,15 +8,19 @@ import (
 )
 
 func TestGetProject(t *testing.T) {
-	baseUrl :=  os.Getenv("SCM_URL")
+	baseUrl := os.Getenv("SCM_URL")
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
 	log.Debugf("url: %v, username: %v", baseUrl, username)
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	id := 1067
-	token := gs.PrivateToken
-	project, err := gs.GetProject(token, baseUrl, id)
+	product := &Product{
+		Token:   gs.PrivateToken,
+		BaseUrl: baseUrl,
+		ID:      id,
+	}
+	project, err := product.GetProject()
 	if err != nil {
 		return
 	}
@@ -25,13 +29,17 @@ func TestGetProject(t *testing.T) {
 }
 
 func TestGetProjectList(t *testing.T) {
-	baseUrl :=  os.Getenv("SCM_URL")
+	baseUrl := os.Getenv("SCM_URL")
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
 	log.Debugf("url: %v, username: %v", baseUrl, username)
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
-	projects, err := gs.GetProjectLlist(gs.PrivateToken, baseUrl)
+	product := &Product{
+		Token:   gs.PrivateToken,
+		BaseUrl: baseUrl,
+	}
+	projects, err := product.GetProjectLlist()
 	assert.Equal(t, nil, err)
 	assert.Equal(t, username, gs.Username)
 	log.Debug("project size:", len(projects))
@@ -39,7 +47,7 @@ func TestGetProjectList(t *testing.T) {
 }
 
 func TestGetUserProject(t *testing.T) {
-	baseUrl :=  os.Getenv("SCM_URL")
+	baseUrl := os.Getenv("SCM_URL")
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
 	name := "hello-world"
@@ -47,8 +55,14 @@ func TestGetUserProject(t *testing.T) {
 	log.Debugf("url: %v, username: %v", baseUrl, username)
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
+	product := &Product{
+		Token:     gs.PrivateToken,
+		Name:      name,
+		Namespace: namespace,
+		BaseUrl:   baseUrl,
+	}
 	assert.Equal(t, nil, err)
-	exists := gs.GetUserProject(gs.PrivateToken, baseUrl, name, namespace)
+	exists := product.GetUserProject()
 	log.Debug("get user project exists :", exists)
 	assert.Equal(t, true, exists)
 }

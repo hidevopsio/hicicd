@@ -39,7 +39,6 @@ func (c *BaseController) Before(ctx *web.Context) {
 		c.Password = parseToken(claims, ScmPassword)
 		c.ScmToken = parseToken(claims, ScmToken)
 		log.Debugf("url: %v, username: %v, password: %v", username, strings.Repeat("*", len(password)))
-
 	} else {
 		log.Debug("valid username  password   err")
 		return
