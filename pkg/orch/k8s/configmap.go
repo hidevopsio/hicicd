@@ -9,16 +9,17 @@ import (
 )
 
 type ConfigMaps struct {
-	Name      string `json:"name"`
-	Namespace string `json:"namespace"`
+	Name      string            `json:"name"`
+	Namespace string            `json:"namespace"`
 	Data      map[string]string `json:"data"`
 	Interface v1.ConfigMapInterface
 }
 
-func NewConfigMaps(name, namespace string) *ConfigMaps {
+func NewConfigMaps(name, namespace string, data map[string]string) *ConfigMaps {
 	return &ConfigMaps{
 		Name:      name,
 		Namespace: namespace,
+		Data:      data,
 		Interface: orch.ClientSet.CoreV1().ConfigMaps(namespace),
 	}
 }
@@ -31,8 +32,8 @@ func (c *ConfigMaps) Create() (*core_v1.ConfigMap, error) {
 		},
 		Data: c.Data,
 	}
-	co,err := c.Get()
-	log.Debug("config map get :",co)
+	co, err := c.Get()
+	log.Debug("config map get :", co)
 	if err == nil {
 		con, err := c.Update(cm)
 		return con, err

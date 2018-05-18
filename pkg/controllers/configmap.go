@@ -29,7 +29,7 @@ func (c *ConfigMapController) PostAdd(ctx *web.Context) {
 		ctx.ResponseError(err.Error(), http.StatusUnavailableForLegalReasons)
 		return
 	}
-	config := k8s.NewConfigMaps(configMap.Name, configMap.Namespace)
+	config := k8s.NewConfigMaps(configMap.Name, configMap.Namespace, configMap.Data)
 	co, e := config.Create()
 	log.Debug("create debug",co)
 	if e != nil {
