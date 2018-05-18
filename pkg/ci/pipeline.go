@@ -193,8 +193,6 @@ func (pl *Pipeline) CreateRoleBinding(username string) error{
 	return err
 }
 
-
-
 func (p *Pipeline) Build(secret string, completedHandler func() error) error {
 	log.Debug("Pipeline.Build()")
 

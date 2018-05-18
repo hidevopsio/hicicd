@@ -40,10 +40,9 @@ func (r *RoleBinding) Get() (*authorization_v1.RoleBinding, error) {
 }
 
 func (r *RoleBinding) Create(rolebinding *authorization_v1.RoleBinding) (*authorization_v1.RoleBinding, error) {
-	log.Debug("create rolebinding")
+	log.Debug("create role binding")
 	_, err := r.Interface.Get(r.Name, meta_v1.GetOptions{})
-	if err != nil {
-		log.Error("get policy err :", err)
+	if err == nil {
 		result, err := r.Update(rolebinding)
 		if err != nil {
 			return nil, err
