@@ -26,6 +26,10 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/orch/istio"
 	"github.com/jinzhu/copier"
 	"path/filepath"
+	authorization_v1 "github.com/openshift/api/authorization/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	"github.com/hidevopsio/hicicd/pkg/scm/gitlab"
 )
 
 type Scm struct {
@@ -149,6 +153,48 @@ func (p *Pipeline) CreateSecret(username, password string, isToken bool) (string
 	return secretName, err
 }
 
+func (pl *Pipeline) CreateProject()  error  {
+	p, err := openshift.NewProject(pl.Name,"", "")
+	if err != nil {
+		log.Error("create namespace err :",err)
+		return err
+	}
+	pro, err := p.Get()
+	if err == nil {
+		log.Debug("exists project debug", pro)
+		return err
+	}
+	project, err := p.Create()
+	log.Debug("create project debug", project)
+	return nil
+}
+
+func (pl *Pipeline) CreateRoleBinding(username string) error{
+	bin, err := openshift.NewRoleBinding(pl.Name, pl.Namespace)
+	if err != nil {
+		return err
+	}
+	rolebinding := &authorization_v1.RoleBinding{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      pl.Name,
+			Namespace: pl.Namespace,
+		},
+		RoleRef: corev1.ObjectReference{
+			Name: pl.Name,
+		},
+		Subjects: []corev1.ObjectReference{
+			{
+				Name: username,
+				Kind : "User",
+			},
+		},
+	}
+	_, err = bin.Create(rolebinding)
+	return err
+}
+
+
+
 func (p *Pipeline) Build(secret string, completedHandler func() error) error {
 	log.Debug("Pipeline.Build()")
 
@@ -261,9 +307,29 @@ func (p *Pipeline) CreateRoute() error {
 func (p *Pipeline) Run(username, password string, isToken bool) error {
 	log.Debug("Pipeline.Run()")
 	// TODO: first, let's check if namespace is exist or not
-
+	//新建namespace
+	 err := p.CreateProject()
+	if err != nil {
+		log.Error("Pipeline run new namespace err:",err)
+		return err
+	}
+	//授权给该用户
+	err = p.CreateRoleBinding(username)
+	if err != nil {
+		log.Error("Pipeline run Create RoleBinding err :",err)
+		return err
+	}
 	// TODO: check if the same app in the same namespace is already in running status.
-
+	product := &gitlab.Product{
+		BaseUrl:   p.Scm.Url,
+		Name:      p.Name,
+		Namespace: p.Namespace,
+	}
+	//该username  是否存在该app账号的权限  存在  true   不存在  false
+	exists := product.GetUserProject()
+	if exists {
+		return fmt.Errorf("no authority create app", exists)
+	}
 	// create secret for building image
 	secret, err := p.CreateSecret(username, password, isToken)
 	if err != nil {
@@ -280,7 +346,7 @@ func (p *Pipeline) Run(username, password string, isToken bool) error {
 				if p.IstioConfigs.Skip {
 					return in, nil
 				}
-				
+
 				injector := &istio.Injector{}
 				copier.Copy(injector, p.IstioConfigs)
 				return injector.Inject(in)

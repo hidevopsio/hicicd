@@ -16,9 +16,18 @@ package ci
 
 import (
 	"testing"
+	"github.com/magiconair/properties/assert"
 )
-
 
 func TestPipelineInit(t *testing.T) {
 
+}
+
+func TestPipelineCreateProject(t *testing.T) {
+	name := "demo-test"
+	pl := &Pipeline{
+		Name: name,
+	}
+	err := pl.CreateProject()
+	assert.Equal(t, nil, err)
 }
