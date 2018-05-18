@@ -7,11 +7,11 @@ import (
 )
 
 type ProductInterface interface {
-	GetProject(token, baseUrl string, id interface{}) (*gitlab.Project, error)
+	GetProject() (*gitlab.Project, error)
 
-	GetProjectLlist(token, baseUrl string) ([]*gitlab.Project, error)
+	GetProjectLlist() ([]*gitlab.Project, error)
 
-	GetUserProject(token, baseUrl, name, namespace string) bool
+	GetUserProject() bool
 }
 
 type Product struct {
