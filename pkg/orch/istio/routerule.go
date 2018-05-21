@@ -73,21 +73,21 @@ func (rr *RouterRule) GetConfig() (model.Config, error) {
 	return config, nil
 }
 //create  route rule
-func (router *RouterRule) Create() (string, error) {
-	log.Debug("create rule :", router)
-	config, err := router.GetConfig()
-	con, exists := router.Get(RouterType)
+func (rr *RouterRule) Create() (string, error) {
+	log.Debug("create rule :", rr)
+	config, err := rr.GetConfig()
+	con, exists := rr.Get(RouterType)
 	log.Debug("config exists", exists)
 	if exists {
 		config.ResourceVersion = con.ResourceVersion
-		resourceVersion, err := router.Crd.Update(config)
+		resourceVersion, err := rr.Crd.Update(config)
 		if err != nil {
 			return "", err
 		}
 		return resourceVersion, nil
 	}
 	log.Debug("create route rule config ", config)
-	resourceVersion, err := router.Crd.Create(config)
+	resourceVersion, err := rr.Crd.Create(config)
 	if err != nil {
 		log.Error("create route rule error %v", err)
 		return "", err
