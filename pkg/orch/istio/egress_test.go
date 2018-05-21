@@ -12,7 +12,7 @@ func TestCreateEgress(t *testing.T) {
 			Name:        "mysql-dev",
 			Namespace:   "istio-system",
 		},
-		Protocol:    EgressProtocol[4],
+		Protocol:    EgressProtocolTcp,
 		Port:        3306,
 		Destination: "172.16.8.80",
 	}

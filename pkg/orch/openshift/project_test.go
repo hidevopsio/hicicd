@@ -41,7 +41,7 @@ func TestProjectLit(t *testing.T) {
 }
 
 func TestProjectCreate(t *testing.T) {
-	namespace := "moses-demos-dev"
+	namespace := "demo-test"
 	projects, err := NewProject(namespace, "", "")
 	assert.Equal(t, nil, err)
 

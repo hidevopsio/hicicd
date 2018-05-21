@@ -11,6 +11,12 @@ const (
 	EgressVersion = "v1alpha2"
 	EgressGroup   = "config.istio.io"
 	EgressDomain  = "cluster"
+	EgressProtocolHttp = "HTTP"
+	EgressProtocolHttps = "HTTPS"
+	EgressProtocolGrpc = "GRPC"
+	EgressProtocolHttp2 = "HTTP2"
+	EgressProtocolTcp =  "TCP"
+	EgressProtocolMongo = "MONGO"
 )
 
 //HTTP|HTTPS|GRPC|HTTP2|TCP|MONGO
