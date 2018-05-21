@@ -184,7 +184,7 @@ func (pl *Pipeline) CreateRoleBinding(username string) error {
 	}
 	b, err := binding.Get()
 	if err != nil {
-		rolebinding := &authorization_v1.RoleBinding{
+		role := &authorization_v1.RoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      binding.Name,
 				Namespace: pl.Namespace,
@@ -199,7 +199,7 @@ func (pl *Pipeline) CreateRoleBinding(username string) error {
 				},
 			},
 		}
-		_, err = binding.Create(rolebinding)
+		_, err = binding.Create(role)
 		return err
 	}
 	for _, value := range b.Subjects {

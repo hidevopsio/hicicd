@@ -37,6 +37,7 @@ func TestJavaPipeline(t *testing.T)  {
 
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
+	baseUrl :=  os.Getenv("SCM_URL")
 	java.Init(&ci.Pipeline{
 		Name: "java",
 		Profile: "test",
@@ -44,7 +45,7 @@ func TestJavaPipeline(t *testing.T)  {
 		Project: "demo",
 		Version: "v2",
 		Scm: ci.Scm{
-			Url: os.Getenv("SCM_URL"),
+			Url: baseUrl,
 			Ref: "v2",
 		},
 		BuildConfigs: ci.BuildConfigs{
@@ -54,8 +55,6 @@ func TestJavaPipeline(t *testing.T)  {
 			ForceUpdate: true,
 		},
 	})
-	baseUrl :=  os.Getenv("SCM_URL")
-	log.Debugf("url: %v, username: %v", baseUrl, username)
 	gs := new(gitlab.Session)
 	err := gs.GetSession(baseUrl, username, password)
 	assert.Equal(t, nil, err)
