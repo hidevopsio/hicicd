@@ -7,14 +7,6 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
-type ClientInterface interface {
-	Create() (string, error)
-	Get(typ string) (*model.Config, bool)
-	Delete(typ string) error
-	Update() (string, error)
-	getConfig() (model.Config, error)
-}
-
 type Client struct {
 	Type            int64 `json:"type"`
 	FullName        string `json:"full_name"`
