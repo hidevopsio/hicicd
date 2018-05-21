@@ -51,7 +51,7 @@ func (e *Egress) getConfig() (model.Config, error) {
 }
 
 func (e *Egress) Create() (string, error) {
-	log.Debug("create rule :", e)
+	log.Debug("create egress :", e)
 	config, err := e.getConfig()
 	con, exists := e.Get(EgressType)
 	log.Debug("config exists", exists)
