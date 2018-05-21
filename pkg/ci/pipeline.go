@@ -153,10 +153,10 @@ func (p *Pipeline) CreateSecret(username, password string, isToken bool) (string
 	return secretName, err
 }
 
-func (pl *Pipeline) CreateProject()  error  {
-	p, err := openshift.NewProject(pl.Name,"", "")
+func (pl *Pipeline) CreateProject() error {
+	p, err := openshift.NewProject(pl.Namespace, "", "")
 	if err != nil {
-		log.Error("create namespace err :",err)
+		log.Error("create namespace err :", err)
 		return err
 	}
 	pro, err := p.Get()
@@ -165,31 +165,54 @@ func (pl *Pipeline) CreateProject()  error  {
 		return err
 	}
 	project, err := p.Create()
+	if err != nil {
+		return err
+	}
+	//初始化namespace
+	err = pl.InitProject()
+	if err != nil {
+		return err
+	}
 	log.Debug("create project debug", project)
 	return nil
 }
 
-func (pl *Pipeline) CreateRoleBinding(username string) error{
-	bin, err := openshift.NewRoleBinding(pl.Name, pl.Namespace)
+func (pl *Pipeline) CreateRoleBinding(username string) error {
+	binding, err := openshift.NewRoleBinding("admin", pl.Namespace)
 	if err != nil {
 		return err
 	}
-	rolebinding := &authorization_v1.RoleBinding{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      pl.Name,
-			Namespace: pl.Namespace,
-		},
-		RoleRef: corev1.ObjectReference{
-			Name: pl.Name,
-		},
-		Subjects: []corev1.ObjectReference{
-			{
-				Name: username,
-				Kind : "User",
+	b, err := binding.Get()
+	if err != nil {
+		rolebinding := &authorization_v1.RoleBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      binding.Name,
+				Namespace: pl.Namespace,
 			},
-		},
+			RoleRef: corev1.ObjectReference{
+				Name: binding.Name,
+			},
+			Subjects: []corev1.ObjectReference{
+				{
+					Name: username,
+					Kind: "User",
+				},
+			},
+		}
+		_, err = binding.Create(rolebinding)
+		return err
 	}
-	_, err = bin.Create(rolebinding)
+	for _, value := range b.Subjects {
+		if value.Name == username {
+			return nil
+		}
+	}
+	re := corev1.ObjectReference{
+		Name: username,
+		Kind: "User",
+	}
+	b.Subjects = append(b.Subjects, re)
+	_, err = binding.Create(b)
 	return err
 }
 
@@ -302,30 +325,53 @@ func (p *Pipeline) CreateRoute() error {
 	return nil
 }
 
-func (p *Pipeline) Run(username, password string, isToken bool) error {
+func (p *Pipeline) InitProject() error {
+	//init Groups
+	role := &openshift.RoleBinding{
+		Namespace: p.Namespace,
+	}
+	err := role.InitImageBuilders()
+	if err != nil {
+		return err
+	}
+	err = role.InitImagePullers()
+	if err != nil {
+		return err
+	}
+	err = role.InitSystemDeployers()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *Pipeline) Run(username, password, token string, isToken bool) error {
 	log.Debug("Pipeline.Run()")
 	// TODO: first, let's check if namespace is exist or not
 	//新建namespace
-	 err := p.CreateProject()
+	err := p.CreateProject()
+
 	if err != nil {
-		log.Error("Pipeline run new namespace err:",err)
+		log.Error("Pipeline run new namespace err:", err)
 		return err
 	}
+
 	//授权给该用户
 	err = p.CreateRoleBinding(username)
 	if err != nil {
-		log.Error("Pipeline run Create RoleBinding err :",err)
+		log.Error("Pipeline run Create RoleBinding err :", err)
 		return err
 	}
 	// TODO: check if the same app in the same namespace is already in running status.
 	product := &gitlab.Product{
 		BaseUrl:   p.Scm.Url,
-		Name:      p.Name,
+		Name:      p.App,
 		Namespace: p.Namespace,
+		Token:     token,
 	}
 	//该username  是否存在该app账号的权限  存在  true   不存在  false
-	exists := product.GetUserProject()
-	if exists {
+	exists, err := product.GetUserProject()
+	if exists || err != nil {
 		return fmt.Errorf("no authority create app", exists)
 	}
 	// create secret for building image

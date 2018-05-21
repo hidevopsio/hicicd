@@ -38,7 +38,7 @@ func TestJavaPipeline(t *testing.T)  {
 	password := os.Getenv("SCM_PASSWORD")
 	java.Init(&ci.Pipeline{
 		Name: "java",
-		Profile: "dev",
+		Profile: "test",
 		App: "demo-consumer",
 		Project: "demo",
 		Version: "v2",
@@ -53,7 +53,7 @@ func TestJavaPipeline(t *testing.T)  {
 			ForceUpdate: true,
 		},
 	})
-	err := java.Run(username, password, false)
+	err := java.Run(username, password,"LgD1ZedJB9FLhn73nxGT", false)
 	assert.Equal(t, nil, err)
 }
 

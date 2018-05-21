@@ -24,7 +24,7 @@ func TestPipelineInit(t *testing.T) {
 }
 
 func TestPipelineCreateProject(t *testing.T) {
-	name := "demo-test1"
+	name := "demo-test"
 	pl := &Pipeline{
 		Name: name,
 	}

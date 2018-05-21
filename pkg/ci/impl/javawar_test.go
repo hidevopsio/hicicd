@@ -42,6 +42,6 @@ func TestJavaWarPipeline(t *testing.T)  {
 		Project: "demo",
 		Scm: ci.Scm{Url: os.Getenv("SCM_URL")},
 	})
-	err := java.Run(username, password, false)
+	err := java.Run(username, password,"", false)
 	assert.Equal(t, nil, err)
 }

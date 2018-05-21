@@ -32,6 +32,6 @@ func TestNodeJsPipeline(t *testing.T) {
 		//},
 	}
 	nodeJs.Init(pi)
-	err := nodeJs.Run(username, password, false)
+	err := nodeJs.Run(username, password,"", false)
 	assert.Equal(t, nil, err)
 }
