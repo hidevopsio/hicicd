@@ -6,6 +6,7 @@ import (
 	"os"
 	"github.com/hidevopsio/hicicd/pkg/ci"
 	"github.com/magiconair/properties/assert"
+	"github.com/hidevopsio/hicicd/pkg/scm/gitlab"
 )
 
 func TestNodeJsPipeline(t *testing.T) {
@@ -32,6 +33,13 @@ func TestNodeJsPipeline(t *testing.T) {
 		//},
 	}
 	nodeJs.Init(pi)
-	err := nodeJs.Run(username, password, false)
+	baseUrl :=  os.Getenv("SCM_URL")
+	log.Debugf("url: %v, username: %v", baseUrl, username)
+	gs := new(gitlab.Session)
+	err := gs.GetSession(baseUrl, username, password)
+	assert.Equal(t, nil, err)
+	log.Debug(gs)
+	assert.Equal(t, username, gs.Username)
+	err = nodeJs.Run(username, password,gs.PrivateToken, false)
 	assert.Equal(t, nil, err)
 }

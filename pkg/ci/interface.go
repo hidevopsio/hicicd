@@ -26,4 +26,6 @@ type PipelineInterface interface {
 	CreateService() error
 	CreateRoute() error
 	Run(username, password string, isToken bool) error
+	CreateProject() error
+	CreateRoleBinding(username string) error
 }

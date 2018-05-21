@@ -22,6 +22,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"fmt"
+	"github.com/hidevopsio/hicicd/pkg/scm/gitlab"
 )
 
 func init()  {
@@ -36,24 +37,30 @@ func TestJavaPipeline(t *testing.T)  {
 
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
+	baseUrl :=  os.Getenv("SCM_URL")
 	java.Init(&ci.Pipeline{
 		Name: "java",
-		Profile: "dev",
-		App: "hello-world",
+		Profile: "test",
+		App: "demo-consumer",
 		Project: "demo",
-		Version: "v3",
+		Version: "v2",
 		Scm: ci.Scm{
-			Url: os.Getenv("SCM_URL"),
-			Ref: "master",
+			Url: baseUrl,
+			Ref: "v2",
 		},
 		BuildConfigs: ci.BuildConfigs{
-			Skip: true,
+			Skip: false,
 		},
 		DeploymentConfigs: ci.DeploymentConfigs{
 			ForceUpdate: true,
 		},
 	})
-	err := java.Run(username, password, false)
+	gs := new(gitlab.Session)
+	err := gs.GetSession(baseUrl, username, password)
+	assert.Equal(t, nil, err)
+	log.Debug(gs)
+	assert.Equal(t, username, gs.Username)
+	err = java.Run(username, password, gs.PrivateToken, false)
 	assert.Equal(t, nil, err)
 }
 
