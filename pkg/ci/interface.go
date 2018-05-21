@@ -25,7 +25,7 @@ type PipelineInterface interface {
 	Deploy() error
 	CreateService() error
 	CreateRoute() error
-	Run(username, password string, isToken bool) error
+	Run(username, password, scmToken string, isToken bool) error
 	CreateProject() error
 	CreateRoleBinding(username string) error
 }
