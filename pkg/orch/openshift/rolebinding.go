@@ -65,17 +65,17 @@ func (rb *RoleBinding) Get() (*authorization_v1.RoleBinding, error) {
 	return role, nil
 }
 
-func (rb *RoleBinding) Create(rolebinding *authorization_v1.RoleBinding) (*authorization_v1.RoleBinding, error) {
+func (rb *RoleBinding) Create(roleBinding *authorization_v1.RoleBinding) (*authorization_v1.RoleBinding, error) {
 	log.Debug("create role binding")
 	_, err := rb.Interface.Get(rb.Name, meta_v1.GetOptions{})
 	if err == nil {
-		result, err := rb.Update(rolebinding)
+		result, err := rb.Update(roleBinding)
 		if err != nil {
 			return nil, err
 		}
 		return result, nil
 	}
-	result, err := rb.Interface.Create(rolebinding)
+	result, err := rb.Interface.Create(roleBinding)
 	if err != nil {
 		return nil, err
 	}

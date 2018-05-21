@@ -21,7 +21,7 @@ func TestRoleBindingGet(t *testing.T) {
 
 func TestRoleBindingDelete(t *testing.T) {
 	name := "admin"
-	namespace := "default"
+	namespace := "demo-test"
 	roleBinding, err := NewRoleBinding(name, namespace)
 	assert.Equal(t, nil, err)
 	err = roleBinding.Delete()
@@ -33,16 +33,26 @@ func TestRoleBindingCreate(t *testing.T) {
 	namespace := "demo-test"
 	roleBinding, err := NewRoleBinding(name, namespace)
 	assert.Equal(t, nil, err)
-	rb := &RoleBinding{
-		Name:name,
-		Namespace: namespace,
-		RoleRefName: "admin",
-		RoleRefKind: "",
-		SubjectName: "chen",
-		SubjectKind: "User",
+	roleBinding1 := &authorization_v1.RoleBinding{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+		},
+		RoleRef: corev1.ObjectReference{
+			Name: name,
+		},
+		Subjects: []corev1.ObjectReference{
+			{
+				Kind:      "User",
+				Name:      "chen",
+			},
+			{
+				Kind:      "User",
+				Name:      "shi",
+			},
+		},
 	}
-	binding := rb.Init()
-	role, err := roleBinding.Create(binding)
+	role, err := roleBinding.Create(roleBinding1)
 	log.Debug(role)
 	log.Debug(err)
 }

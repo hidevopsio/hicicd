@@ -212,6 +212,7 @@ func (p *Pipeline) CreateRoleBinding(username string) error {
 		Kind: "User",
 	}
 	r.Subjects = append(r.Subjects, reference)
+	r.UserNames =append(r.UserNames, username)
 	_, err = roleBinding.Create(r)
 	return err
 }
