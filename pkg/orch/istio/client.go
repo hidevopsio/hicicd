@@ -44,7 +44,7 @@ func newClient(kubeconfig string) (*crd.Client, error) {
 	return crd.NewClient(kubeconfig, config, "")
 }
 
-func (client *Client) getConfig() (*model.Config, error) {
+func (c *Client) getConfig() (*model.Config, error) {
 	return nil, nil
 }
 
@@ -54,8 +54,8 @@ func (c *Client) Get(typ string) (*model.Config, bool){
 	return config, exists
 }
 
-func (client *Client) Delete(typ string) error {
-	err := client.Crd.Delete(typ, client.Name, client.Namespace)
+func (c *Client) Delete(typ string) error {
+	err := c.Crd.Delete(typ, c.Name, c.Namespace)
 	if err != nil {
 		log.Error("type: "+ typ +" route rule delete config", err)
 		return err

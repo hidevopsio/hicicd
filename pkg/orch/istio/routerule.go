@@ -24,37 +24,37 @@ type RouterRule struct {
 	FixedDelay     int64                        `json:"fixed_delay"`
 }
 //Obtain  config
-func (rr *RouterRule) GetConfig() (model.Config, error) {
+func (r *RouterRule) GetConfig() (model.Config, error) {
 	routerule := &routing.RouteRule{
 		Destination: &routing.IstioService{
-			Name: rr.Name,
+			Name: r.Name,
 		},
 	}
-	if rr.FixedDelay != 0 {
+	if r.FixedDelay != 0 {
 		routerule.HttpFault = &routing.HTTPFaultInjection{
 			Delay: &routing.HTTPFaultInjection_Delay{
-				Percent: rr.Percent,
+				Percent: r.Percent,
 				HttpDelayType: &routing.HTTPFaultInjection_Delay_FixedDelay{
 					FixedDelay: &google_protobuf1.Duration{
-						Seconds: rr.FixedDelay,
+						Seconds: r.FixedDelay,
 					},
 				},
 			},
 		}
 	}
-	if rr.Timeout != 0 {
+	if r.Timeout != 0 {
 		routerule.HttpReqTimeout = &routing.HTTPTimeout{
 			TimeoutPolicy: &routing.HTTPTimeout_SimpleTimeout{
 				SimpleTimeout: &routing.HTTPTimeout_SimpleTimeoutPolicy{
 					Timeout: &google_protobuf1.Duration{
-						Seconds: rr.Timeout,
+						Seconds: r.Timeout,
 					},
 				},
 			},
 		}
 	}
-	if len(rr.Route) != 0 {
-		routerule.Route = rr.Route
+	if len(r.Route) != 0 {
+		routerule.Route = r.Route
 	}
 	log.Debug("route.HttpFault :{}", routerule)
 	config := model.Config{
@@ -62,8 +62,8 @@ func (rr *RouterRule) GetConfig() (model.Config, error) {
 			Type:        RouterType,
 			Version:     RouterVersion,
 			Group:       RouterGroup,
-			Name:        rr.Name,
-			Namespace:   rr.Namespace,
+			Name:        r.Name,
+			Namespace:   r.Namespace,
 			Domain:      RouterDomain,
 			Labels:      map[string]string{"label": "value"},
 			Annotations: map[string]string{"annotation": "value"},
@@ -73,21 +73,21 @@ func (rr *RouterRule) GetConfig() (model.Config, error) {
 	return config, nil
 }
 //create  route rule
-func (router *RouterRule) Create() (string, error) {
-	log.Debug("create rule :", router)
-	config, err := router.GetConfig()
-	con, exists := router.Get(RouterType)
+func (r *RouterRule) Create() (string, error) {
+	log.Debug("create rule :", r)
+	config, err := r.GetConfig()
+	con, exists := r.Get(RouterType)
 	log.Debug("config exists", exists)
 	if exists {
 		config.ResourceVersion = con.ResourceVersion
-		resourceVersion, err := router.Crd.Update(config)
+		resourceVersion, err := r.Crd.Update(config)
 		if err != nil {
 			return "", err
 		}
 		return resourceVersion, nil
 	}
 	log.Debug("create route rule config ", config)
-	resourceVersion, err := router.Crd.Create(config)
+	resourceVersion, err := r.Crd.Create(config)
 	if err != nil {
 		log.Error("create route rule error %v", err)
 		return "", err
