@@ -31,13 +31,6 @@ type Client struct {
 
 var Typ = [5]string{"route-rule","egress-rule","destination-policy","quota-spec"}
 
-const (
-	Type    = "route-rule"
-	Version = "v1alpha2"
-	Group   = "config.istio.io"
-	Domain  = "cluster"
-)
-
 func newClient(kubeconfig string) (*crd.Client, error) {
 	// TODO: use model.IstioConfigTypes once model.IngressRule is deprecated
 	config := model.ConfigDescriptor{
