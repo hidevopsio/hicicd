@@ -20,21 +20,21 @@ type RoleBinding struct {
 	Interface   v1.RoleBindingInterface
 }
 
-func (r *RoleBinding) Init() (*authorization_v1.RoleBinding) {
+func (rb *RoleBinding) Init() (*authorization_v1.RoleBinding) {
 	roleBinding := &authorization_v1.RoleBinding{
 		ObjectMeta: meta_v1.ObjectMeta{
-			Name:      r.Name,
-			Namespace: r.Namespace,
+			Name:      rb.Name,
+			Namespace: rb.Namespace,
 		},
 		RoleRef: corev1.ObjectReference{
-			Name: r.RoleRefName,
-			Kind: r.RoleRefKind,
+			Name: rb.RoleRefName,
+			Kind: rb.RoleRefKind,
 		},
 		Subjects: []corev1.ObjectReference{
 			{
-				Kind:      r.SubjectKind,
-				Name:      r.SubjectName,
-				Namespace: r.Namespace,
+				Kind:      rb.SubjectKind,
+				Name:      rb.SubjectName,
+				Namespace: rb.Namespace,
 			},
 		},
 	}
@@ -55,9 +55,9 @@ func NewRoleBinding(name, namespace string) (*RoleBinding, error) {
 	return r, nil
 }
 
-func (r *RoleBinding) Get() (*authorization_v1.RoleBinding, error) {
+func (rb *RoleBinding) Get() (*authorization_v1.RoleBinding, error) {
 	log.Debug("get RoleBinding:")
-	role, err := r.Interface.Get(r.Name, meta_v1.GetOptions{})
+	role, err := rb.Interface.Get(rb.Name, meta_v1.GetOptions{})
 	if err != nil {
 		log.Error("get policy err :", err)
 		return nil, err
@@ -65,41 +65,41 @@ func (r *RoleBinding) Get() (*authorization_v1.RoleBinding, error) {
 	return role, nil
 }
 
-func (r *RoleBinding) Create(rolebinding *authorization_v1.RoleBinding) (*authorization_v1.RoleBinding, error) {
+func (rb *RoleBinding) Create(rolebinding *authorization_v1.RoleBinding) (*authorization_v1.RoleBinding, error) {
 	log.Debug("create role binding")
-	_, err := r.Interface.Get(r.Name, meta_v1.GetOptions{})
+	_, err := rb.Interface.Get(rb.Name, meta_v1.GetOptions{})
 	if err == nil {
-		result, err := r.Update(rolebinding)
+		result, err := rb.Update(rolebinding)
 		if err != nil {
 			return nil, err
 		}
 		return result, nil
 	}
-	result, err := r.Interface.Create(rolebinding)
+	result, err := rb.Interface.Create(rolebinding)
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
-func (r *RoleBinding) Delete() error {
+func (rb *RoleBinding) Delete() error {
 	log.Debug("get RoleBinding:")
-	err := r.Interface.Delete(r.Name, &meta_v1.DeleteOptions{})
+	err := rb.Interface.Delete(rb.Name, &meta_v1.DeleteOptions{})
 	return err
 }
 
-func (r *RoleBinding) Update(roleBinding *authorization_v1.RoleBinding) (*authorization_v1.RoleBinding, error) {
+func (rb *RoleBinding) Update(roleBinding *authorization_v1.RoleBinding) (*authorization_v1.RoleBinding, error) {
 	log.Debug("get RoleBinding:")
-	result, err := r.Interface.Update(roleBinding)
+	result, err := rb.Interface.Update(roleBinding)
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
-func (r *RoleBinding) InitImagePullers() error {
+func (rb *RoleBinding) InitImagePullers() error {
 	name := "system:image-pullers"
-	namespace := r.Namespace
+	namespace := rb.Namespace
 	bin, err := NewRoleBinding(name, namespace)
 	if err != nil {
 		return err
@@ -107,7 +107,7 @@ func (r *RoleBinding) InitImagePullers() error {
 	roleBinding := &authorization_v1.RoleBinding{
 		ObjectMeta: meta_v1.ObjectMeta{
 			Name:      name,
-			Namespace: r.Namespace,
+			Namespace: rb.Namespace,
 		},
 		RoleRef: corev1.ObjectReference{
 			Name: "system:image-puller",
@@ -125,9 +125,9 @@ func (r *RoleBinding) InitImagePullers() error {
 	return err
 }
 
-func (r *RoleBinding) InitImageBuilders() error {
+func (rb *RoleBinding) InitImageBuilders() error {
 	name := "system:image-builders"
-	namespace := r.Namespace
+	namespace := rb.Namespace
 	bin, err := NewRoleBinding(name, namespace)
 	if err != nil {
 		return err
@@ -153,9 +153,9 @@ func (r *RoleBinding) InitImageBuilders() error {
 	return err
 }
 
-func (r *RoleBinding) InitSystemDeployers() error {
+func (rb *RoleBinding) InitSystemDeployers() error {
 	name := "system:deployers"
-	namespace := r.Namespace
+	namespace := rb.Namespace
 	bin, err := NewRoleBinding(name, namespace)
 	if err != nil {
 		return err
