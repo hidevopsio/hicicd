@@ -9,8 +9,8 @@ import (
 
 type ClientInterface interface {
 	Create() (string, error)
-	Get() (*model.Config, bool)
-	Delete() error
+	Get(typ string) (*model.Config, bool)
+	Delete(typ string) error
 	Update() (string, error)
 	getConfig() (model.Config, error)
 }
@@ -63,8 +63,8 @@ func (client *Client) getConfig() (*model.Config, error) {
 	return nil, nil
 }
 
-func (client *Client) Get(typ string) (*model.Config, bool) {
-	config, exists := client.Crd.Get(typ, client.Name, client.Namespace)
+func (c *Client) Get(typ string) (*model.Config, bool){
+	config, exists := c.Crd.Get(typ, c.Name, c.Namespace)
 	log.Debug("route rule get config", exists)
 	return config, exists
 }

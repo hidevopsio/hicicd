@@ -11,28 +11,28 @@ import (
 func TestGet(t *testing.T) {
 	config, err := NewClient()
 	assert.Equal(t, nil, err)
-	rule := Client{
+	client := Client{
 		Name:      "demo-provider",
 		Namespace: "demo-dev",
 	}
-	rule.Crd = config
+	client.Crd = config
 	typ := RouterType
-	con, flag := rule.Get(typ)
-	log.Info("get rule :", con)
-	resoureceVersion := con.ResourceVersion
+	c, flag := client.Get(typ)
+	log.Info("get rule :", c)
+	resoureceVersion := c.ResourceVersion
 	assert.Equal(t, true, flag)
-	log.Info("route Rule get version :", resoureceVersion)
+	log.Info("routerule get version :", resoureceVersion)
 }
 
 func TestDelete(t *testing.T) {
 	config, err := NewClient()
 	assert.Equal(t, nil, err)
-	rule := Client{
-		Name:      "demo-provider",
+	client := Client{
+		Name:      "hello-world",
 		Namespace: "demo-dev",
 	}
 	typ := RouterType
-	rule.Crd = config
-	err = rule.Delete(typ)
+	client.Crd = config
+	err = client.Delete(typ)
 	assert.Equal(t, nil, err)
 }

@@ -24,51 +24,51 @@ type RouterRule struct {
 	FixedDelay     int64                        `json:"fixed_delay"`
 }
 //Obtain  config
-func (router *RouterRule) GetConfig() (model.Config, error) {
-	route := &routing.RouteRule{
+func (rr *RouterRule) GetConfig() (model.Config, error) {
+	routerule := &routing.RouteRule{
 		Destination: &routing.IstioService{
-			Name: router.Name,
+			Name: rr.Name,
 		},
 	}
-	if router.FixedDelay != 0 {
-		route.HttpFault = &routing.HTTPFaultInjection{
+	if rr.FixedDelay != 0 {
+		routerule.HttpFault = &routing.HTTPFaultInjection{
 			Delay: &routing.HTTPFaultInjection_Delay{
-				Percent: router.Percent,
+				Percent: rr.Percent,
 				HttpDelayType: &routing.HTTPFaultInjection_Delay_FixedDelay{
 					FixedDelay: &google_protobuf1.Duration{
-						Seconds: router.FixedDelay,
+						Seconds: rr.FixedDelay,
 					},
 				},
 			},
 		}
 	}
-	if router.Timeout != 0 {
-		route.HttpReqTimeout = &routing.HTTPTimeout{
+	if rr.Timeout != 0 {
+		routerule.HttpReqTimeout = &routing.HTTPTimeout{
 			TimeoutPolicy: &routing.HTTPTimeout_SimpleTimeout{
 				SimpleTimeout: &routing.HTTPTimeout_SimpleTimeoutPolicy{
 					Timeout: &google_protobuf1.Duration{
-						Seconds: router.Timeout,
+						Seconds: rr.Timeout,
 					},
 				},
 			},
 		}
 	}
-	if len(router.Route) != 0 {
-		route.Route = router.Route
+	if len(rr.Route) != 0 {
+		routerule.Route = rr.Route
 	}
-	log.Debug("route.HttpFault :{}", route)
+	log.Debug("route.HttpFault :{}", routerule)
 	config := model.Config{
 		ConfigMeta: model.ConfigMeta{
 			Type:        RouterType,
 			Version:     RouterVersion,
 			Group:       RouterGroup,
-			Name:        router.Name,
-			Namespace:   router.Namespace,
+			Name:        rr.Name,
+			Namespace:   rr.Namespace,
 			Domain:      RouterDomain,
 			Labels:      map[string]string{"label": "value"},
 			Annotations: map[string]string{"annotation": "value"},
 		},
-		Spec: route,
+		Spec: routerule,
 	}
 	return config, nil
 }
