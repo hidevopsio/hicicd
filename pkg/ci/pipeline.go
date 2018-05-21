@@ -350,12 +350,10 @@ func (p *Pipeline) Run(username, password, token string, isToken bool) error {
 	// TODO: first, let's check if namespace is exist or not
 	//新建namespace
 	err := p.CreateProject()
-
 	if err != nil {
 		log.Error("Pipeline run new namespace err:", err)
 		return err
 	}
-
 	//授权给该用户
 	err = p.CreateRoleBinding(username)
 	if err != nil {
