@@ -12,10 +12,10 @@ func TestConfigMapsCreate(t *testing.T) {
 	name := "test"
 	namespace := "demo-dev"
 	data := map[string]string{}
-	config := NewConfigMaps(name, namespace, data)
-	config.Data = map[string]string{
+	configMaps := NewConfigMaps(name, namespace, data)
+	configMaps.Data = map[string]string{
 	}
-	result, err := config.Create()
+	result, err := configMaps.Create()
 	assert.Equal(t, nil, err)
 	log.Info("", result)
 }
@@ -24,8 +24,8 @@ func TestConfigMapsGet(t *testing.T) {
 	name := "test1"
 	namespace := "demo-dev"
 	data := map[string]string{}
-	config := NewConfigMaps(name, namespace, data)
-	result, err := config.Get()
+	configMaps := NewConfigMaps(name, namespace, data)
+	result, err := configMaps.Get()
 	assert.Equal(t, nil, err)
 	log.Info(result)
 }
