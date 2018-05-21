@@ -32,11 +32,11 @@ func (c *ConfigMaps) Create() (*core_v1.ConfigMap, error) {
 		},
 		Data: c.Data,
 	}
-	co, err := c.Get()
-	log.Debug("config map get :", co)
+	cm, err := c.Get()
+	log.Debug("config map get :", cm)
 	if err == nil {
-		con, err := c.Update(configMap)
-		return con, err
+		nc, err := c.Update(configMap)
+		return nc, err
 	}
 	config, er := c.Interface.Create(configMap)
 	if er != nil {
