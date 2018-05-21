@@ -6,7 +6,7 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 )
 
-type Product struct {
+type Project struct {
 	Token     string `json:"token"`
 	BaseUrl   string `json:"base_url"`
 	ID        interface{}
@@ -14,7 +14,7 @@ type Product struct {
 	Namespace string `json:"namespace"`
 }
 
-func (p *Product) GetProject() (*gitlab.Project, error) {
+func (p *Project) GetProject() (*gitlab.Project, error) {
 	log.Debug("Product.GetProject()")
 	c := gitlab.NewClient(&http.Client{}, p.Token)
 	c.SetBaseURL(p.BaseUrl + ApiVersion)
@@ -24,7 +24,7 @@ func (p *Product) GetProject() (*gitlab.Project, error) {
 	return project, err
 }
 
-func (p *Product) GetProjectList() ([]*gitlab.Project, error) {
+func (p *Project) GetProjectList() ([]*gitlab.Project, error) {
 	log.Debug("Product.GetProjectList()")
 	log.Debugf("url: %v", p.BaseUrl)
 	c := gitlab.NewClient(&http.Client{}, p.Token)
@@ -34,7 +34,7 @@ func (p *Product) GetProjectList() ([]*gitlab.Project, error) {
 	return project, err
 }
 
-func (p *Product) GetUserProject() (bool, error) {
+func (p *Project) GetUserProject() (bool, error) {
 	log.Debug("Product.GetUserProject()")
 	log.Debugf("url: %v", p.BaseUrl)
 	c := gitlab.NewClient(&http.Client{}, p.Token)

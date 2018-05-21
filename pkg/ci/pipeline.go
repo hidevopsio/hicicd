@@ -364,7 +364,7 @@ func (p *Pipeline) Run(username, password, token string, isToken bool) error {
 		return err
 	}
 	// TODO: check if the same app in the same namespace is already in running status.
-	product := &gitlab.Product{
+	product := &gitlab.Project{
 		BaseUrl:   p.Scm.Url,
 		Name:      p.App,
 		Namespace: p.Namespace,

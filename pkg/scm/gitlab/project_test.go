@@ -15,17 +15,17 @@ func TestGetProject(t *testing.T) {
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	id := 1067
-	product := &Product{
+	project := &Project{
 		Token:   gs.PrivateToken,
 		BaseUrl: baseUrl,
 		ID:      id,
 	}
-	project, err := product.GetProject()
+	p, err := project.GetProject()
 	if err != nil {
 		return
 	}
 	assert.Equal(t, nil, err)
-	assert.Equal(t, project.ID, id)
+	assert.Equal(t, p.ID, id)
 }
 
 func TestGetProjectList(t *testing.T) {
@@ -35,7 +35,7 @@ func TestGetProjectList(t *testing.T) {
 	log.Debugf("url: %v, username: %v", baseUrl, username)
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
-	product := &Product{
+	product := &Project{
 		Token:   gs.PrivateToken,
 		BaseUrl: baseUrl,
 	}
@@ -55,7 +55,7 @@ func TestGetUserProject(t *testing.T) {
 	log.Debugf("url: %v, username: %v", baseUrl, username)
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
-	product := &Product{
+	product := &Project{
 		Token:     gs.PrivateToken,
 		Name:      name,
 		Namespace: namespace,

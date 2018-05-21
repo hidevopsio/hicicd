@@ -21,7 +21,7 @@ func TestConfigMapsCreate(t *testing.T) {
 }
 
 func TestConfigMapsGet(t *testing.T) {
-	name := "test1"
+	name := "test"
 	namespace := "demo-dev"
 	data := map[string]string{}
 	configMaps := NewConfigMaps(name, namespace, data)
