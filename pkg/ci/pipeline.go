@@ -29,7 +29,7 @@ import (
 	authorization_v1 "github.com/openshift/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
-	"github.com/hidevopsio/hicicd/pkg/scm/gitlab"
+	"github.com/hidevopsio/hicicd/pkg/auth"
 )
 
 type Scm struct {
@@ -352,29 +352,11 @@ func (p *Pipeline) InitProject() error {
 func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) error {
 	log.Debug("Pipeline.Run()")
 	// TODO: check if the same app in the same namespace is already in running status.
-	project := &gitlab.Project{
-		BaseUrl:   p.Scm.Url,
-		Name:      p.App,
-		Namespace: p.Project,
-		Token:     token,
-	}
-	pid, err := project.GetUserProject(p.Scm.Url, token, p.App, p.Project)
-	if project == nil || err != nil {
-		return fmt.Errorf("no authority create app", project)
-	}
-	projectMember := &gitlab.ProjectMember{
-		Token:   token,
-		BaseUrl: p.Scm.Url,
-		Pid:     pid,
-		User:    uid,
-	}
-	metaName, roleRefName, accessLevelValue, err := projectMember.GetProjectMember(token, p.Scm.Url, pid, uid)
+	authority := &auth.Authority{}
+	metaName, roleRefName, accessLevelValue, err := authority.GetAuthority(p.Scm.Url, token, p.App, p.Project, uid)
 	if err != nil || accessLevelValue < 30{
-		log.Debug("没有权限")
 		return err
 	}
-
-
 	// TODO: first, let's check if namespace is exist or not
 	//create  namespace
 	err = p.CreateProject()

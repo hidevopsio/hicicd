@@ -4,15 +4,13 @@ import (
 	"github.com/xanzy/go-gitlab"
 	"net/http"
 	"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hicicd/pkg/scm"
 )
 
 type Project struct {
-	Token     string `json:"token"`
-	BaseUrl   string `json:"base_url"`
-	ID        interface{}
-	Name      string `json:"name"`
-	Namespace string `json:"namespace"`
+	scm.Project
 }
+
 
 func (p *Project) GetProject() (*gitlab.Project, error) {
 	log.Debug("Product.GetProject()")

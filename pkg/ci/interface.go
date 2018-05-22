@@ -26,6 +26,7 @@ type PipelineInterface interface {
 	CreateService() error
 	CreateRoute() error
 	Run(username, password, scmToken string, uid int, isToken bool) error
+	InitProject() error
+	CreateRoleBinding(username, metaName, roleRefName string) error
 	CreateProject() error
-	CreateRoleBinding(username string) error
 }
