@@ -62,8 +62,8 @@ func TestGetUserProject(t *testing.T) {
 		BaseUrl:   baseUrl,
 	}
 	assert.Equal(t, nil, err)
-	exists, err := product.GetUserProject()
-	log.Debug("get user project exists :", exists)
-	assert.Equal(t, true, exists)
+	pid, err := product.GetUserProject(baseUrl, gs.PrivateToken, name, namespace)
+	log.Debug("get user project pid :", pid)
+	assert.Equal(t, true, pid)
 	assert.Equal(t, nil, err)
 }

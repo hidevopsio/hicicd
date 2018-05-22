@@ -30,7 +30,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
 	"github.com/hidevopsio/hicicd/pkg/scm/gitlab"
-	gitlabv1 "github.com/xanzy/go-gitlab"
 )
 
 type Scm struct {
@@ -178,14 +177,8 @@ func (pl *Pipeline) CreateProject() error {
 	return nil
 }
 
-func (p *Pipeline) CreateRoleBinding(username string, value gitlabv1.AccessLevelValue) error {
-	var projectPermissions gitlab.ProjectPermissions
-	for pid, permissions := range gitlab.Permissions  {
-		if pid == value {
-			projectPermissions = permissions
-		}
-	}
-	roleBinding, err := openshift.NewRoleBinding(projectPermissions.MetaName, p.Namespace)
+func (p *Pipeline) CreateRoleBinding(username, metaName, roleRefName string) error {
+	roleBinding, err := openshift.NewRoleBinding(metaName, p.Namespace)
 	if err != nil {
 		return err
 	}
@@ -193,11 +186,11 @@ func (p *Pipeline) CreateRoleBinding(username string, value gitlabv1.AccessLevel
 	if err != nil {
 		role := &authorization_v1.RoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      projectPermissions.MetaName,
+				Name:      metaName,
 				Namespace: p.Namespace,
 			},
 			RoleRef: corev1.ObjectReference{
-				Name: projectPermissions.RoleRefName,
+				Name: roleRefName,
 			},
 			Subjects: []corev1.ObjectReference{
 				{
@@ -359,26 +352,26 @@ func (p *Pipeline) InitProject() error {
 func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) error {
 	log.Debug("Pipeline.Run()")
 	// TODO: check if the same app in the same namespace is already in running status.
-	product := &gitlab.Project{
+	project := &gitlab.Project{
 		BaseUrl:   p.Scm.Url,
 		Name:      p.App,
 		Namespace: p.Project,
 		Token:     token,
 	}
-	project, err := product.GetUserProject()
+	pid, err := project.GetUserProject(p.Scm.Url, token, p.App, p.Project)
 	if project == nil || err != nil {
 		return fmt.Errorf("no authority create app", project)
 	}
 	projectMember := &gitlab.ProjectMember{
 		Token:   token,
 		BaseUrl: p.Scm.Url,
-		Pid:     project.ID,
+		Pid:     pid,
 		User:    uid,
 	}
-	pm, err := projectMember.GetProjectMember()
-	if err != nil {
+	metaName, roleRefName, accessLevelValue, err := projectMember.GetProjectMember(token, p.Scm.Url, pid, uid)
+	if err != nil || accessLevelValue < 30{
+		log.Debug("没有权限")
 		return err
-		log.Debug(pm)
 	}
 
 
@@ -390,7 +383,7 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 		return err
 	}
 	//Authorize the user
-	err = p.CreateRoleBinding(username, pm.AccessLevel)
+	err = p.CreateRoleBinding(username, metaName, roleRefName)
 	if err != nil {
 		log.Error("Pipeline run Create RoleBinding err :", err)
 		return err

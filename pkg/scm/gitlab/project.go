@@ -34,24 +34,24 @@ func (p *Project) GetProjectList() ([]*gitlab.Project, error) {
 	return project, err
 }
 
-func (p *Project) GetUserProject() (*gitlab.Project, error) {
+func (p *Project) GetUserProject(baseUrl, token, name, namespace string) (int, error) {
 	log.Debug("Product.GetUserProject()")
-	log.Debugf("url: %v", p.BaseUrl)
-	c := gitlab.NewClient(&http.Client{}, p.Token)
-	c.SetBaseURL(p.BaseUrl + ApiVersion)
+	log.Debugf("url: %v", baseUrl)
+	c := gitlab.NewClient(&http.Client{}, token)
+	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before c.Session.GetProjectList")
 	projects, _, err := c.Projects.ListProjects(&gitlab.ListProjectsOptions{})
 	if err != nil {
 		log.Error("get list project :", err)
-		return nil, err
+		return 0, err
 	}
 	log.Debug("after c.Session.GetSession(so)")
 	log.Debug("get project size: ", len(projects))
 	for _, project := range projects {
-		if project.Name == p.Name && project.Namespace.Name == p.Namespace {
-			log.Debugf("project name: %v , name : %v", project.Name, p.Name)
-			return project, nil
+		if project.Name == name && project.Namespace.Name == namespace {
+			log.Debugf("project name: %v , name : %v", project.Name, name)
+			return project.ID, nil
 		}
 	}
-	return nil, err
+	return 0, err
 }

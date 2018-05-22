@@ -7,17 +7,18 @@ import (
 )
 
 type ProjectPermissions struct {
-	MetaName    string `json:"meta_name"`
-	RoleRefName string `json:"role_ref_name"`
+	MetaName         string `json:"meta_name"`
+	RoleRefName      string `json:"role_ref_name"`
+	AccessLevelValue int    `json:"access_level_value"`
 }
 
 var Permissions = map[gitlab.AccessLevelValue]ProjectPermissions{
-	gitlab.OwnerPermission:      ProjectPermissions{MetaName: "admin", RoleRefName: "admin"},
-	gitlab.MasterPermissions:    ProjectPermissions{MetaName: "admin", RoleRefName: "admin"},
-	gitlab.DeveloperPermissions: ProjectPermissions{MetaName: "edit-hptg8", RoleRefName: "edit"},
-	gitlab.ReporterPermissions:  ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view"},
-	gitlab.GuestPermissions:     ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view"},
-	gitlab.NoPermissions:        ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view"},
+	gitlab.OwnerPermission:      ProjectPermissions{MetaName: "admin",      RoleRefName: "admin", AccessLevelValue: 50},
+	gitlab.MasterPermissions:    ProjectPermissions{MetaName: "admin",      RoleRefName: "admin", AccessLevelValue: 40},
+	gitlab.DeveloperPermissions: ProjectPermissions{MetaName: "edit-hptg8", RoleRefName: "edit",  AccessLevelValue: 30},
+	gitlab.ReporterPermissions:  ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view",  AccessLevelValue: 20},
+	gitlab.GuestPermissions:     ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view",  AccessLevelValue: 10},
+	gitlab.NoPermissions:        ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view",  AccessLevelValue: 0},
 }
 
 type ProjectMember struct {
@@ -29,12 +30,17 @@ type ProjectMember struct {
 	Namespace string `json:"namespace"`
 }
 
-func (p *ProjectMember) GetProjectMember() (*gitlab.ProjectMember, error) {
+func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid int) (string, string, int, error) {
 	log.Debug("Product.GetProject()")
-	c := gitlab.NewClient(&http.Client{}, p.Token)
-	c.SetBaseURL(p.BaseUrl + ApiVersion)
+	c := gitlab.NewClient(&http.Client{}, token)
+	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before c.Session.GetSession(so)")
-	projectMember, _, err := c.ProjectMembers.GetProjectMember(p.Pid, p.User)
+	projectMember, _, err := c.ProjectMembers.GetProjectMember(pid, uid)
 	log.Debug("after c.Session.GetSession(so)")
-	return projectMember, err
+	for id, permissions := range Permissions  {
+		if projectMember.AccessLevel == id {
+			return permissions.MetaName, permissions.RoleRefName, permissions.AccessLevelValue, nil
+		}
+	}
+	return "", "", 0, err
 }

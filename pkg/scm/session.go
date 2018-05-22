@@ -20,6 +20,7 @@ import (
 
 type SessionInterface interface {
 	GetSession(baseUrl, username, password string) error
+	//GetUserProject() (int, error)
 	GetToken() string
 	GetId() int
 }
