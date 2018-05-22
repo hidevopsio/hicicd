@@ -41,7 +41,7 @@ func TestJavaPipeline(t *testing.T)  {
 	java.Init(&ci.Pipeline{
 		Name: "java",
 		Profile: "test",
-		App: "demo-consumer",
+		App: "hello-world",
 		Project: "demo",
 		Version: "v2",
 		Scm: ci.Scm{
