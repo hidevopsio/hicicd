@@ -30,6 +30,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
 	"github.com/hidevopsio/hicicd/pkg/scm/gitlab"
+	gitlabv1 "github.com/xanzy/go-gitlab"
 )
 
 type Scm struct {
@@ -177,8 +178,14 @@ func (pl *Pipeline) CreateProject() error {
 	return nil
 }
 
-func (p *Pipeline) CreateRoleBinding(username string) error {
-	roleBinding, err := openshift.NewRoleBinding("admin", p.Namespace)
+func (p *Pipeline) CreateRoleBinding(username string, value gitlabv1.AccessLevelValue) error {
+	var projectPermissions gitlab.ProjectPermissions
+	for pid, permissions := range gitlab.Permissions  {
+		if pid == value {
+			projectPermissions = permissions
+		}
+	}
+	roleBinding, err := openshift.NewRoleBinding(projectPermissions.MetaName, p.Namespace)
 	if err != nil {
 		return err
 	}
@@ -186,11 +193,11 @@ func (p *Pipeline) CreateRoleBinding(username string) error {
 	if err != nil {
 		role := &authorization_v1.RoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      roleBinding.Name,
+				Name:      projectPermissions.MetaName,
 				Namespace: p.Namespace,
 			},
 			RoleRef: corev1.ObjectReference{
-				Name: roleBinding.Name,
+				Name: projectPermissions.RoleRefName,
 			},
 			Subjects: []corev1.ObjectReference{
 				{
@@ -349,32 +356,44 @@ func (p *Pipeline) InitProject() error {
 	return nil
 }
 
-func (p *Pipeline) Run(username, password, token string, isToken bool) error {
+func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) error {
 	log.Debug("Pipeline.Run()")
+	// TODO: check if the same app in the same namespace is already in running status.
+	product := &gitlab.Project{
+		BaseUrl:   p.Scm.Url,
+		Name:      p.App,
+		Namespace: p.Project,
+		Token:     token,
+	}
+	project, err := product.GetUserProject()
+	if project == nil || err != nil {
+		return fmt.Errorf("no authority create app", project)
+	}
+	projectMember := &gitlab.ProjectMember{
+		Token:   token,
+		BaseUrl: p.Scm.Url,
+		Pid:     project.ID,
+		User:    uid,
+	}
+	pm, err := projectMember.GetProjectMember()
+	if err != nil {
+		return err
+		log.Debug(pm)
+	}
+
+
 	// TODO: first, let's check if namespace is exist or not
 	//create  namespace
-	err := p.CreateProject()
+	err = p.CreateProject()
 	if err != nil {
 		log.Error("Pipeline run new namespace err:", err)
 		return err
 	}
 	//Authorize the user
-	err = p.CreateRoleBinding(username)
+	err = p.CreateRoleBinding(username, pm.AccessLevel)
 	if err != nil {
 		log.Error("Pipeline run Create RoleBinding err :", err)
 		return err
-	}
-	// TODO: check if the same app in the same namespace is already in running status.
-	product := &gitlab.Project{
-		BaseUrl:   p.Scm.Url,
-		Name:      p.App,
-		Namespace: p.Namespace,
-		Token:     token,
-	}
-	//该username  是否存在该app账号的权限  存在  true   不存在  false
-	exists, err := product.GetUserProject()
-	if exists || err != nil {
-		return fmt.Errorf("no authority create app", exists)
 	}
 	// create secret for building image
 	secret, err := p.CreateSecret(username, password, isToken)

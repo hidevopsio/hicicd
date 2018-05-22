@@ -32,9 +32,9 @@ func TestUserLogin(t *testing.T) {
 	password := os.Getenv("SCM_PASSWORD")
 
 	u := new(User)
-	token, message, err := u.Login(baseUrl, username,  password)
+	token, id, message, err := u.Login(baseUrl, username,  password)
 	assert.Equal(t, nil, err)
-
+	log.Debug(id)
 	log.Debug(token)
 	log.Debug(message)
 }
@@ -43,8 +43,9 @@ func TestUserLoginFailed(t *testing.T) {
 	baseUrl :=  os.Getenv("SCM_URL")
 
 	u := new(User)
-	token, message, err := u.Login(baseUrl, "xxx",  "xxx")
+	token, id, message, err := u.Login(baseUrl, "xxx",  "xxx")
 	assert.Contains(t, err.Error(), "Unauthorized")
+	log.Debug(id)
 	log.Debug(token)
 	log.Debug(message)
 }
@@ -68,4 +69,8 @@ func TestUserGetSessionUnauthorized(t *testing.T) {
 	assert.Contains(t, err.Error(), "Unauthorized")
 
 	log.Debug(err.Error())
+}
+
+func pa()  {
+	
 }

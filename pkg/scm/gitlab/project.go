@@ -34,7 +34,7 @@ func (p *Project) GetProjectList() ([]*gitlab.Project, error) {
 	return project, err
 }
 
-func (p *Project) GetUserProject() (bool, error) {
+func (p *Project) GetUserProject() (*gitlab.Project, error) {
 	log.Debug("Product.GetUserProject()")
 	log.Debugf("url: %v", p.BaseUrl)
 	c := gitlab.NewClient(&http.Client{}, p.Token)
@@ -43,15 +43,15 @@ func (p *Project) GetUserProject() (bool, error) {
 	projects, _, err := c.Projects.ListProjects(&gitlab.ListProjectsOptions{})
 	if err != nil {
 		log.Error("get list project :", err)
-		return false, err
+		return nil, err
 	}
 	log.Debug("after c.Session.GetSession(so)")
 	log.Debug("get project size: ", len(projects))
 	for _, project := range projects {
 		if project.Name == p.Name && project.Namespace.Name == p.Namespace {
 			log.Debugf("project name: %v , name : %v", project.Name, p.Name)
-			return true, nil
+			return project, nil
 		}
 	}
-	return false, err
+	return nil, err
 }

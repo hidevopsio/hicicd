@@ -5,6 +5,7 @@ import (
 	"os"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/magiconair/properties/assert"
+	"github.com/xanzy/go-gitlab"
 )
 
 func TestGetProjectMember(t *testing.T) {
@@ -23,5 +24,7 @@ func TestGetProjectMember(t *testing.T) {
 		User:    401,
 	}
 	p, err := projectMember.GetProjectMember()
-	log.Info(p)
+	assert.Equal(t, p.AccessLevel, gitlab.MasterPermissions)
+	log.Info(p.AccessLevel)
+
 }

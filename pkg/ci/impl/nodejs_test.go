@@ -40,6 +40,6 @@ func TestNodeJsPipeline(t *testing.T) {
 	assert.Equal(t, nil, err)
 	log.Debug(gs)
 	assert.Equal(t, username, gs.Username)
-	err = nodeJs.Run(username, password,gs.PrivateToken, false)
+	err = nodeJs.Run(username, password, gs.PrivateToken, gs.ID, false)
 	assert.Equal(t, nil, err)
 }

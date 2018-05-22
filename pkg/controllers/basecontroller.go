@@ -19,6 +19,7 @@ import (
 	"strings"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"strconv"
 )
 
 type BaseController struct {
@@ -27,6 +28,7 @@ type BaseController struct {
 	Password string
 	Url      string
 	ScmToken string
+	Uid      int
 }
 
 func (c *BaseController) Before(ctx *web.Context) {
@@ -38,6 +40,7 @@ func (c *BaseController) Before(ctx *web.Context) {
 		c.Username = parseToken(claims, ScmUsername)
 		c.Password = parseToken(claims, ScmPassword)
 		c.ScmToken = parseToken(claims, ScmToken)
+		c.Uid, _ = strconv.Atoi(parseToken(claims, ScmUid))
 		log.Debugf("url: %v, username: %v, password: %v", username, strings.Repeat("*", len(password)))
 	} else {
 		log.Debug("valid username  password   err")

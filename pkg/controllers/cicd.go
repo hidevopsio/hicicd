@@ -38,6 +38,7 @@ const (
 	ScmUsername = "username"
 	ScmPassword = "password"
 	ScmToken    = "scmToken"
+	ScmUid      = "uid"
 )
 
 func init() {
@@ -68,7 +69,7 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 	if err == nil {
 		// Run Pipeline, password is a token, no need to pass username to pipeline
 		pipeline.Init(&pl)
-		err = pipeline.Run(c.Username, c.Password,c.ScmToken, false)
+		err = pipeline.Run(c.Username, c.Password, c.ScmToken, c.Uid, false)
 		if err != nil {
 			message = err.Error()
 		}
