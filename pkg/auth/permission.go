@@ -5,16 +5,16 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/scm/factories"
 )
 
-type Authority struct {
+type Permission struct {
 	Product scm.ProjectInterface
 	ProductMember scm.ProjectMemberInterface
 }
 
-type AuthorityInterface interface {
-	GetAuthority(baseUrl, token, name, namespace string, uid int) (string, string, int, error)
+type PermissionInterface interface {
+	Get(baseUrl, token, name, namespace string, uid int) (string, string, int, error)
 }
 
-func (a *Authority) GetAuthority(baseUrl, token, name, namespace string, uid int) (string, string, int, error) {
+func (a *Permission) Get(baseUrl, token, name, namespace string, uid int) (string, string, int, error) {
 	scmFactory := new(factories.ScmFactory)
 	var err error
 	a.Product, err = scmFactory.NewProject(factories.GitlabScmType)

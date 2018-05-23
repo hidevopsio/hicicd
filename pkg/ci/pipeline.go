@@ -352,8 +352,8 @@ func (p *Pipeline) InitProject() error {
 func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) error {
 	log.Debug("Pipeline.Run()")
 	// TODO: check if the same app in the same namespace is already in running status.
-	authority := &auth.Authority{}
-	metaName, roleRefName, accessLevelValue, err := authority.GetAuthority(p.Scm.Url, token, p.App, p.Project, uid)
+	permission := &auth.Permission{}
+	metaName, roleRefName, accessLevelValue, err := permission.Get(p.Scm.Url, token, p.App, p.Project, uid)
 	if err != nil || accessLevelValue < 30{
 		return err
 	}
