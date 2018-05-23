@@ -34,4 +34,5 @@ func TestUserGet(t *testing.T)  {
 	err := gs.GetSession(baseUrl, username, password)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, username, gs.Username)
+	log.Info(gs)
 }

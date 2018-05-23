@@ -52,3 +52,7 @@ func (s *Session) GetSession(baseUrl, username, password string) error {
 func (s *Session) GetToken() string {
 	return s.PrivateToken
 }
+
+func (s *Session) GetId() int {
+	return s.ID
+}

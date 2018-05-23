@@ -21,18 +21,19 @@ import (
 type SessionInterface interface {
 	GetSession(baseUrl, username, password string) error
 	GetToken() string
+	GetId() int
 }
 
 type Session struct {
-	ID               int         `json:"id"`
-	Username         string      `json:"username"`
-	Email            string      `json:"email"`
-	Name             string      `json:"name"`
-	PrivateToken     string      `json:"private_token"`
-	Blocked          bool        `json:"blocked"`
-	CreatedAt        *time.Time  `json:"created_at"`
-	IsAdmin          bool        `json:"is_admin"`
-	CanCreateGroup   bool        `json:"can_create_group"`
-	CanCreateTeam    bool        `json:"can_create_team"`
-	CanCreateProject bool        `json:"can_create_project"`
+	ID               int        `json:"id"`
+	Username         string     `json:"username"`
+	Email            string     `json:"email"`
+	Name             string     `json:"name"`
+	PrivateToken     string     `json:"private_token"`
+	Blocked          bool       `json:"blocked"`
+	CreatedAt        *time.Time `json:"created_at"`
+	IsAdmin          bool       `json:"is_admin"`
+	CanCreateGroup   bool       `json:"can_create_group"`
+	CanCreateTeam    bool       `json:"can_create_team"`
+	CanCreateProject bool       `json:"can_create_project"`
 }

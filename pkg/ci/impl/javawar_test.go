@@ -20,6 +20,7 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/ci"
 	"os"
 	"github.com/stretchr/testify/assert"
+	"github.com/hidevopsio/hicicd/pkg/scm/gitlab"
 )
 
 func init()  {
@@ -42,6 +43,13 @@ func TestJavaWarPipeline(t *testing.T)  {
 		Project: "demo",
 		Scm: ci.Scm{Url: os.Getenv("SCM_URL")},
 	})
-	err := java.Run(username, password, false)
+	baseUrl :=  os.Getenv("SCM_URL")
+	log.Debugf("url: %v, username: %v", baseUrl, username)
+	gs := new(gitlab.Session)
+	err := gs.GetSession(baseUrl, username, password)
+	assert.Equal(t, nil, err)
+	log.Debug(gs)
+	assert.Equal(t, username, gs.Username)
+	err = java.Run(username, password,gs.PrivateToken, gs.ID, false)
 	assert.Equal(t, nil, err)
 }

@@ -44,7 +44,7 @@ func fatal(err error) {
 	}
 }
 
-func (u *User) Login(baseUrl, username, password string) (string, string, error) {
+func (u *User) Login(baseUrl, username, password string) (string, int, string, error) {
 	log.Debug("User.Login()")
 	retVal := "Login successful."
 	// login scm
@@ -53,7 +53,7 @@ func (u *User) Login(baseUrl, username, password string) (string, string, error)
 		retVal = "Login " + err.Error()
 	}
 
-	return u.session.GetToken(), retVal, err
+	return u.session.GetToken(), u.session.GetId(), retVal, err
 }
 
 func (u *User) GetSession(baseUrl, username, password string) error {

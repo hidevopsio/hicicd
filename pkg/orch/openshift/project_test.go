@@ -41,7 +41,7 @@ func TestProjectLit(t *testing.T) {
 }
 
 func TestProjectCreate(t *testing.T) {
-	namespace := "moses-demos-dev"
+	namespace := "demo-test"
 	projects, err := NewProject(namespace, "", "")
 	assert.Equal(t, nil, err)
 
@@ -49,7 +49,7 @@ func TestProjectCreate(t *testing.T) {
 	if errors.IsNotFound(err) {
 		projects.Create()
 	} else {
-		log.Debugf("%v is already exist", namespace)
+		log.Debugf("%v is already exist", err)
 	}
 }
 
