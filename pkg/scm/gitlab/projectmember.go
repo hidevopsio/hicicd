@@ -18,6 +18,9 @@ func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid int) (s
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before c.Session.GetSession(so)")
 	projectMember, _, err := c.ProjectMembers.GetProjectMember(pid, uid)
+	if err != nil {
+		return "", "", 0, err
+	}
 	log.Debug("after c.Session.GetSession(so)")
 	for id, permissions := range scm.Permissions  {
 		if projectMember.AccessLevel == id {
