@@ -49,7 +49,7 @@ func TestProjectCreate(t *testing.T) {
 	if errors.IsNotFound(err) {
 		projects.Create()
 	} else {
-		log.Debugf("%v is already exist", namespace)
+		log.Debugf("%v is already exist", err)
 	}
 }
 
