@@ -15,11 +15,7 @@ func TestGetProject(t *testing.T) {
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	id := 1067
-	project := &Project{
-		Token:   gs.PrivateToken,
-		BaseUrl: baseUrl,
-		ID:      id,
-	}
+	project := new(Project)
 	p, err := project.GetProject()
 	if err != nil {
 		return
@@ -28,25 +24,22 @@ func TestGetProject(t *testing.T) {
 	assert.Equal(t, p.ID, id)
 }
 
-func TestGetProjectList(t *testing.T) {
+func TestListProjects(t *testing.T) {
 	baseUrl := os.Getenv("SCM_URL")
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
 	log.Debugf("url: %v, username: %v", baseUrl, username)
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
-	product := &Project{
-		Token:   gs.PrivateToken,
-		BaseUrl: baseUrl,
-	}
-	projects, err := product.GetProjectList()
+	project := new(Project)
+	projects, err := project.ListProjects()
 	assert.Equal(t, nil, err)
 	assert.Equal(t, username, gs.Username)
 	log.Debug("project size:", len(projects))
 	log.Debug("project size:", projects)
 }
 
-func TestGetUserProject(t *testing.T) {
+func TestListUserProjects(t *testing.T) {
 	baseUrl := os.Getenv("SCM_URL")
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
@@ -55,14 +48,9 @@ func TestGetUserProject(t *testing.T) {
 	log.Debugf("url: %v, username: %v", baseUrl, username)
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
-	product := &Project{
-		Token:     gs.PrivateToken,
-		Name:      name,
-		Namespace: namespace,
-		BaseUrl:   baseUrl,
-	}
+	project := new(Project)
 	assert.Equal(t, nil, err)
-	pid, err := product.GetUserProject(baseUrl, gs.PrivateToken, name, namespace)
+	pid, err := project.ListUserProjects(baseUrl, gs.PrivateToken, name, namespace)
 	log.Debug("get user project pid :", pid)
 	assert.Equal(t, true, pid)
 	assert.Equal(t, nil, err)

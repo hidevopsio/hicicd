@@ -1,7 +1,7 @@
 package scm
 
 type ProjectInterface interface {
-	GetUserProject (baseUrl, token, name, namespace string) (int, error)
+	ListUserProjects (baseUrl, token, name, namespace string) (int, error)
 }
 
 

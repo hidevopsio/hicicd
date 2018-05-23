@@ -21,7 +21,7 @@ func (p *Permission) Get(baseUrl, token, name, namespace string, uid int) (strin
 	if err != nil {
 		return "", "", 0, err
 	}
-	pid, err := p.Project.GetUserProject(baseUrl, token, name, namespace)
+	pid, err := p.Project.ListUserProjects(baseUrl, token, name, namespace)
 	if err != nil {
 		return "", "", 0, err
 	}
