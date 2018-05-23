@@ -35,14 +35,13 @@ func (c *BaseController) Before(ctx *web.Context) {
 	log.Debug("route rule  add:{}")
 	ti := ctx.Values().Get("jwt")
 	token := ti.(*jwt.Token)
-	var username, password string
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		c.Username = parseToken(claims, ScmUsername)
 		c.Password = parseToken(claims, ScmPassword)
 		c.ScmToken = parseToken(claims, ScmToken)
 		c.Uid, _ = strconv.Atoi(parseToken(claims, ScmUid))
 		c.Url = parseToken(claims, ScmUrl)
-		log.Debugf("url: %v, username: %v, password: %v", username, strings.Repeat("*", len(password)))
+		log.Debugf("url: %v, username: %v, password: %v", c.Username, strings.Repeat("*", len(c.Password)))
 	} else {
 		log.Debug("valid username  password   err")
 		return

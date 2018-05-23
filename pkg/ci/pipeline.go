@@ -212,7 +212,7 @@ func (p *Pipeline) CreateRoleBinding(username, metaName, roleRefName string) err
 		Kind: "User",
 	}
 	r.Subjects = append(r.Subjects, reference)
-	r.UserNames =append(r.UserNames, username)
+	r.UserNames = append(r.UserNames, username)
 	_, err = roleBinding.Create(r)
 	return err
 }
@@ -354,7 +354,7 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 	// TODO: check if the same app in the same namespace is already in running status.
 	permission := &auth.Permission{}
 	metaName, roleRefName, accessLevelValue, err := permission.Get(p.Scm.Url, token, p.App, p.Project, uid)
-	if err != nil || accessLevelValue < 30{
+	if err != nil || accessLevelValue < 30 {
 		return err
 	}
 	// TODO: first, let's check if namespace is exist or not
