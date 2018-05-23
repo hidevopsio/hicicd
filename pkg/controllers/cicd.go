@@ -59,8 +59,9 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 	log.Debug("CicdController.Run()")
 	var pl ci.Pipeline
 	err := ctx.RequestBody(&pl)
-	pl.Scm = ci.Scm{
-		Url: c.Url,
+	// replace pl.Scm.Url with c.Url if it is empty
+	if pl.Scm.Url == "" {
+		pl.Scm.Url = c.Url
 	}
 	if err != nil {
 		return
