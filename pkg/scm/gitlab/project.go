@@ -5,31 +5,46 @@ import (
 	"net/http"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hicicd/pkg/scm"
+	"github.com/jinzhu/copier"
 )
 
 type Project struct {
 	scm.Project
 }
 
-
-func (p *Project) GetProject() (*gitlab.Project, error) {
+func (p *Project) GetProject(name, namespace, url, token string) (*gitlab.Project, error) {
 	log.Debug("project.GetProject()")
-	c := gitlab.NewClient(&http.Client{}, p.Token)
+	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(p.BaseUrl + ApiVersion)
 	log.Debug("before c.Session.GetSession(so)")
-	project, _, err := c.Projects.GetProject(p.ID)
-	log.Debug("after c.Session.GetSession(so)")
-	return project, err
+    search := "admin"
+	options := &gitlab.ListProjectsOptions{
+		Search: &search,
+	}
+	projects, _, err := c.Projects.ListProjects(options)
+	log.Debug("after c.Session.GetSession(so)", projects)
+	return nil, err
 }
 
-func (p *Project) ListProjects() ([]*gitlab.Project, error) {
+func (p *Project) ListProjects(baseUrl, token string, page int) ([]scm.Project, error) {
 	log.Debug("project.ListProjects()")
-	log.Debugf("url: %v", p.BaseUrl)
-	c := gitlab.NewClient(&http.Client{}, p.Token)
-	c.SetBaseURL(p.BaseUrl + ApiVersion)
-	project, _, err := c.Projects.ListProjects(&gitlab.ListProjectsOptions{})
-	log.Debugf("after project: %v", len(project))
-	return project, err
+	log.Debugf("url: %v", baseUrl)
+	c := gitlab.NewClient(&http.Client{}, token)
+	c.SetBaseURL(baseUrl + ApiVersion)
+	listProjectsOptions := &gitlab.ListProjectsOptions{
+		ListOptions: gitlab.ListOptions{
+			Page: page,
+		},
+	}
+	ps, _, err := c.Projects.ListProjects(listProjectsOptions)
+	log.Debugf("after project: %v", len(ps))
+	projects := []scm.Project{}
+	project := &scm.Project{}
+	for _, pro := range ps {
+		copier.Copy(project, pro)
+		projects = append(projects, *project)
+	}
+	return projects, err
 }
 
 func (p *Project) ListUserProjects(baseUrl, token, name, namespace string) (int, error) {
@@ -38,18 +53,64 @@ func (p *Project) ListUserProjects(baseUrl, token, name, namespace string) (int,
 	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before c.project.ListUserProjects")
-	projects, _, err := c.Projects.ListProjects(&gitlab.ListProjectsOptions{})
-	if err != nil {
-		log.Error("get list project :", err)
-		return 0, err
-	}
-	log.Debug("after c.project.project(so)")
-	log.Debug("get project size: ", len(projects))
-	for _, project := range projects {
-		if project.Name == name && project.Namespace.Name == namespace {
-			log.Debugf("project name: %v , name : %v", project.Name, name)
-			return project.ID, nil
+	page := 1
+	for {
+		listProjectsOptions := &gitlab.ListProjectsOptions{
+			ListOptions: gitlab.ListOptions{
+				Page: page,
+			},
 		}
+		projects, _, err := c.Projects.ListProjects(listProjectsOptions)
+		if err != nil {
+			log.Error("get list project :", err)
+			return 0, err
+		}
+		if len(projects) == 0 {
+			break
+		}
+		log.Debug("after c.project.project(so)")
+		log.Debug("get project size: ", len(projects))
+		for _, project := range projects {
+			if project.Name == name && project.Namespace.Name == namespace {
+				log.Debugf("project name: %v , name : %v", project.Name, name)
+				return project.ID, nil
+			}
+		}
+		page++
 	}
-	return 0, err
+	return 0, nil
+}
+
+func (p *Project) ListGroupProjects(baseUrl, token, namespace string) ([]scm.Project, error) {
+	log.Debug("project List Group Project")
+	c := gitlab.NewClient(&http.Client{}, token)
+	scmProjects := []scm.Project{}
+	scmProject := &scm.Project{}
+	c.SetBaseURL(baseUrl + ApiVersion)
+	log.Debug("c group projects ")
+	page := 1
+	for {
+		listProjectsOptions := &gitlab.ListProjectsOptions{
+			ListOptions: gitlab.ListOptions{
+				Page:    page,
+				PerPage: 100,
+			},
+		}
+		projects, _, err := c.Projects.ListProjects(listProjectsOptions)
+		if err != nil {
+			return nil, err
+		}
+		if len(projects) == 0 {
+			break
+		}
+		log.Debugf("project size : %v", len(projects))
+		for _, p := range projects {
+			if p.Namespace.Name == namespace {
+				copier.Copy(scmProject, p)
+				scmProjects = append(scmProjects, *scmProject)
+			}
+		}
+		page++
+	}
+	return scmProjects, nil
 }

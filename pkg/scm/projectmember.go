@@ -28,7 +28,7 @@ type ProjectMember struct {
 	Token     string `json:"token"`
 	BaseUrl   string `json:"base_url"`
 	User      int    `json:"user"`
-	Pid       int    `json:"pid"`
+	Pid       int    `json:"pid" `
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
 }

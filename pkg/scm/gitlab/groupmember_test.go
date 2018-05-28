@@ -16,7 +16,7 @@ func TestListGroupMembers(t *testing.T) {
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	groupMember := GroupMember{}
-	g, err := groupMember.ListGroupMembers(gs.PrivateToken, baseUrl, gid)
+	g, err := groupMember.ListGroupMembers(gs.PrivateToken, baseUrl, gid, gs.ID)
 	assert.Equal(t, nil, err)
 	log.Info(g)
 }
@@ -30,7 +30,8 @@ func TestGetGroupMember(t *testing.T) {
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	groupMember := new(GroupMember)
-	err = groupMember.GetGroupMember(gs.PrivateToken, baseUrl, gid, gs.ID)
+	gm, err := groupMember.GetGroupMember(gs.PrivateToken, baseUrl, gid, gs.ID)
 	assert.Equal(t, nil, err)
-	log.Info(groupMember)
+	log.Info(gm)
 }
+

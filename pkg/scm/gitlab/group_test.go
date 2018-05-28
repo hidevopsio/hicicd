@@ -29,7 +29,23 @@ func TestGetGroup(t *testing.T) {
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	group := new(Group)
-	err = group.GetGroup(gs.PrivateToken, baseUrl, gid)
+	scmGroup, err := group.GetGroup(gs.PrivateToken, baseUrl, gid)
 	assert.Equal(t, nil, err)
-	log.Info(group)
+	log.Info(scmGroup)
 }
+
+func TestListGroupProjects1(t *testing.T)   {
+	baseUrl := os.Getenv("SCM_URL")
+	username := os.Getenv("SCM_USERNAME")
+	password := os.Getenv("SCM_PASSWORD")
+	gid := 158
+	page := 1
+	log.Debugf("url: %v, username: %v", baseUrl, username)
+	gs := new(Session)
+	err := gs.GetSession(baseUrl, username, password)
+	group := new(Group)
+	scmProject, err := group.ListGroupProjects(gs.PrivateToken, baseUrl, gid, page)
+	assert.Equal(t, nil, err)
+	log.Info(scmProject)
+}
+

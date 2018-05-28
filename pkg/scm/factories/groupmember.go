@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"errors"
+	"github.com/hidevopsio/hicicd/pkg/scm/gitlab"
 )
 
 func (s *ScmFactory) NewGroupMember(provider int) (scm.GroupMemberInterface, error)  {
