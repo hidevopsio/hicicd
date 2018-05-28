@@ -32,8 +32,8 @@ func (p *Permission) Get(baseUrl, token, name, namespace string, uid int) (strin
 	if err != nil {
 		return "", "", 0, err
 	}
-	metaName, roleRefName, accessLevelValue, err := p.ProjectMember.GetProjectMember(token, baseUrl, pid, uid)
-	return metaName, roleRefName, accessLevelValue, err
+	projectMember, err := p.ProjectMember.GetProjectMember(token, baseUrl, pid, uid)
+	return projectMember.MetaName, projectMember.RoleRefName, projectMember.AccessLevelValue, err
 }
 
 func (p *Permission) ListGroups(token, baseUrl string, uid int) ([]scm.Group, error){
@@ -113,6 +113,6 @@ func (p *Permission) GetProjectMember(token, baseUrl string, pid, uid int) (int,
 	if err != nil  {
 		return 0, err
 	}
-	_, _, accessLevelValue, err := p.ProjectMember.GetProjectMember(token, baseUrl, pid, uid)
-	return accessLevelValue, err
+	projectMember, err := p.ProjectMember.GetProjectMember(token, baseUrl, pid, uid)
+	return projectMember.AccessLevelValue, err
 }

@@ -5,9 +5,8 @@ import (
 )
 
 type ProjectMemberInterface interface {
-	GetProjectMember(token, baseUrl string, pid, uid int) (string, string, int, error)
+	GetProjectMember(token, baseUrl string, pid, uid int) (ProjectMember, error)
 }
-
 
 type ProjectPermissions struct {
 	MetaName         string `json:"meta_name"`
@@ -16,12 +15,12 @@ type ProjectPermissions struct {
 }
 
 var Permissions = map[gitlab.AccessLevelValue]ProjectPermissions{
-	gitlab.OwnerPermission:      ProjectPermissions{MetaName: "admin",      RoleRefName: "admin", AccessLevelValue: 50},
-	gitlab.MasterPermissions:    ProjectPermissions{MetaName: "admin",      RoleRefName: "admin", AccessLevelValue: 40},
-	gitlab.DeveloperPermissions: ProjectPermissions{MetaName: "edit-hptg8", RoleRefName: "edit",  AccessLevelValue: 30},
-	gitlab.ReporterPermissions:  ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view",  AccessLevelValue: 20},
-	gitlab.GuestPermissions:     ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view",  AccessLevelValue: 10},
-	gitlab.NoPermissions:        ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view",  AccessLevelValue: 0},
+	gitlab.OwnerPermission:      ProjectPermissions{MetaName: "admin", RoleRefName: "admin", AccessLevelValue: 50},
+	gitlab.MasterPermissions:    ProjectPermissions{MetaName: "admin", RoleRefName: "admin", AccessLevelValue: 40},
+	gitlab.DeveloperPermissions: ProjectPermissions{MetaName: "edit-hptg8", RoleRefName: "edit", AccessLevelValue: 30},
+	gitlab.ReporterPermissions:  ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view", AccessLevelValue: 20},
+	gitlab.GuestPermissions:     ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view", AccessLevelValue: 10},
+	gitlab.NoPermissions:        ProjectPermissions{MetaName: "view-gbtpw", RoleRefName: "view", AccessLevelValue: 0},
 }
 
 type ProjectMember struct {
@@ -31,4 +30,6 @@ type ProjectMember struct {
 	Pid       int    `json:"pid" `
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
+	Gid       int    `json:"gid"`
+	ProjectPermissions
 }

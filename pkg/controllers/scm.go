@@ -8,9 +8,6 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/scm"
 )
 
-type ProjectMember struct {
-	Page      int    `json:"page"`
-}
 // Operations about object
 type ScmController struct {
 	BaseController

@@ -12,18 +12,15 @@ type Project struct {
 	scm.Project
 }
 
-func (p *Project) GetProject(name, namespace, url, token string) (*gitlab.Project, error) {
+func (p *Project) GetGId(url, token string, pid int) (int, error) {
 	log.Debug("project.GetProject()")
 	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(p.BaseUrl + ApiVersion)
 	log.Debug("before c.Session.GetSession(so)")
-    search := "admin"
-	options := &gitlab.ListProjectsOptions{
-		Search: &search,
-	}
-	projects, _, err := c.Projects.ListProjects(options)
-	log.Debug("after c.Session.GetSession(so)", projects)
-	return nil, err
+	project, _, err := c.Projects.GetProject(pid)
+	log.Debug("after c.project.GetProject(so)", project)
+
+	return project.Namespace.ID, err
 }
 
 func (p *Project) ListProjects(baseUrl, token string, page int) ([]scm.Project, error) {

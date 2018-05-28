@@ -12,22 +12,39 @@ type ProjectMember struct {
 
 
 
-func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid int) (string, string, int, error) {
+func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid int) (scm.ProjectMember, error) {
 	log.Debug("Product.GetProject()")
+	scmProjectMember := scm.ProjectMember{}
 	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(baseUrl + ApiVersion)
-	log.Debug("before c.Session.GetSession(so)")
+	log.Debug("before p.project.GetProjectMember(so)")
+	project, _, err := c.Projects.GetProject(pid)
+	if err != nil {
+		return scmProjectMember, err
+	}
+	groupMembers, _, err := c.Groups.ListGroupMembers(project.Namespace.ID, &gitlab.ListGroupMembersOptions{})
+	for _, groupMember := range groupMembers {
+		if groupMember.ID == uid {
+			for id, permissions := range scm.Permissions  {
+				if groupMember.AccessLevel == id {
+					scmProjectMember.ProjectPermissions = permissions
+					return scmProjectMember, nil
+				}
+			}
+		}
+	}
 	projectMember, _, err := c.ProjectMembers.GetProjectMember(pid, uid)
 	if err != nil {
-		return "", "", 0, err
+		return scmProjectMember, err
 	}
 	log.Debug("after c.Session.GetSession(so)")
 	for id, permissions := range scm.Permissions  {
 		if projectMember.AccessLevel == id {
-			return permissions.MetaName, permissions.RoleRefName, permissions.AccessLevelValue, nil
+			scmProjectMember.ProjectPermissions = permissions
+			return scmProjectMember, nil
 		}
 	}
-	return "", "", 0, err
+	return scmProjectMember, err
 }
 
 func (p *ProjectMember) ListProjectMembers(token, baseUrl string, pid int)  ([]*gitlab.ProjectMember, error) {

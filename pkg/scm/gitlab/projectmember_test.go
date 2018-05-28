@@ -17,10 +17,9 @@ func TestGetProjectMember(t *testing.T) {
 	assert.Equal(t, nil, err)
 	id := 1024
 	projectMember := new(ProjectMember)
-	m, r, v, err := projectMember.GetProjectMember(gs.PrivateToken, baseUrl, id, gs.ID)
-	assert.Equal(t, 40, v)
-	assert.Equal(t, "admin", m)
-	assert.Equal(t, "admin", r)
+	p, err := projectMember.GetProjectMember(gs.PrivateToken, baseUrl, id, gs.ID)
+	assert.Equal(t, 40, p)
+	log.Debug(p)
 }
 
 func TestListProjectMembers(t *testing.T) {

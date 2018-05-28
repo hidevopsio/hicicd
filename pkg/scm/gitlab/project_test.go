@@ -12,13 +12,11 @@ func TestGetProject(t *testing.T) {
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
 	log.Debugf("url: %v, username: %v", baseUrl, username)
-	name := "hello-world"
-	namespace := "demo"
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	pid := 1067
 	project := new(Project)
-	p, err := project.GetProject(name, namespace, baseUrl, gs.PrivateToken)
+	p, err := project.GetProject(baseUrl, gs.PrivateToken, pid)
 	if err != nil {
 		return
 	}
