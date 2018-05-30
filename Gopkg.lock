@@ -470,10 +470,16 @@
   version = "v1.2.1"
 
 [[projects]]
+  name = "github.com/nccurry/go-kong"
+  packages = ["."]
+  revision = "a0c3ea87ccc9dd86b62ce482ef3712baf6010327"
+
+[[projects]]
   name = "github.com/xanzy/go-gitlab"
   packages = ["."]
   revision = "109fd962a3876c6e486a5bc9507289d060e3c587"
   version = "v0.9.0"
+
 
 [[projects]]
   branch = "master"

@@ -48,8 +48,9 @@ func NewRoute(name, namespace string) (*Route, error)  {
 	}, nil
 }
 
-func (r *Route) Create(port int32) error {
+func (r *Route) Create(port int32) (string, error) {
 	log.Debug("Route.Create()")
+	upstreamUrl := ""
 	cfg := &v1.Route{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: r.Name,
@@ -76,22 +77,24 @@ func (r *Route) Create(port int32) error {
 		cfg.ObjectMeta.ResourceVersion = result.ResourceVersion
 		result, err = r.Interface.Update(cfg)
 		if err == nil {
+			upstreamUrl = result.Spec.Host
 			log.Infof("Updated Route %v", result.Name)
 		} else {
-			return err
+			return upstreamUrl, err
 		}
 		break
 	case errors.IsNotFound(err):
 		route, err := r.Interface.Create(cfg)
 		if err != nil {
-			return err
+			return upstreamUrl, err
 		}
+		upstreamUrl = route.Spec.Host
 		log.Infof("Created Route %q.\n", route.Name)
 		break
 	default:
-		return fmt.Errorf("failed to create Route: %s", err)
+		return upstreamUrl, fmt.Errorf("failed to create Route: %s", err)
 	}
-	return nil
+	return upstreamUrl, nil
 }
 
 func (r *Route) Get() (*v1.Route, error) {

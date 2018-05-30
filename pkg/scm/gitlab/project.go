@@ -12,14 +12,13 @@ type Project struct {
 	scm.Project
 }
 
-func (p *Project) GetGId(url, token string, pid int) (int, error) {
+func (p *Project) GetGroupId(url, token string, pid int) (int, error) {
 	log.Debug("project.GetProject()")
 	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(p.BaseUrl + ApiVersion)
 	log.Debug("before c.Session.GetSession(so)")
 	project, _, err := c.Projects.GetProject(pid)
 	log.Debug("after c.project.GetProject(so)", project)
-
 	return project.Namespace.ID, err
 }
 

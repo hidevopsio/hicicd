@@ -6,7 +6,7 @@ type ProjectInterface interface {
 	ListUserProjects(baseUrl, token, name, namespace string) (int, error)
 	ListProjects(baseUrl, token string, page int) ([]Project, error)
 	ListGroupProjects(baseUrl, token, namespace string) ([]Project, error)
-	GetGId(url, token string, pid int) (int, error)
+	GetGroupId(url, token string, pid int) (int, error)
 }
 
 type Project struct {

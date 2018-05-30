@@ -24,9 +24,10 @@ type PipelineInterface interface {
 	CreateDeploymentConfig(force bool, injectFn func(in interface{}) (interface{}, error)) error
 	Deploy() error
 	CreateService() error
-	CreateRoute() error
+	CreateRoute() (string, error)
 	Run(username, password, scmToken string, uid int, isToken bool) error
 	InitProject() error
 	CreateRoleBinding(username, metaName, roleRefName string) error
 	CreateProject() error
+	InstantiateDeploymentConfig() error
 }

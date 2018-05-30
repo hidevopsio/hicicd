@@ -30,6 +30,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
 	"github.com/hidevopsio/hicicd/pkg/auth"
+	"github.com/hidevopsio/hicicd/pkg/orch/kong"
+	"os"
+	"strings"
 )
 
 type Scm struct {
@@ -48,7 +51,7 @@ type DeploymentConfigs struct {
 
 type BuildConfigs struct {
 	Skip        bool         `json:"skip"` // TODO: ? Always, IfNotPresent, Never
-	Tag         string       `json:"tag"`
+	TagFrom     string       `json:"tag_from"`
 	ImageStream string       `json:"image_stream"`
 	Env         []system.Env `json:"env"`
 }
@@ -282,7 +285,7 @@ func (p *Pipeline) CreateDeploymentConfig(force bool, injectSidecar func(in inte
 	return nil
 }
 
-func (p *Pipeline) Deploy() error {
+func (p *Pipeline) InstantiateDeploymentConfig() error {
 	log.Debug("Pipeline.Deploy()")
 
 	// new dc instance
@@ -300,6 +303,30 @@ func (p *Pipeline) Deploy() error {
 	return nil
 }
 
+func (p *Pipeline) CreateKongGateway(upstreamUrl string) error {
+	log.Debug("Pipeline.CreateKongGateway()")
+	uris := "/" + p.Project + "-" + p.App
+	uris = strings.Replace(uris, "-", "/", -1)
+	host := os.Getenv("KONG_HOST")
+	apiRequest := &kong.ApiRequest{
+		Name:                   p.App,
+		Hosts:                  []string{host},
+		Uris:                   []string{uris},
+		UpstreamURL:            "http://" + upstreamUrl,
+		StripUri:               true,
+		PreserveHost:           false,
+		Retries:                5,
+		UpstreamConnectTimeout: 6000,
+		UpstreamSendTimeout:    6000,
+		UpstreamReadTimeout:    6000,
+		HttpsOnly:              false,
+		HttpIfTerminated:       true,
+	}
+	baseUrl := os.Getenv("KONG_ADMIN_URL")
+	err := apiRequest.Post(baseUrl)
+	return err
+}
+
 func (p *Pipeline) CreateService() error {
 	log.Debug("Pipeline.CreateService()")
 
@@ -307,23 +334,20 @@ func (p *Pipeline) CreateService() error {
 	svc := k8s.NewService(p.App, p.Namespace)
 
 	err := svc.Create(&p.Ports)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	log.Debug("Pipeline.CreateService svc.Create result: ", err)
+	return err
 }
 
-func (p *Pipeline) CreateRoute() error {
+func (p *Pipeline) CreateRoute() (string, error) {
 	log.Debug("Pipeline.CreateRoute()")
-
+	upstreamUrl := ""
 	route, err := openshift.NewRoute(p.App, p.Namespace)
 	if err != nil {
-		return err
+		return upstreamUrl, err
 	}
 
-	err = route.Create(8080)
-	return nil
+	upstreamUrl, err = route.Create(8080)
+	return upstreamUrl, err
 }
 
 func (p *Pipeline) InitProject() error {
@@ -349,11 +373,68 @@ func (p *Pipeline) InitProject() error {
 	return nil
 }
 
+func (p *Pipeline) Deploy() error {
+	if !p.DeploymentConfigs.Skip {
+
+		// create dc - deployment config
+		err := p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate, func(in interface{}) (interface{}, error) {
+			if p.IstioConfigs.Skip {
+				return in, nil
+			}
+
+			injector := &istio.Injector{}
+			copier.Copy(injector, p.IstioConfigs)
+			return injector.Inject(in)
+		})
+		if err != nil {
+			log.Error(err.Error())
+			return fmt.Errorf("failed on CreateDeploymentConfig! %s", err.Error())
+		}
+
+		//// deploy
+		//err = p.Deploy()
+		//if err != nil {
+		//	log.Error(err.Error())
+		//	return fmt.Errorf("failed on Deploy! %s", err.Error())
+		//}
+
+		rc := k8s.NewReplicationController(p.App, p.Namespace)
+		// rc.Watch(message, handler)
+		err = rc.Watch(func() error {
+			log.Debug("Completed!")
+			return nil
+		})
+		if err != nil {
+			log.Error(err.Error())
+			return fmt.Errorf("failed on watch rc! %s", err.Error())
+		}
+	}
+
+	// create service
+	err := p.CreateService()
+	if err != nil {
+		log.Error(err.Error())
+		return fmt.Errorf("failed on CreateService! %s", err.Error())
+	}
+
+	// create route
+	upstreamUrl, err := p.CreateRoute()
+	if err != nil {
+		log.Error(err.Error())
+		return fmt.Errorf("failed on CreateRoute! %s", err.Error())
+	}
+
+	//create kong-gateway
+	err = p.CreateKongGateway(upstreamUrl)
+	return err
+}
+
 func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) error {
 	log.Debug("Pipeline.Run()")
 	// TODO: check if the same app in the same namespace is already in running status.
 	permission := &auth.Permission{}
 	metaName, roleRefName, accessLevelValue, err := permission.Get(p.Scm.Url, token, p.App, p.Project, uid)
+	// TODO: accessLevelValue permission 30
 	if err != nil || accessLevelValue < 30 {
 		return err
 	}
@@ -370,6 +451,7 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 		log.Error("Pipeline run Create RoleBinding err :", err)
 		return err
 	}
+
 	// create secret for building image
 	secret, err := p.CreateSecret(username, password, isToken)
 	if err != nil {
@@ -378,58 +460,9 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 
 	// build image
 	err = p.Build(secret, func() error {
-
-		if !p.DeploymentConfigs.Skip {
-
-			// create dc - deployment config
-			err = p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate, func(in interface{}) (interface{}, error) {
-				if p.IstioConfigs.Skip {
-					return in, nil
-				}
-
-				injector := &istio.Injector{}
-				copier.Copy(injector, p.IstioConfigs)
-				return injector.Inject(in)
-			})
-			if err != nil {
-				log.Error(err.Error())
-				return fmt.Errorf("failed on CreateDeploymentConfig! %s", err.Error())
-			}
-
-			//// deploy
-			//err = p.Deploy()
-			//if err != nil {
-			//	log.Error(err.Error())
-			//	return fmt.Errorf("failed on Deploy! %s", err.Error())
-			//}
-
-			rc := k8s.NewReplicationController(p.App, p.Namespace)
-			// rc.Watch(message, handler)
-			err = rc.Watch(func() error {
-				log.Debug("Completed!")
-				return nil
-			})
-			if err != nil {
-				log.Error(err.Error())
-				return fmt.Errorf("failed on watch rc! %s", err.Error())
-			}
-		}
-
-		// create service
-		err = p.CreateService()
-		if err != nil {
-			log.Error(err.Error())
-			return fmt.Errorf("failed on CreateService! %s", err.Error())
-		}
-
-		// create route
-		err = p.CreateRoute()
-		if err != nil {
-			log.Error(err.Error())
-			return fmt.Errorf("failed on CreateRoute! %s", err.Error())
-		}
-		return nil
+		return p.Deploy()
 	})
+
 	if err != nil {
 		return fmt.Errorf("failed on Build! %s", err.Error())
 	}
