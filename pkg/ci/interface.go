@@ -30,4 +30,5 @@ type PipelineInterface interface {
 	CreateRoleBinding(username, metaName, roleRefName string) error
 	CreateProject() error
 	InstantiateDeploymentConfig() error
+	CreateImageStreamTag() error
 }

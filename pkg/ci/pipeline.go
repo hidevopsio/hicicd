@@ -308,6 +308,7 @@ func (p *Pipeline) CreateKongGateway(upstreamUrl string) error {
 	uris := "/" + p.Project + "-" + p.App
 	uris = strings.Replace(uris, "-", "/", -1)
 	host := os.Getenv("KONG_HOST")
+	host = strings.Replace(host, "${profile}", p.Profile, -1)
 	apiRequest := &kong.ApiRequest{
 		Name:                   p.App,
 		Hosts:                  []string{host},
@@ -323,6 +324,7 @@ func (p *Pipeline) CreateKongGateway(upstreamUrl string) error {
 		HttpIfTerminated:       true,
 	}
 	baseUrl := os.Getenv("KONG_ADMIN_URL")
+	baseUrl = strings.Replace(baseUrl, "${profile}", p.Profile, -1)
 	err := apiRequest.Post(baseUrl)
 	return err
 }
@@ -349,6 +351,19 @@ func (p *Pipeline) CreateRoute() (string, error) {
 	upstreamUrl, err = route.Create(8080)
 	return upstreamUrl, err
 }
+
+func (p *Pipeline) CreateImageStreamTag() error {
+	log.Debug("Pipeline.CreateImageStreamTag")
+	ist, err := openshift.NewImageStreamTags(p.App, p.Version, p.Namespace)
+	if err != nil {
+		log.Error("Pipeline.CreateImageStreamTag.NewImageStreamTags", err)
+		return err
+	}
+	fromNamespace := p.Project + "-" + p.BuildConfigs.TagFrom
+	_, err = ist.Create(fromNamespace)
+	return err
+}
+
 
 func (p *Pipeline) InitProject() error {
 	//init Groups
@@ -429,6 +444,7 @@ func (p *Pipeline) Deploy() error {
 	return err
 }
 
+
 func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) error {
 	log.Debug("Pipeline.Run()")
 	// TODO: check if the same app in the same namespace is already in running status.
@@ -452,16 +468,26 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 		return err
 	}
 
-	// create secret for building image
-	secret, err := p.CreateSecret(username, password, isToken)
-	if err != nil {
-		return fmt.Errorf("failed on CreateSecret! %s", err.Error())
+	if p.BuildConfigs.TagFrom == p.Profile {
+		// create secret for building image
+		secret, err := p.CreateSecret(username, password, isToken)
+		if err != nil {
+			return fmt.Errorf("failed on CreateSecret! %s", err.Error())
+		}
+
+		// build image
+		err = p.Build(secret, func() error {
+			return p.Deploy()
+		})
+	} else {
+		err = p.CreateImageStreamTag()
+		if err != nil {
+			log.Error("Pipeline.Run.CreateImageStreamTag error", err)
+			return err
+		}
+		p.Deploy()
 	}
 
-	// build image
-	err = p.Build(secret, func() error {
-		return p.Deploy()
-	})
 
 	if err != nil {
 		return fmt.Errorf("failed on Build! %s", err.Error())

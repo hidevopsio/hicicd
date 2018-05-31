@@ -6,6 +6,7 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"os"
 	"strings"
+	"github.com/hidevopsio/hiboot/pkg/utils"
 )
 
 func TestGet(t *testing.T) {
@@ -40,6 +41,7 @@ func TestPost(t *testing.T) {
 		HttpIfTerminated:       true,
 	}
 	baseUrl := os.Getenv("KONG_ADMIN_URL")
+	utils.ReplaceStringVariables(baseUrl, "test")
 	 err := apiRequest.Post(baseUrl)
 	assert.Equal(t, nil, err)
 }
