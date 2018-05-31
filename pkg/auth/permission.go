@@ -13,6 +13,16 @@ type Permission struct {
 	GroupMember scm.GroupMemberInterface
 }
 
+const (
+	NoPermissions        int = 0
+	GuestPermissions     int = 10
+	ReporterPermissions  int = 20
+	DeveloperPermissions int = 30
+	MasterPermissions    int = 40
+	OwnerPermission      int = 50
+)
+
+
 type PermissionInterface interface {
 	Get(baseUrl, token, name, namespace string, uid int) (string, string, int, error)
 }

@@ -451,7 +451,7 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 	permission := &auth.Permission{}
 	metaName, roleRefName, accessLevelValue, err := permission.Get(p.Scm.Url, token, p.App, p.Project, uid)
 	// TODO: accessLevelValue permission 30
-	if err != nil || accessLevelValue < 30 {
+	if err != nil || accessLevelValue < auth.DeveloperPermissions {
 		return err
 	}
 	// TODO: first, let's check if namespace is exist or not
