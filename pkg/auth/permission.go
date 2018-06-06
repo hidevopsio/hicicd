@@ -25,6 +25,12 @@ const (
 
 type PermissionInterface interface {
 	Get(baseUrl, token, name, namespace string, uid int) (string, string, int, error)
+	ListGroups(token, baseUrl string, uid int) ([]scm.Group, error)
+	GetGroup(token, baseUrl string, gid int) (*scm.Group, error)
+	ListGroupMembers(token, baseUrl string, gid, uid int) (int,  error)
+	ListGroupProjects(token, baseUrl string, gid, page int) ([]scm.Project,  error)
+	GetProjectMember(token, baseUrl string, pid, uid int) (int, error)
+	ListProjects(token, baseUrl string, page int) ([]scm.Project,  error)
 }
 
 func (p *Permission) Get(baseUrl, token, name, namespace string, uid int) (string, string, int, error) {

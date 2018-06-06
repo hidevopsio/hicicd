@@ -14,14 +14,11 @@ func TestGetProject(t *testing.T) {
 	log.Debugf("url: %v, username: %v", baseUrl, username)
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
-	pid := 1067
 	project := new(Project)
-	p, err := project.GetProject(baseUrl, gs.PrivateToken, pid)
-	if err != nil {
-		return
-	}
+	p, err := project.GetProject(baseUrl, "demo/hello-world", gs.PrivateToken)
+	log.Info("err:{}", err)
+	log.Info("product:{}", p)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, p.ID, pid)
 }
 
 func TestListProjects(t *testing.T) {
