@@ -3,8 +3,10 @@ pipeline:
   name: nodejs
   identifiers: # unused
   - package.json
+  istioConfigs:
+    skip: true
   buildConfigs:
-    imagestream: s2i-nodejs:6.14.2
+    imagestream: s2i-nodejs:alpine
     env:
     - name: npm_config_registry
       value: ${npm_config_registry}
@@ -20,17 +22,22 @@ pipeline:
       value: https://npm.taobao.org/mirrors/node-sass/
     - name: BUILD_SCRIPT
       value: |
-        echo === npm_config_registry: ${npm_config_registry} ===
-        npm install --only=dev
-        if [[ $? == 0 ]]; then
-          echo "Build Successful."
-        else
-          echo "Build Failed!"
-          exit 1
-        fi
-
+        nid="npm install --only=dev"
+        ni="npm install"
+        nrb="npm run build:dev"
+        for cmd in "${nid}" "${ni}" "${nrb}" ;
+          do
+            echo "${cmd} 开始"
+            ${cmd}
+            if [[ $? == 0 ]]; then
+              echo "$cmd Successful."
+            else
+              echo "$cmd Failed!"
+              exit 1
+            fi
+        done
   deploymentConfigs:
-    healthEndPoint: http://localhost:8080/index.html
+    healthEndPoint: http://localhost:8080/
     env:
     - name: NODE_ENV
       value: ${profile}
@@ -42,11 +49,11 @@ pipeline:
       value: ${project}
     - name: RUN_SCRIPT
       value: |
-        npm run build:${profile}
+        npm run build:dev
         if [[ $? == 0 ]]; then
-          echo "Build Successful."
+          echo "npm run build:dev Successful."
         else
-          echo "Build Failed!"
+          echo "npm run build:dev Failed!"
           exit 1
         fi
         npm run start

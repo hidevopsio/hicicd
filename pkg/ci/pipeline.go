@@ -54,6 +54,7 @@ type BuildConfigs struct {
 	TagFrom     string       `json:"tag_from"`
 	ImageStream string       `json:"image_stream"`
 	Env         []system.Env `json:"env"`
+	Rebuild     bool         `json:"rebuild"`
 }
 
 type IstioConfigs struct {
@@ -141,6 +142,7 @@ func (p *Pipeline) Init(pl *Pipeline) {
 	}
 
 	log.Debug(p)
+
 }
 
 func (p *Pipeline) CreateSecret(username, password string, isToken bool) (string, error) {
@@ -228,7 +230,7 @@ func (p *Pipeline) Build(secret string, completedHandler func() error) error {
 	}
 
 	scmUrl := p.CombineScmUrl()
-	buildConfig, err := openshift.NewBuildConfig(p.Namespace, p.App, scmUrl, p.Scm.Ref, secret, p.Version, p.BuildConfigs.ImageStream)
+	buildConfig, err := openshift.NewBuildConfig(p.Namespace, p.App, scmUrl, p.Scm.Ref, secret, p.Version, p.BuildConfigs.ImageStream, p.BuildConfigs.Rebuild)
 	if err != nil {
 		return err
 	}
@@ -364,7 +366,6 @@ func (p *Pipeline) CreateImageStreamTag() error {
 	return err
 }
 
-
 func (p *Pipeline) InitProject() error {
 	//init Groups
 	roleBinding := &openshift.RoleBinding{
@@ -444,7 +445,6 @@ func (p *Pipeline) Deploy() error {
 	return err
 }
 
-
 func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) error {
 	log.Debug("Pipeline.Run()")
 	// TODO: check if the same app in the same namespace is already in running status.
@@ -487,7 +487,6 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 		}
 		p.Deploy()
 	}
-
 
 	if err != nil {
 		return fmt.Errorf("failed on Build! %s", err.Error())

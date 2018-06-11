@@ -27,7 +27,7 @@ func init() {
 
 func login(expired int64, unit time.Duration) (*web.Token, error) {
 	u := &auth.User{}
-	_, _, err := u.Login(userRequest.Url, userRequest.Username, userRequest.Password)
+	_, _, _, err := u.Login(userRequest.Url, userRequest.Username, userRequest.Password)
 	if err != nil {
 		return nil, err
 	}

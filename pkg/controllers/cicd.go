@@ -72,15 +72,15 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 	message := "success"
 	if err == nil {
 		// Run Pipeline, password is a token, no need to pass username to pipeline
+
 		pipeline.Init(&pl)
-		err = pipeline.Run(c.Username, c.Password, c.ScmToken, c.Uid, false)
-		if err != nil {
-			message = err.Error()
-		}
+			err = pipeline.Run(c.Username, c.Password, c.ScmToken, c.Uid, false)
+			if err != nil {
+				message = err.Error()
+			}
 	} else {
 		message = "failed, " + err.Error()
 	}
-
 	ctx.ResponseBody(message, nil)
 }
 

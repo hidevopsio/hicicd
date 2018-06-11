@@ -11,6 +11,7 @@ pipeline:
   buildConfigs:
     skip: false
     tagFrom: dev
+    rebuild: false
   deploymentConfigs:
     skip: false
     forceUpdate: false
