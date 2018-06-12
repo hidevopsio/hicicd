@@ -22,20 +22,28 @@ pipeline:
       value: https://npm.taobao.org/mirrors/node-sass/
     - name: BUILD_SCRIPT
       value: |
-        nid="npm install --only=dev"
-        ni="npm install"
-        nrb="npm run build:dev"
-        for cmd in "${nid}" "${ni}" "${nrb}" ;
-          do
-            echo "${cmd} 开始"
-            ${cmd}
-            if [[ $? == 0 ]]; then
-              echo "$cmd Successful."
-            else
-              echo "$cmd Failed!"
-              exit 1
-            fi
-        done
+        echo === npm_config_registry: ${npm_config_registry} ===
+        npm install --only=dev
+        if [[ $? == 0 ]]; then
+          echo "npm install --only=dev Successful."
+        else
+          echo "npm install --only=dev Failed!"
+          exit 1
+        fi
+        npm install
+        if [[ $? == 0 ]]; then
+          echo "npm install Successful."
+        else
+          echo "npm install Failed!"
+          exit 1
+        fi
+        npm run build:dev
+        if [[ $? == 0 ]]; then
+          echo "npm run build:dev Successful."
+        else
+          echo "npm run build:dev Failed!"
+          exit 1
+        fi
   deploymentConfigs:
     healthEndPoint: http://localhost:8080/
     env:
@@ -49,11 +57,4 @@ pipeline:
       value: ${project}
     - name: RUN_SCRIPT
       value: |
-        npm run build:dev
-        if [[ $? == 0 ]]; then
-          echo "npm run build:dev Successful."
-        else
-          echo "npm run build:dev Failed!"
-          exit 1
-        fi
         npm run start

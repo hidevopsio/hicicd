@@ -124,3 +124,24 @@ func TestCicdRunNodejs(t *testing.T) {
 		})
 	}
 }
+
+var jobChan chan int
+
+func worker(jobChan <- chan int)  {
+	for job := range jobChan{
+		fmt.Printf("执行任务 %d \n", job)
+	}
+}
+
+func TestGoChan(t *testing.T)  {
+	jobChan = make(chan int, 100)
+	//入队
+	for i := 1; i <= 10; i++{
+		jobChan <- i
+	}
+
+	close(jobChan)
+	go worker(jobChan)
+}
+
+
