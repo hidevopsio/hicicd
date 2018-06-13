@@ -82,6 +82,7 @@ type Pipeline struct {
 	App               string            `json:"app" validate:"required"`
 	Profile           string            `json:"profile" validate:"required"`
 	Project           string            `json:"project" validate:"required"`
+	Cluster           string            `json:"cluster"`
 	Namespace         string            `json:"namespace"`
 	Scm               Scm               `json:"scm"`
 	Version           string            `json:"version"`
@@ -242,11 +243,12 @@ func (p *Pipeline) Build(secret string, completedHandler func() error) error {
 	build, err := buildConfig.Build(p.BuildConfigs.Env)
 
 	if err != nil {
+		log.Error("buildConfig.Build(p.BuildConfigs.Env)", err)
 		return err
 	}
 
-	buildConfig.Watch(build, completedHandler)
-
+	err = buildConfig.Watch(build, completedHandler)
+	log.Info("buildConfig.Watch", err)
 	return err
 }
 
@@ -390,6 +392,7 @@ func (p *Pipeline) InitProject() error {
 }
 
 func (p *Pipeline) Deploy() error {
+	log.Info("p.Deploy()")
 	if !p.DeploymentConfigs.Skip {
 
 		// create dc - deployment config

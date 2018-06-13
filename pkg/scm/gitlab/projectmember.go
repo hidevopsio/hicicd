@@ -17,12 +17,18 @@ func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid int) (s
 	scmProjectMember := scm.ProjectMember{}
 	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(baseUrl + ApiVersion)
-	log.Debug("before p.project.GetProjectMember(so)")
+	log.Debug("before p.project.GetProjectMember(so)", pid)
 	project, _, err := c.Projects.GetProject(pid)
 	if err != nil {
+		log.Error("Projects.GetProject ", err)
 		return scmProjectMember, err
 	}
 	groupMembers, _, err := c.Groups.ListGroupMembers(project.Namespace.ID, &gitlab.ListGroupMembersOptions{})
+	if err != nil {
+		log.Error("Groups.ListGroupMembers err:", err)
+		return scmProjectMember, err
+	}
+	log.Debug("Groups.ListGroupMembers  size", groupMembers)
 	for _, groupMember := range groupMembers {
 		if groupMember.ID == uid {
 			for id, permissions := range scm.Permissions  {
@@ -35,6 +41,7 @@ func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid int) (s
 	}
 	projectMember, _, err := c.ProjectMembers.GetProjectMember(pid, uid)
 	if err != nil {
+		log.Error("ProjectMembers.GetProjectMember ", err)
 		return scmProjectMember, err
 	}
 	log.Debug("after c.Session.GetSession(so)")

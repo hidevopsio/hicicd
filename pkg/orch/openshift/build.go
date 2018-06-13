@@ -232,6 +232,7 @@ func (b *BuildConfig) Build(env []system.Env) (*v1.Build, error) {
 
 	build, err := b.BuildConfigs.Instantiate(b.Name, &buildRequest)
 	if nil != err {
+		log.Error("b.BuildConfigs.Instantiate err", err)
 		return nil, err
 	}
 	log.Infof("Instantiated Build %v", build.Name)
@@ -245,6 +246,7 @@ func (b *BuildConfig) Watch(build *v1.Build, completedHandler func() error) erro
 	})
 
 	if nil != err {
+		log.Error("BuildConfig.Watch err ", err)
 		return err
 	}
 
@@ -252,6 +254,7 @@ func (b *BuildConfig) Watch(build *v1.Build, completedHandler func() error) erro
 		select {
 		case event, ok := <-w.ResultChan():
 			if !ok {
+				log.Info("resultChan: %v", ok)
 				return fmt.Errorf("resultChan: %v", ok)
 			}
 			switch event.Type {
@@ -266,14 +269,17 @@ func (b *BuildConfig) Watch(build *v1.Build, completedHandler func() error) erro
 					log.Debugf("bld.Status.Phase: %v", bld.Status.Phase)
 					switch bld.Status.Phase {
 					case v1.BuildPhaseComplete:
+						log.Info("bld.Status.Phase", bld.Status.Phase)
 						var err error
 						if nil != completedHandler {
 							err = completedHandler()
 						}
 						w.Stop()
+						log.Error("bld.Status.Phase completedHandler", err)
 						return err
 					case v1.BuildPhaseError, v1.BuildPhaseCancelled, v1.BuildPhaseFailed:
 						w.Stop()
+						log.Error("bld.Status.Phase BuildPhaseError", fmt.Errorf(bld.Status.Message))
 						return fmt.Errorf(bld.Status.Message)
 
 					}
@@ -286,7 +292,7 @@ func (b *BuildConfig) Watch(build *v1.Build, completedHandler func() error) erro
 			}
 		}
 	}
-
+	log.Info("build.watch", err)
 	return err
 }
 
