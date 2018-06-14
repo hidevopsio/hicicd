@@ -12,18 +12,13 @@ type ProjectMember struct {
 
 
 
-func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid int) (scm.ProjectMember, error) {
+func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid, gid int) (scm.ProjectMember, error) {
 	log.Debug("Product.GetProject()")
 	scmProjectMember := scm.ProjectMember{}
 	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before p.project.GetProjectMember(so)", pid)
-	project, _, err := c.Projects.GetProject(pid)
-	if err != nil {
-		log.Error("Projects.GetProject ", err)
-		return scmProjectMember, err
-	}
-	groupMembers, _, err := c.Groups.ListGroupMembers(project.Namespace.ID, &gitlab.ListGroupMembersOptions{})
+	groupMembers, _, err := c.Groups.ListGroupMembers(gid, &gitlab.ListGroupMembersOptions{})
 	if err != nil {
 		log.Error("Groups.ListGroupMembers err:", err)
 		return scmProjectMember, err

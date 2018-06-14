@@ -8,17 +8,18 @@ import (
 )
 
 func TestGetProject(t *testing.T) {
-	baseUrl := os.Getenv("SCM_URL")
+	baseUrl := "http://gitlab.vpclub.cn:8022"
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
 	log.Debugf("url: %v, username: %v", baseUrl, username)
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	project := new(Project)
-	p, err := project.GetProject(baseUrl, "demo/hello-world", gs.PrivateToken)
-	log.Info("err:{}", err)
-	log.Info("product:{}", p)
+	id := "demo/hello-world"
+	pid, gid, err := project.GetProject(baseUrl, id, gs.PrivateToken)
 	assert.Equal(t, nil, err)
+	assert.Equal(t, 12, pid)
+	assert.Equal(t, 178, gid)
 }
 
 func TestListProjects(t *testing.T) {
@@ -37,7 +38,7 @@ func TestListProjects(t *testing.T) {
 	log.Debug("project size:", projects)
 }
 
-func TestListUserProjects(t *testing.T) {
+/*func TestListUserProjects(t *testing.T) {
 	baseUrl := os.Getenv("SCM_URL")
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
@@ -68,4 +69,4 @@ func TestListGroupProjects(t *testing.T) {
 	log.Debug("get user project pid :", pid)
 	assert.Equal(t, true, pid)
 	assert.Equal(t, nil, err)
-}
+}*/

@@ -40,7 +40,8 @@ func (p *Permission) Get(baseUrl, token, name, namespace string, uid int) (strin
 	if err != nil {
 		return "", "", 0, err
 	}
-	pid, err := p.Project.ListUserProjects(baseUrl, token, name, namespace)
+	id := namespace + "/" + name
+	pid, gid, err :=p.Project.GetProject(baseUrl, id, token)
 	if err != nil {
 		return "", "", 0, err
 	}
@@ -48,7 +49,7 @@ func (p *Permission) Get(baseUrl, token, name, namespace string, uid int) (strin
 	if err != nil {
 		return "", "", 0, err
 	}
-	projectMember, err := p.ProjectMember.GetProjectMember(token, baseUrl, pid, uid)
+	projectMember, err := p.ProjectMember.GetProjectMember(token, baseUrl, pid, uid, gid)
 	return projectMember.MetaName, projectMember.RoleRefName, projectMember.AccessLevelValue, err
 }
 
@@ -121,7 +122,7 @@ func (p *Permission) ListProjects(token, baseUrl string, page int) ([]scm.Projec
 	return projects, err
 }
 
-func (p *Permission) GetProjectMember(token, baseUrl string, pid, uid int) (int, error){
+func (p *Permission) GetProjectMember(token, baseUrl string, pid, uid, gid int) (int, error){
 	log.Debug("Permission List Group Projects:{}")
 	scmFactory := new(factories.ScmFactory)
 	var err error
@@ -129,6 +130,6 @@ func (p *Permission) GetProjectMember(token, baseUrl string, pid, uid int) (int,
 	if err != nil  {
 		return 0, err
 	}
-	projectMember, err := p.ProjectMember.GetProjectMember(token, baseUrl, pid, uid)
+	projectMember, err := p.ProjectMember.GetProjectMember(token, baseUrl, pid, uid, gid)
 	return projectMember.AccessLevelValue, err
 }

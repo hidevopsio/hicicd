@@ -75,7 +75,7 @@ func (c *ScmController) PostGetProjectMember(ctx *web.Context)  {
 		return
 	}
 	permission := &auth.Permission{}
-	projects, err := permission.GetProjectMember(c.ScmToken, c.Url, projectMember.Pid, c.Uid)
+	projects, err := permission.GetProjectMember(c.ScmToken, c.Url, projectMember.Pid, c.Uid, projectMember.Gid)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return

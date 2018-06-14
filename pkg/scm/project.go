@@ -3,10 +3,9 @@ package scm
 import "time"
 
 type ProjectInterface interface {
-	ListUserProjects(baseUrl, token, name, namespace string) (int, error)
 	ListProjects(baseUrl, token string, page int) ([]Project, error)
-	ListGroupProjects(baseUrl, token, namespace string) ([]Project, error)
 	GetGroupId(url, token string, pid int) (int, error)
+	GetProject(baseUrl, id, token string) (int, int, error)
 }
 
 type Project struct {

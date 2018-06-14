@@ -5,7 +5,7 @@ import (
 )
 
 type ProjectMemberInterface interface {
-	GetProjectMember(token, baseUrl string, pid, uid int) (ProjectMember, error)
+	GetProjectMember(token, baseUrl string, pid, uid, gid int) (ProjectMember, error)
 }
 
 type ProjectPermissions struct {

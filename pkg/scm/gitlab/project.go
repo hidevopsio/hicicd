@@ -12,13 +12,13 @@ type Project struct {
 	scm.Project
 }
 
-func (p *Project) GetProject(baseUrl, name, token string) (*gitlab.Project, error) {
+func (p *Project) GetProject(baseUrl, id, token string) (int, int, error) {
 	log.Debug("project.GetProject()")
 	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before c.Session.GetSession(so)")
-	project, _, err := c.Projects.GetProject(name)
-	return project, err
+	project, _, err := c.Projects.GetProject(id)
+	return project.ID, project.Namespace.ID, err
 }
 
 func (p *Project) GetGroupId(url, token string, pid int) (int, error) {
@@ -52,7 +52,7 @@ func (p *Project) ListProjects(baseUrl, token string, page int) ([]scm.Project, 
 	return projects, err
 }
 
-func (p *Project) ListUserProjects(baseUrl, token, name, namespace string) (int, error) {
+/*func (p *Project) ListUserProjects(baseUrl, token, name, namespace string) (int, error) {
 	log.Debug("project.ListUserProjects()")
 	log.Debugf("url: %v", baseUrl)
 	c := gitlab.NewClient(&http.Client{}, token)
@@ -84,9 +84,9 @@ func (p *Project) ListUserProjects(baseUrl, token, name, namespace string) (int,
 		page++
 	}
 	return 0, nil
-}
+}*/
 
-func (p *Project) ListGroupProjects(baseUrl, token, namespace string) ([]scm.Project, error) {
+/*func (p *Project) ListGroupProjects(baseUrl, token, namespace string) ([]scm.Project, error) {
 	log.Debug("project List Group Project")
 	c := gitlab.NewClient(&http.Client{}, token)
 	scmProjects := []scm.Project{}
@@ -118,4 +118,4 @@ func (p *Project) ListGroupProjects(baseUrl, token, namespace string) ([]scm.Pro
 		page++
 	}
 	return scmProjects, nil
-}
+}*/
