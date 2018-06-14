@@ -54,7 +54,7 @@ func NewDeploymentConfig(name, namespace, version string) (*DeploymentConfig, er
 	}, nil
 }
 
-func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas int32, force bool, healthEndPoint string, injectSidecar func(in interface{}) (interface{}, error)) error {
+func (dc *DeploymentConfig) Create(env interface{}, labels *map[string]string, ports interface{}, replicas int32, force bool, healthEndPoint string, injectSidecar func(in interface{}) (interface{}, error)) error {
 	log.Debug("DeploymentConfig.Create()")
 
 	// env
@@ -63,7 +63,6 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 
 	p := make([]corev1.ContainerPort, 0)
 	copier.Copy(&p, ports)
-
 	cfg := &v1.DeploymentConfig{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "apps.openshift.io/v1",
@@ -71,10 +70,7 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: dc.FullName,
-			Labels: map[string]string{
-				"app": dc.Name,
-				"version": dc.Version,
-			},
+			Labels: *labels,
 		},
 		Spec: v1.DeploymentConfigSpec{
 			Replicas: replicas,

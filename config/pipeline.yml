@@ -19,6 +19,9 @@ pipeline:
     env:
     - name: TZ
       value: Asia/Shanghai
+    labels:
+      app: ${app}
+      version: ${version}
   istioConfigs:
     skip: false
     version: 0.7.1  # use env variable instead ?

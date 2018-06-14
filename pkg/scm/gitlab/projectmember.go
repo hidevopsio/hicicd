@@ -18,12 +18,15 @@ func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid, gid in
 	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before p.project.GetProjectMember(so)", pid)
-	groupMembers, _, err := c.Groups.ListGroupMembers(gid, &gitlab.ListGroupMembersOptions{})
+	opt := &gitlab.ListGroupMembersOptions{
+		Page: 50,
+	}
+	groupMembers, _, err := c.Groups.ListGroupMembers(gid, opt)
 	if err != nil {
 		log.Error("Groups.ListGroupMembers err:", err)
 		return scmProjectMember, err
 	}
-	log.Debug("Groups.ListGroupMembers  size", groupMembers)
+	log.Debug("Groups.ListGroupMembers ")
 	for _, groupMember := range groupMembers {
 		if groupMember.ID == uid {
 			for id, permissions := range scm.Permissions  {

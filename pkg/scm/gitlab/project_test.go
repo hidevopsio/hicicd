@@ -18,8 +18,8 @@ func TestGetProject(t *testing.T) {
 	id := "demo/hello-world"
 	pid, gid, err := project.GetProject(baseUrl, id, gs.PrivateToken)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 12, pid)
-	assert.Equal(t, 178, gid)
+	assert.Equal(t, 905, pid)
+	assert.Equal(t, 4, gid)
 }
 
 func TestListProjects(t *testing.T) {

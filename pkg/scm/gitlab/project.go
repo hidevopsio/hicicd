@@ -18,6 +18,9 @@ func (p *Project) GetProject(baseUrl, id, token string) (int, int, error) {
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before c.Session.GetSession(so)")
 	project, _, err := c.Projects.GetProject(id)
+	if err != nil {
+		return 0, 0, err
+	}
 	return project.ID, project.Namespace.ID, err
 }
 

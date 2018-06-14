@@ -31,6 +31,8 @@ pipeline:
       value: ${profile}
     - name: KUBERNETES_LABELS
       value: cluster=${cluster}-${profile}
+    labels:
+      cluster: ${cluster}-${profile}
   ports:
   - name: grpc-7575
     port: 7575

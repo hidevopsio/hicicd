@@ -42,11 +42,12 @@ type Scm struct {
 }
 
 type DeploymentConfigs struct {
-	HealthEndPoint string       `json:"health_end_point"`
-	Skip           bool         `json:"skip"`
-	ForceUpdate    bool         `json:"force_update"`
-	Replicas       int32        `json:"replicas"`
-	Env            []system.Env `json:"env"`
+	HealthEndPoint string            `json:"health_end_point"`
+	Skip           bool              `json:"skip"`
+	ForceUpdate    bool              `json:"force_update"`
+	Replicas       int32             `json:"replicas"`
+	Env            []system.Env      `json:"env"`
+	Labels         map[string]string `json:"labels"`
 }
 
 type BuildConfigs struct {
@@ -167,7 +168,7 @@ func (pl *Pipeline) CreateProject() error {
 	}
 	pro, err := p.Get()
 	if err == nil {
-		log.Debug("exists project debug", pro)
+		log.Debug("exists project debug:", pro.Name)
 		return err
 	}
 	project, err := p.Create()
@@ -281,7 +282,7 @@ func (p *Pipeline) CreateDeploymentConfig(force bool, injectSidecar func(in inte
 		return err
 	}
 
-	err = dc.Create(&p.DeploymentConfigs.Env, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, injectSidecar)
+	err = dc.Create(&p.DeploymentConfigs.Env, &p.DeploymentConfigs.Labels, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, injectSidecar)
 	if err != nil {
 		return err
 	}
