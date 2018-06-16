@@ -24,7 +24,7 @@ func (c *DestinationController) Before(ctx *web.Context) {
 }
 
 func (c *DestinationController) PostAdd(ctx *web.Context) {
-	log.Debug("egress  add:{}")
+	log.Debug("destination  add:{}")
 	var destination istio.Destination
 	err := ctx.RequestBody(&destination)
 	if err != nil {

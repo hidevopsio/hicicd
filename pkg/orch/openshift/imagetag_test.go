@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	name = "red-shop"
-	namespace = "demo-test"
-	fromNamespace = "demo-dev"
-	version = "v2"
+	name = "file-server"
+	namespace = "hidevopsio"
+	fromNamespace = "hidevopsio-dev"
+	version = "v1"
 	fullName = name + ":" + version
 )
 

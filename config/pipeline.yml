@@ -9,11 +9,11 @@ pipeline:
     ref: master
   dockerRegistry: docker-registry.default.svc:5000
   buildConfigs:
-    skip: false
+    enable: true
     tagFrom: stage
     rebuild: false
   deploymentConfigs:
-    skip: false
+    enable: true
     forceUpdate: false
     replicas: 1
     env:
@@ -23,7 +23,7 @@ pipeline:
       app: ${app}
       version: ${version}
   istioConfigs:
-    skip: false
+    enable: false
     version: 0.7.1  # use env variable instead ?
     namespace: istio-system
     dockerHub: docker.io/istio

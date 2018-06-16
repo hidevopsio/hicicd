@@ -32,7 +32,7 @@ type BaseController struct {
 }
 
 func (c *BaseController) Before(ctx *web.Context) {
-	log.Debug("route rule  add:{}")
+	log.Debug("controller before:{}")
 	ti := ctx.Values().Get("jwt")
 	token := ti.(*jwt.Token)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -41,7 +41,7 @@ func (c *BaseController) Before(ctx *web.Context) {
 		c.ScmToken = parseToken(claims, ScmToken)
 		c.Uid, _ = strconv.Atoi(parseToken(claims, ScmUid))
 		c.Url = parseToken(claims, ScmUrl)
-		log.Debugf("url: %v, username: %v, password: %v", c.Username, strings.Repeat("*", len(c.Password)))
+		log.Debugf("url: %v, username: %v, password: %v", c.Url, c.Username, strings.Repeat("*", len(c.Password)))
 	} else {
 		log.Debug("invalid token")
 		return

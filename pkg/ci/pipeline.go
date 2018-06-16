@@ -33,6 +33,7 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/orch/kong"
 	"os"
 	"strings"
+	"encoding/json"
 )
 
 type Scm struct {
@@ -42,16 +43,22 @@ type Scm struct {
 }
 
 type DeploymentConfigs struct {
-	HealthEndPoint string            `json:"health_end_point"`
-	Skip           bool              `json:"skip"`
-	ForceUpdate    bool              `json:"force_update"`
-	Replicas       int32             `json:"replicas"`
-	Env            []system.Env      `json:"env"`
-	Labels         map[string]string `json:"labels"`
+	HealthEndPoint string       `json:"health_end_point"`
+	Enable         bool         `json:"enable"`
+	ForceUpdate    bool         `json:"force_update"`
+	Replicas       int32        `json:"replicas"`
+	Env            []system.Env `json:"env"`
+	Labels         Labels       `json:"labels"`
+}
+
+type Labels struct {
+	App     string `json:"app"`
+	Version string `json:"version"`
+	Cluster string `json:"cluster"`
 }
 
 type BuildConfigs struct {
-	Skip        bool         `json:"skip"` // TODO: ? Always, IfNotPresent, Never
+	Enable      bool         `json:"enable"` // TODO: ? Always, IfNotPresent, Never
 	TagFrom     string       `json:"tag_from"`
 	ImageStream string       `json:"image_stream"`
 	Env         []system.Env `json:"env"`
@@ -59,7 +66,7 @@ type BuildConfigs struct {
 }
 
 type IstioConfigs struct {
-	Skip                bool   `json:"skip"`
+	Enable              bool   `json:"enable"`
 	Version             string `json:"version"`
 	Namespace           string `json:"namespace"`
 	DockerHub           string `json:"docker_hub"`
@@ -227,7 +234,7 @@ func (p *Pipeline) CreateRoleBinding(username, metaName, roleRefName string) err
 func (p *Pipeline) Build(secret string, completedHandler func() error) error {
 	log.Debug("Pipeline.Build()")
 
-	if p.BuildConfigs.Skip {
+	if !p.BuildConfigs.Enable {
 		return completedHandler()
 	}
 
@@ -281,8 +288,10 @@ func (p *Pipeline) CreateDeploymentConfig(force bool, injectSidecar func(in inte
 	if err != nil {
 		return err
 	}
-
-	err = dc.Create(&p.DeploymentConfigs.Env, &p.DeploymentConfigs.Labels, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, injectSidecar)
+	var l map[string]string
+	labels, _ := json.Marshal(p.DeploymentConfigs.Labels)
+	err = json.Unmarshal(labels, &l)
+	err = dc.Create(&p.DeploymentConfigs.Env, l, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, injectSidecar)
 	if err != nil {
 		return err
 	}
@@ -394,11 +403,11 @@ func (p *Pipeline) InitProject() error {
 
 func (p *Pipeline) Deploy() error {
 	log.Info("p.Deploy()")
-	if !p.DeploymentConfigs.Skip {
+	if p.DeploymentConfigs.Enable {
 
 		// create dc - deployment config
 		err := p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate, func(in interface{}) (interface{}, error) {
-			if p.IstioConfigs.Skip {
+			if !p.IstioConfigs.Enable {
 				return in, nil
 			}
 

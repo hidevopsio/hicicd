@@ -75,7 +75,10 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 					"uid": uid,
 				}, 24, time.Hour)
 				if err == nil {
-					ctx.ResponseBody("success", &jwtToken)
+					data := map[string]interface{}{
+						"token": &jwtToken,
+					}
+					ctx.ResponseBody("success", &data)
 				} else {
 					ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 				}

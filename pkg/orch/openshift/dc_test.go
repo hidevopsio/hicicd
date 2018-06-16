@@ -62,7 +62,7 @@ func TestDeploymentConfigCreation(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, app, dc.Name)
 	// create dc
-	err = dc.Create(&env, &ports, 1, false, healthEndPoint, nil)
+	err = dc.Create(&env, map[string]string{}, &ports, 1, false, healthEndPoint, nil)
 	assert.Equal(t, nil, err)
 }
 

@@ -54,8 +54,8 @@ func NewDeploymentConfig(name, namespace, version string) (*DeploymentConfig, er
 	}, nil
 }
 
-func (dc *DeploymentConfig) Create(env interface{}, labels *map[string]string, ports interface{}, replicas int32, force bool, healthEndPoint string, injectSidecar func(in interface{}) (interface{}, error)) error {
-	log.Debug("DeploymentConfig.Create()")
+func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, ports interface{}, replicas int32, force bool, healthEndPoint string, injectSidecar func(in interface{}) (interface{}, error)) error {
+	log.Debug("DeploymentConfig.Create()", labels)
 
 	// env
 	e := make([]corev1.EnvVar, 0)
@@ -70,7 +70,7 @@ func (dc *DeploymentConfig) Create(env interface{}, labels *map[string]string, p
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: dc.FullName,
-			Labels: *labels,
+			Labels: labels,
 		},
 		Spec: v1.DeploymentConfigSpec{
 			Replicas: replicas,
@@ -87,10 +87,7 @@ func (dc *DeploymentConfig) Create(env interface{}, labels *map[string]string, p
 			Template: &corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: dc.Name,
-					Labels: map[string]string{
-						"app":  dc.Name,
-						"version": dc.Version,
-					},
+					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
