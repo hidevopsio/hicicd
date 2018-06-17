@@ -21,6 +21,7 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"os"
 	"net/http"
+	"strconv"
 )
 
 type UserRequest struct {
@@ -66,14 +67,19 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 		user := &auth.User{}
 		privateToken, uid, _, err := user.Login(url, request.Username, request.Password)
 		if err == nil {
-
-				jwtToken, err := web.GenerateJwtToken(web.JwtMap{
-					"url": url,
-					"username": request.Username,
+			expired := os.Getenv("TOKEN_EXPIRED_HOUR")
+			log.Debug("login expired time :", expired)
+			if expired == "" {
+				expired = "24"
+			}
+			exp, err:=strconv.ParseInt(expired, 10, 64)
+			jwtToken, err := web.GenerateJwtToken(web.JwtMap{
+				"url": url,
+				"username": request.Username,
 					"password": request.Password, // TODO: token is not working?
 					"scmToken": privateToken,
 					"uid": uid,
-				}, 24, time.Hour)
+				}, exp, time.Hour)
 				if err == nil {
 					data := map[string]interface{}{
 						"token": &jwtToken,

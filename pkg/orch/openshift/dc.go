@@ -55,7 +55,7 @@ func NewDeploymentConfig(name, namespace, version string) (*DeploymentConfig, er
 }
 
 func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, ports interface{}, replicas int32, force bool, healthEndPoint string, injectSidecar func(in interface{}) (interface{}, error)) error {
-	log.Debug("DeploymentConfig.Create()", labels)
+	log.Debug("DeploymentConfig.Create()", force)
 
 	// env
 	e := make([]corev1.EnvVar, 0)

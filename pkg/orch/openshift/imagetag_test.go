@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	name = "file-server"
+	name = "hiweb"
 	namespace = "hidevopsio"
 	fromNamespace = "hidevopsio-dev"
 	version = "v1"
