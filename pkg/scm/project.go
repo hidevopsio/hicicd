@@ -3,10 +3,10 @@ package scm
 import "time"
 
 type ProjectInterface interface {
-	ListProjects(baseUrl, token string, page int) ([]Project, error)
+	ListProjects(baseUrl, token, search string, page int) ([]Project, error)
 	GetGroupId(url, token string, pid int) (int, error)
 	GetProject(baseUrl, id, token string) (int, int, error)
-	Search(baseUrl, token, query string) ([]Project, error)
+	Search(baseUrl, token, search string) ([]Project, error)
 }
 
 type Project struct {
@@ -52,5 +52,10 @@ type Project struct {
 	BaseUrl                                   string     `json:"base_url"`
 	Namespace                                 string     `json:"namespace"`
 	Page                                      int        `json:"page"`
+	Search                                    string     `json:"search"`
 	Group                                     *Group
+}
+
+type Search struct {
+	Keyword string `json:"keyword"`
 }

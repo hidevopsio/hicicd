@@ -13,6 +13,9 @@ type ScmController struct {
 	BaseController
 }
 
+
+
+
 func init() {
 	web.Add(new(ScmController))
 }
@@ -58,7 +61,7 @@ func (c *ScmController) PostListProjects(ctx *web.Context) {
 		return
 	}
 	permission := &auth.Permission{}
-	projects, err := permission.ListProjects(c.ScmToken, c.Url, project.Page)
+	projects, err := permission.ListProjects(c.ScmToken, c.Url, project.Search, project.Page)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
@@ -76,6 +79,25 @@ func (c *ScmController) PostGetProjectMember(ctx *web.Context)  {
 	}
 	permission := &auth.Permission{}
 	projects, err := permission.GetProjectMember(c.ScmToken, c.Url, projectMember.Pid, c.Uid, projectMember.Gid)
+	if err != nil {
+		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
+		return
+	}
+	ctx.ResponseBody("success", &projects)
+}
+
+
+func (c *ScmController) PostSearch(ctx *web.Context){
+	log.Debug("ScmController Post Search()")
+	var search scm.Search
+	err := ctx.RequestBody(&search)
+	if err != nil {
+		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
+		return
+	}
+	log.Info("ScmController ScmController search", search.Keyword)
+	permission := &auth.Permission{}
+	projects, err := permission.Search(c.Url, c.ScmToken, search.Keyword)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return

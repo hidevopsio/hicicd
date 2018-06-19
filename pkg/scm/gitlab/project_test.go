@@ -37,3 +37,18 @@ func TestListProjects(t *testing.T) {
 	log.Debug("project size:", len(projects))
 	log.Debug("project size:", projects)
 }
+
+func TestSearch(t *testing.T) {
+	baseUrl := "https://gitlab.vpclub.cn"
+	username := os.Getenv("SCM_USERNAME")
+	password := os.Getenv("SCM_PASSWORD")
+	query := "hello-world"
+	log.Debugf("url: %v, username: %v", baseUrl, username)
+	gs := new(Session)
+	err := gs.GetSession(baseUrl, username, password)
+	project := new(Project)
+	p, err := project.Search(baseUrl, gs.PrivateToken, query)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, username, gs.Username)
+	log.Debug(p)
+}

@@ -145,7 +145,13 @@ func (p *Pipeline) Init(pl *Pipeline) {
 			p.Namespace = p.Project + "-" + p.Profile
 		}
 	}
-
+	if "" == p.Profile {
+		p.BuildConfigs.TagFrom = ""
+	}else if p.Profile == "dev" || p.Profile == "test" {
+		p.BuildConfigs.TagFrom = "dev"
+	}else{
+		p.BuildConfigs.TagFrom = "stage"
+	}
 	log.Debug(p)
 
 }

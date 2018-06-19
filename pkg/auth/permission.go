@@ -110,7 +110,7 @@ func (p *Permission) ListGroupProjects(token, baseUrl string, gid, page int) ([]
 	return projects, err
 }
 
-func (p *Permission) ListProjects(token, baseUrl string, page int) ([]scm.Project,  error)  {
+func (p *Permission) ListProjects(token, baseUrl, search string, page int) ([]scm.Project,  error)  {
 	log.Debug("Permission List Group Projects:{}")
 	scmFactory := new(factories.ScmFactory)
 	var err error
@@ -118,7 +118,7 @@ func (p *Permission) ListProjects(token, baseUrl string, page int) ([]scm.Projec
 	if err != nil  {
 		return nil, err
 	}
-	projects, err := p.Project.ListProjects(baseUrl, token, page)
+	projects, err := p.Project.ListProjects(baseUrl, token, search, page)
 	return projects, err
 }
 
@@ -132,4 +132,17 @@ func (p *Permission) GetProjectMember(token, baseUrl string, pid, uid, gid int) 
 	}
 	projectMember, err := p.ProjectMember.GetProjectMember(token, baseUrl, pid, uid, gid)
 	return projectMember.AccessLevelValue, err
+}
+
+func (p *Permission) Search(baseUrl, token, search string) ([]scm.Project, error){
+	log.Debug("permission project Search: {}")
+	projects := []scm.Project{}
+	scmFactory := new(factories.ScmFactory)
+	var err error
+	p.Project, err = scmFactory.NewProject(factories.GitlabScmType)
+	if err != nil  {
+		return projects, err
+	}
+	projects, err = p.Project.Search(baseUrl, token, search)
+	return projects, err
 }
