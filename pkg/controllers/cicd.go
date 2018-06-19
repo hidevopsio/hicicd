@@ -71,12 +71,6 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 	pipeline, err := pipelineFactory.New(pl.Name)
 	message := "success"
 	if err == nil {
-		// Run Pipeline, password is a token, no need to pass username to pipeline
-/*		pl.DeploymentConfigs.Labels = map[string]string{
-			"app":pl.App,
-			"version":pl.Version,
-			"":"",
-		}*/
 		pipeline.Init(&pl)
 
 		go func() {

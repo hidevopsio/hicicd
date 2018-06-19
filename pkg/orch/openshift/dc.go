@@ -176,6 +176,11 @@ func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, po
 			result, err = dc.Interface.Update(cfg)
 			if err == nil {
 				log.Infof("Updated DeploymentConfig %v.", result.Name)
+				_, err := dc.Instantiate()
+				if err != nil {
+					log.Error(err.Error())
+				}
+				return err
 			} else {
 				return err
 			}

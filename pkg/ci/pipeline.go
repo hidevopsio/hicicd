@@ -113,11 +113,8 @@ type Configuration struct {
 // @Return error
 func (p *Pipeline) Init(pl *Pipeline) {
 	log.Debug("Pipeline.EnsureParam()")
-
 	// load config file
 	if pl != nil {
-		/*		builder := &Builder{}
-				c := builder.Build(pl.Name)*/
 
 		b := &system.Builder{
 			Path:       filepath.Join(utils.GetWorkDir(), "config"),
@@ -152,6 +149,10 @@ func (p *Pipeline) Init(pl *Pipeline) {
 	}else{
 		p.BuildConfigs.TagFrom = "stage"
 	}
+	if !pl.BuildConfigs.Enable {
+		p.BuildConfigs.Enable = pl.BuildConfigs.Enable
+	}
+
 	log.Debug(p)
 
 }
