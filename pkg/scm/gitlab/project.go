@@ -55,6 +55,28 @@ func (p *Project) ListProjects(baseUrl, token string, page int) ([]scm.Project, 
 	return projects, err
 }
 
+func (p *Project) Search(baseUrl, token, query string) ([]scm.Project, error){
+	log.Debug("Search.GetProjects()")
+	c := gitlab.NewClient(&http.Client{}, token)
+	c.SetBaseURL(baseUrl + ApiVersion)
+	log.Debug("before Search.project(so)", query)
+	opt := &gitlab.SearchOptions{
+		Page: 20,
+	}
+	ps, _, err := c.Search.Projects(query, opt)
+	if err != nil {
+		return nil, err
+	}
+	log.Debugf("after Search.project: %v", len(ps))
+	projects := []scm.Project{}
+	project := &scm.Project{}
+	for _, pro := range ps {
+		copier.Copy(project, pro)
+		projects = append(projects, *project)
+	}
+	return projects, err
+}
+
 /*func (p *Project) ListUserProjects(baseUrl, token, name, namespace string) (int, error) {
 	log.Debug("project.ListUserProjects()")
 	log.Debugf("url: %v", baseUrl)

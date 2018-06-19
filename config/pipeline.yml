@@ -10,7 +10,6 @@ pipeline:
   dockerRegistry: docker-registry.default.svc:5000
   buildConfigs:
     enable: true
-    tagFrom: stage
     rebuild: false
   deploymentConfigs:
     enable: true

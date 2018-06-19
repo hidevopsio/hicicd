@@ -37,36 +37,3 @@ func TestListProjects(t *testing.T) {
 	log.Debug("project size:", len(projects))
 	log.Debug("project size:", projects)
 }
-
-/*func TestListUserProjects(t *testing.T) {
-	baseUrl := os.Getenv("SCM_URL")
-	username := os.Getenv("SCM_USERNAME")
-	password := os.Getenv("SCM_PASSWORD")
-	name := "hello-world"
-	namespace := "demo"
-	log.Debugf("url: %v, username: %v", baseUrl, username)
-	gs := new(Session)
-	err := gs.GetSession(baseUrl, username, password)
-	project := new(Project)
-	assert.Equal(t, nil, err)
-	pid, err := project.ListUserProjects(baseUrl, gs.PrivateToken, name, namespace)
-	log.Debug("get user project pid :", pid)
-	assert.Equal(t, true, pid)
-	assert.Equal(t, nil, err)
-}
-
-func TestListGroupProjects(t *testing.T) {
-	baseUrl := os.Getenv("SCM_URL")
-	username := os.Getenv("SCM_USERNAME")
-	password := os.Getenv("SCM_PASSWORD")
-	namespace := "moses-demos"
-	log.Debugf("url: %v, username: %v", baseUrl, username)
-	gs := new(Session)
-	err := gs.GetSession(baseUrl, username, password)
-	project := new(Project)
-	assert.Equal(t, nil, err)
-	pid, err := project.ListGroupProjects(baseUrl, gs.PrivateToken, namespace)
-	log.Debug("get user project pid :", pid)
-	assert.Equal(t, true, pid)
-	assert.Equal(t, nil, err)
-}*/

@@ -88,7 +88,7 @@ type IstioConfigs struct {
 type Pipeline struct {
 	Name              string            `json:"name" validate:"required"`
 	App               string            `json:"app" validate:"required"`
-	Profile           string            `json:"profile" validate:"required"`
+	Profile           string            `json:"profile"`
 	Project           string            `json:"project" validate:"required"`
 	Cluster           string            `json:"cluster"`
 	Namespace         string            `json:"namespace"`
@@ -131,10 +131,6 @@ func (p *Pipeline) Init(pl *Pipeline) {
 			return
 		}
 		c := cp.(*Configuration)
-		if pl.Profile == "" {
-			p.Profile = "dev"
-		}
-
 		mergo.Merge(&c.Pipeline, pl, mergo.WithOverride)
 		mergo.Merge(p, c.Pipeline, mergo.WithOverride)
 
@@ -480,7 +476,6 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 		log.Error("Pipeline run Create RoleBinding err :", err)
 		return err
 	}
-
 	if p.BuildConfigs.TagFrom == p.Profile {
 		// create secret for building image
 		secret, err := p.CreateSecret(username, password, isToken)
