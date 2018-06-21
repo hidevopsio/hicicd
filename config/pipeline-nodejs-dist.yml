@@ -23,7 +23,13 @@ pipeline:
     - name: BUILD_SCRIPT
       value: |
         echo === npm_config_registry: ${npm_config_registry} ===
+
+        if [ ! -f dist/index.html ]; then
+          echo "no index.html in dist"
+        fi
+
   deploymentConfigs:
+    healthEndPoint: http://localhost:8080/index.html
     env:
     - name: NODE_ENV
       value: ${profile}

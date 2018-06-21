@@ -5,11 +5,9 @@ import (
 	"os"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/magiconair/properties/assert"
-	"github.com/xanzy/go-gitlab"
-	"net/http"
 )
 
-func TestGetProjectMember(t *testing.T) {
+/*func TestGetProjectMember(t *testing.T) {
 	baseUrl := "http://gitlab.vpclub.cn:8022"
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
@@ -19,11 +17,11 @@ func TestGetProjectMember(t *testing.T) {
 	assert.Equal(t, nil, err)
 	c := gitlab.NewClient(&http.Client{}, gs.PrivateToken)
 	c.SetBaseURL(baseUrl + ApiVersion)
-	groupMember, _, err := c.GroupMembers.GetGroupMember("demo",gs.ID)
+	groupMember, _, err := c.Groups.GetGroupMember("demo",gs.ID)
 	log.Debug(err)
 	log.Debug(groupMember)
 	//p, err := projectMember.GetProjectMember(gs.PrivateToken, baseUrl, id, gs.ID, gid)
-}
+}*/
 
 func TestListProjectMembers(t *testing.T) {
 	baseUrl := os.Getenv("SCM_URL")

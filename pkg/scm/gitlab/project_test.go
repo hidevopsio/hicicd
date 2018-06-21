@@ -31,7 +31,7 @@ func TestListProjects(t *testing.T) {
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	project := new(Project)
-	projects, err := project.ListProjects(baseUrl, gs.PrivateToken, page)
+	projects, err := project.ListProjects(baseUrl, gs.PrivateToken, "demo",page)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, username, gs.Username)
 	log.Debug("project size:", len(projects))

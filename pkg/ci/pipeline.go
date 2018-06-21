@@ -149,9 +149,9 @@ func (p *Pipeline) Init(pl *Pipeline) {
 	}else{
 		p.BuildConfigs.TagFrom = "stage"
 	}
-	if !pl.BuildConfigs.Enable {
-		p.BuildConfigs.Enable = pl.BuildConfigs.Enable
-	}
+	//if !pl.BuildConfigs.Enable {
+	//	p.BuildConfigs.Enable = pl.BuildConfigs.Enable
+	//}
 
 	log.Debug(p)
 

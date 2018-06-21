@@ -45,7 +45,7 @@ pipeline:
           exit 1
         fi
   deploymentConfigs:
-    healthEndPoint: http://localhost:8080/
+    healthEndPoint: http://localhost:8080/index.html
     env:
     - name: NODE_ENV
       value: ${profile}

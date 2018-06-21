@@ -23,7 +23,7 @@ pipeline:
           exit 1
         fi
   deploymentConfigs:
-    healthEndPoint: http://localhost:8080
+    healthEndPoint: http://localhost:8080/health
     env:
     - name: APP_OPTIONS
       value: -Xms128m -Xmx512m -Xss512k -Dapp.cluster-name=${cluster}

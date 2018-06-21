@@ -90,7 +90,9 @@ func (g *Group) ListGroupProjects(token, baseUrl string, gid, page int) ([]scm.P
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before c.group.ListGroups(so)")
 	opt := &gitlab.ListGroupProjectsOptions{
-		Page: page,
+		ListOptions: gitlab.ListOptions{
+			Page: page,
+		},
 	}
 	projects, _, err := c.Groups.ListGroupProjects(gid, opt)
 	log.Debug("ListGroupProjects :{}",len(projects))

@@ -19,7 +19,9 @@ func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid, gid in
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before p.project.GetProjectMember(so)", pid)
 	opt := &gitlab.ListGroupMembersOptions{
-		Page: 50,
+		ListOptions: gitlab.ListOptions{
+			Page: 50,
+		},
 	}
 	groupMembers, _, err := c.Groups.ListGroupMembers(gid, opt)
 	if err != nil {
@@ -37,7 +39,7 @@ func (p *ProjectMember) GetProjectMember(token, baseUrl string, pid, uid, gid in
 			}
 		}
 	}
-	projectMember, _, err := c.ProjectMembers.GetProjectMember(pid, uid)
+	projectMember, _, err := c.Projects.GetProjectMember(pid, uid)
 	if err != nil {
 		log.Error("ProjectMembers.GetProjectMember ", err)
 		return scmProjectMember, err
@@ -58,7 +60,7 @@ func (p *ProjectMember) ListProjectMembers(token, baseUrl string, pid int)  ([]*
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before c.Session.GetSession(so)")
 	opt := &gitlab.ListProjectMembersOptions{}
-	projectMembers, _, err := c.ProjectMembers.ListProjectMembers(pid, opt)
+	projectMembers, _, err := c.Projects.ListProjectMembers(pid, opt)
 	if err != nil {
 		return nil, err
 	}

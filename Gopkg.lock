@@ -477,7 +477,7 @@
 [[projects]]
   name = "github.com/xanzy/go-gitlab"
   packages = ["."]
-  revision = "109fd962a3876c6e486a5bc9507289d060e3c587"
+  revision = "896163fa8f7a8178ada89ef13f7a72e728f0c010"
   version = "v0.9.0"
 
 
