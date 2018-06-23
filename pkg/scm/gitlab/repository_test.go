@@ -18,10 +18,10 @@ func TestGetRepositoty(t *testing.T){
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	repository := new(Repository)
-	repository.GetRepository(baseUrl, gs.PrivateToken, query, ref, pid)
+	context, err := repository.GetRepository(baseUrl, gs.PrivateToken, query, ref, pid)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, username, gs.Username)
-
+	log.Info(context)
 }
 
 func TestListTree(t *testing.T){

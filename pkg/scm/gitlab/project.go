@@ -16,7 +16,7 @@ func (p *Project) GetProject(baseUrl, id, token string) (int, int, error) {
 	log.Debug("project.GetProject()")
 	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(baseUrl + ApiVersion)
-	log.Debug("before c.Session.GetSession(so)")
+	log.Debug("before c.project.GetProject(so)")
 	project, _, err := c.Projects.GetProject(id)
 	if err != nil {
 		return 0, 0, err

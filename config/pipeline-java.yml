@@ -7,12 +7,14 @@ pipeline:
   - src/main/resources/application.yml
   - src/main/resources/application-${profile}.yml
   buildConfigs:
-    imagestream: s2i-java:1.0.5
+    imagestream: s2i-java:latest
     env:
     - name: MAVEN_MIRROR_URL
       value: ${MAVEN_MIRROR_URL}
     - name: MAVEN_CLEAR_REPO
       value: false
+    - name: CLEAR_SOURCE
+      value: true
     - name: BUILD_SCRIPT
       value: |
         mvn clean package -U -Dmaven.test.skip=true -Djava.net.preferIPv4Stack=true

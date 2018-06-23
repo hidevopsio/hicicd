@@ -25,7 +25,6 @@ func TestPost(t *testing.T) {
 	app := "hello-world"
 	uris := "/"+namespace + "-" + app
 	uris = strings.Replace(uris, "-", "/", -1)
-	//host := os.Getenv("KONG_HOST")
 	apiRequest := &ApiRequest{
 		Name:                   app,
 		Hosts:                  []string{"kong-proxy-kong-gateway.apps.oc.com"},
