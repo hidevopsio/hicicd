@@ -201,12 +201,12 @@ func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, po
 
 func (dc *DeploymentConfig) Get() (*v1.DeploymentConfig, error) {
 	log.Debug("DeploymentConfig.Get()")
-	return dc.Interface.Get(dc.Name, metav1.GetOptions{})
+	return dc.Interface.Get(dc.FullName, metav1.GetOptions{})
 }
 
 func (dc *DeploymentConfig) Delete() error {
 	log.Debug("DeploymentConfig.Delete()")
-	return dc.Interface.Delete(dc.Name, &metav1.DeleteOptions{})
+	return dc.Interface.Delete(dc.FullName, &metav1.DeleteOptions{})
 }
 
 func (dc *DeploymentConfig) Instantiate() (*v1.DeploymentConfig, error)  {
@@ -217,12 +217,12 @@ func (dc *DeploymentConfig) Instantiate() (*v1.DeploymentConfig, error)  {
 			Kind: "DeploymentRequest",
 			APIVersion: "v1",
 		},
-		Name: dc.Name,
+		Name: dc.FullName,
 		Force: true,
 		Latest: true,
 	}
 
-	d, err := dc.Interface.Instantiate(dc.Name, request)
+	d, err := dc.Interface.Instantiate(dc.FullName, request)
 	if nil == err {
 		log.Infof("Instantiated Build %v", d.Name)
 	}

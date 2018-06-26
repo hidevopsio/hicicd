@@ -70,10 +70,10 @@ func TestDeploymentConfigInstantiation(t *testing.T) {
 
 	log.Debug("TestDeploymentConfigInstantiation()")
 
-	projectName := "demo"
-	profile := "dev"
+	projectName := "moses"
+	profile := "stage"
 	namespace := projectName + "-" + profile
-	app := "hello-world"
+	app := "admin"
 	version := "v1"
 	dc, err := NewDeploymentConfig(app, namespace, version)
 	assert.Equal(t, nil, err)
