@@ -429,7 +429,7 @@ func (p *Pipeline) Deploy() error {
 			log.Error(err.Error())
 			return fmt.Errorf("failed on CreateDeploymentConfig! %s", err.Error())
 		}
-		rc := k8s.NewReplicationController(p.App, p.Namespace)
+		rc := k8s.NewReplicationController(p.App, p.DeploymentConfigs.Project + "-" + p.Profile)
 		// rc.Watch(message, handler)
 		err = rc.Watch(func() error {
 			log.Debug("Completed!")
