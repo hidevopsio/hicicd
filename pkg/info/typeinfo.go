@@ -158,7 +158,7 @@ func (t *TypeInfo) ParsePom(content string) error {
 	log.Info("pom.xml parse resource:", resource.Packaging)
 	if resource.Packaging == WarPakaging || err != nil {
 		t.AppType = "java-war"
-	} else if resource.Packaging == JavaPomPackaging || (resource.Build.Plugins.Plugin.GroupId == GroupId && resource.Build.Plugins.Plugin.ArtifactId == ArtifactId) {
+	} else if resource.Packaging == JavaPomPackaging || !(resource.Build.Plugins.Plugin.GroupId == GroupId && resource.Build.Plugins.Plugin.ArtifactId == ArtifactId) {
 		t.AppType = JavaLib
 	}
 	return err

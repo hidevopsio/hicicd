@@ -303,6 +303,7 @@ func (p *Pipeline) CreateDeploymentConfig(force bool, injectSidecar func(in inte
 	err = json.Unmarshal(labels, &l)
 	err = dc.Create(&p.DeploymentConfigs.Env, l, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, injectSidecar)
 	if err != nil {
+		log.Error("dc.Create ", err)
 		return err
 	}
 
@@ -420,7 +421,6 @@ func (p *Pipeline) Deploy() error {
 			if !p.IstioConfigs.Enable {
 				return in, nil
 			}
-
 			injector := &istio.Injector{}
 			copier.Copy(injector, p.IstioConfigs)
 			return injector.Inject(in)

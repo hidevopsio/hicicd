@@ -20,8 +20,6 @@ pipeline:
       value: https://npm.taobao.org/mirrors/electron/
     - name: npm_config_sass_binary_site
       value: https://npm.taobao.org/mirrors/node-sass/
-    - name: URI
-      value: ${gateway_configs.uri}
     - name: BUILD_SCRIPT
       value: |
         echo === npm_config_registry: ${npm_config_registry} ===
@@ -40,6 +38,8 @@ pipeline:
       value: 8080
     - name: project
       value: ${project}
+    - name: URI
+      value: ${gatewayConfigs.uri}
     - name: RUN_SCRIPT
       value: |
         npm run start
