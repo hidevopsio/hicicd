@@ -19,6 +19,7 @@ func (p *Project) GetProject(baseUrl, id, token string) (int, int, error) {
 	log.Debug("before c.project.GetProject(so)")
 	project, _, err := c.Projects.GetProject(id)
 	if err != nil {
+		log.Error("Projects.GetProject err:", err)
 		return 0, 0, err
 	}
 	return project.ID, project.Namespace.ID, err

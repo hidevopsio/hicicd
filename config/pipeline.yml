@@ -39,3 +39,5 @@ pipeline:
     port: 8080
     containerPort: 8080
     protocol: TCP
+  gatewayConfigs:
+    enable: true

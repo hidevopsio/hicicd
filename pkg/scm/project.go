@@ -55,6 +55,7 @@ type Project struct {
 	Search                                    string     `json:"search"`
 	Group                                     *Group
 	Ref                                       string     `json:"ref"`
+	Profile                                   string     `json:"profile"`
 }
 
 type Search struct {

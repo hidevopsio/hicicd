@@ -26,7 +26,6 @@ func (c *ConfigMapController) PostAdd(ctx *web.Context) {
 	var configMap k8s.ConfigMaps
 	err := ctx.RequestBody(&configMap)
 	if err != nil {
-		ctx.ResponseError(err.Error(), http.StatusUnavailableForLegalReasons)
 		return
 	}
 	config := k8s.NewConfigMaps(configMap.Name, configMap.Namespace, configMap.Data)

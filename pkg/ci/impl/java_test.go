@@ -48,7 +48,7 @@ func TestJavaPipeline(t *testing.T) {
 			Ref: "test",
 		},
 		IstioConfigs: ci.IstioConfigs{
-			Skip: false,
+			Enable: false,
 		},
 		BuildConfigs : ci.BuildConfigs{
 			TagFrom:     "dev",

@@ -2,25 +2,29 @@ package info
 
 import (
 	"encoding/base64"
-	"github.com/ghodss/yaml"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hicicd/pkg/scm/factories"
 	"github.com/kataras/iris/core/errors"
 	"encoding/xml"
+	"gopkg.in/yaml.v2"
 )
 
 const (
-	JGroups = "axon-jgroups"
-	CQRS = "java-cqrs"
-	WAR  = "war"
-	JAVA = "java"
-	JAVA_POM = "java-pom"
+	JGroupsPackaging = "axon-jgroups"
+	Cqrs             = "java-cqrs"
+	WarPakaging      = "war"
+	JavaPackaging    = "java"
+	JavaLib          = "java-lib"
+	JavaPomPackaging = "pom"
+	GroupId          = "org.springframework.boot"
+	ArtifactId       = "spring-boot-maven-plugin"
 )
-
 
 type TypeInfo struct {
 	ClusterName string `json:"cluster_name"`
 	AppType     string `json:"app_type"`
+	Uri         string `json:"uri"`
+	Host        string `json:"host"`
 }
 
 //app.cluster-name
@@ -32,6 +36,7 @@ type Application struct {
 type App struct {
 	Project     string `yaml:"project"`
 	ClusterName string `yaml:"cluster-name"`
+	Name        string `yaml:"name"`
 }
 
 type Spring struct {
@@ -62,6 +67,20 @@ type ResourceString struct {
 	ArtifactId   string   `xml:"artifactId"`
 	Version      string   `xml:"version"`
 	Packaging    string   `xml:"packaging"`
+	Build        Build    `xml:"build"`
+}
+
+type Build struct {
+	Plugins Plugins `xml:"plugins"`
+}
+
+type Plugins struct {
+	Plugin Plugin `xml:"plugin"`
+}
+
+type Plugin struct {
+	GroupId    string `xml:"groupId"`    //org.springframework.boot
+	ArtifactId string `xml:"artifactId"` //spring-boot-maven-plugin
 }
 
 func (t *TypeInfo) RepositoryType(url, token, ref string, id int) error {
@@ -77,7 +96,7 @@ func (t *TypeInfo) RepositoryType(url, token, ref string, id int) error {
 			if appType.FileType == treeNode.Type && appType.FileName == treeNode.Name {
 				log.Info(appType)
 				t.AppType = appType.Name
-				if appType.Name == JAVA {
+				if appType.Name == JavaPackaging {
 					//TODO if pom.xml <packaging>jar</packaging>  packagin is jar TypeInfo.typeapp=java   typeapp=java-war
 					pomContext, err := r.GetRepository(url, token, "pom.xml", ref, id)
 					if err != nil {
@@ -109,8 +128,8 @@ func (t *TypeInfo) Parse(context string) error {
 		return err
 	}
 	for _, include := range application.Spring.Profiles.Include {
-		if include == JGroups {
-			t.AppType = CQRS
+		if include == JGroupsPackaging {
+			t.AppType = Cqrs
 			t.ClusterName = application.App.ClusterName
 			return nil
 		}
@@ -137,10 +156,10 @@ func (t *TypeInfo) ParsePom(content string) error {
 	resource := &ResourceString{}
 	err = xml.Unmarshal([]byte(data), resource)
 	log.Info("pom.xml parse resource:", resource.Packaging)
-	if resource.Packaging == WAR || err != nil {
+	if resource.Packaging == WarPakaging || err != nil {
 		t.AppType = "java-war"
-	} else if resource.Packaging == JAVA_POM{
-		t.AppType = JAVA_POM
+	} else if resource.Packaging == JavaPomPackaging || (resource.Build.Plugins.Plugin.GroupId == GroupId && resource.Build.Plugins.Plugin.ArtifactId == ArtifactId) {
+		t.AppType = JavaLib
 	}
 	return err
 }

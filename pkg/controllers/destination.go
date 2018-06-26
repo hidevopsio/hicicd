@@ -28,7 +28,6 @@ func (c *DestinationController) PostAdd(ctx *web.Context) {
 	var destination istio.Destination
 	err := ctx.RequestBody(&destination)
 	if err != nil {
-		ctx.ResponseError(err.Error(), http.StatusUnavailableForLegalReasons)
 		return
 	}
 	config, err := istio.NewClient()

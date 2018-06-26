@@ -40,7 +40,6 @@ func (c *ScmController) PostListGroupProjects(ctx *web.Context) {
 	var group scm.Group
 	err := ctx.RequestBody(&group)
 	if err != nil {
-		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
 	}
 	permission := &auth.Permission{}

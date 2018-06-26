@@ -4,32 +4,32 @@ import (
 	"testing"
 	"github.com/magiconair/properties/assert"
 	"github.com/hidevopsio/hiboot/pkg/log"
-	"os"
 	"strings"
-	"github.com/hidevopsio/hiboot/pkg/utils"
 )
 
 func TestGet(t *testing.T) {
 	api := ApiRequest{
-		Name: "Example",
+		Name: "moses-comment-consumer",
 	}
-	baseUrl := os.Getenv("KONG_ADMIN_URL")
+	baseUrl := "http://kong-admin-kong-gateway-stage.apps.cloud.vpclub.cn"
 	a, err := api.Get(baseUrl)
 	assert.Equal(t, nil, err)
 	log.Info("result: ", a)
 }
 
 func TestPost(t *testing.T) {
-	upstreamUrl := "http://hello-world-demo-dev.apps.oc.com"
-	namespace := "demo-dev"
-	app := "hello-world"
-	uris := "/"+namespace + "-" + app
+	upstreamUrl := "comment-consumer-moses-stage.apps.cloud.vpclub.cn"
+	app := "moses-comment-consumer"
+	uris := "/moses/comment/consumer"
 	uris = strings.Replace(uris, "-", "/", -1)
+	log.Debug("Pipeline.CreateKongGateway()")
+	uris = strings.Replace(uris, "-", "/", -1)
+	host := "stagecould.vpclub.cn"
 	apiRequest := &ApiRequest{
 		Name:                   app,
-		Hosts:                  []string{"kong-proxy-kong-gateway.apps.oc.com"},
+		Hosts:                  []string{host},
 		Uris:                   []string{uris},
-		UpstreamURL:            upstreamUrl,
+		UpstreamURL:            "http://" + upstreamUrl,
 		StripUri:               true,
 		PreserveHost:           false,
 		Retries:                5,
@@ -39,17 +39,18 @@ func TestPost(t *testing.T) {
 		HttpsOnly:              false,
 		HttpIfTerminated:       true,
 	}
-	baseUrl := os.Getenv("KONG_ADMIN_URL")
-	utils.ReplaceStringVariables(baseUrl, "test")
-	 err := apiRequest.Post(baseUrl)
+	baseUrl := "http://kong-admin-kong-gateway-stage.apps.cloud.vpclub.cn"
+	baseUrl = strings.Replace(baseUrl, "${profile}", "stage", -1)
+	err := apiRequest.Post(baseUrl)
 	assert.Equal(t, nil, err)
+
 }
 
 func TestDelete(t *testing.T) {
 	api := ApiRequest{
-		Name: "Example",
+		Name: "comment-consumer-moses-stage-legacy",
 	}
-	baseUrl := os.Getenv("KONG_ADMIN_URL")
+	baseUrl := "http://kong-admin-kong-gateway-stage.apps.cloud.vpclub.cn"
 	err := api.Delete(baseUrl)
 	assert.Equal(t, nil, err)
 }

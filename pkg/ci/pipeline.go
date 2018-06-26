@@ -49,6 +49,7 @@ type DeploymentConfigs struct {
 	Replicas       int32        `json:"replicas"`
 	Env            []system.Env `json:"env"`
 	Labels         Labels       `json:"labels"`
+	Project        string       `json:"project"`
 }
 
 type Labels struct {
@@ -101,10 +102,16 @@ type Pipeline struct {
 	BuildConfigs      BuildConfigs      `json:"build_configs"`
 	DeploymentConfigs DeploymentConfigs `json:"deployment_configs"`
 	IstioConfigs      IstioConfigs      `json:"istio_configs"`
+	GatewayConfigs    GatewayConfigs    `json:"gateway_configs"`
 }
 
 type Configuration struct {
 	Pipeline Pipeline `mapstructure:"pipeline"`
+}
+
+type GatewayConfigs struct {
+	Enable bool   `json:"enable"`
+	Uri    string `json:"uri"`
 }
 
 // @Title Init
@@ -144,9 +151,9 @@ func (p *Pipeline) Init(pl *Pipeline) {
 	}
 	if "" == p.Profile {
 		p.BuildConfigs.TagFrom = ""
-	}else if p.Profile == "dev" || p.Profile == "test" {
+	} else if p.Profile == "dev" || p.Profile == "test" {
 		p.BuildConfigs.TagFrom = "dev"
-	}else{
+	} else {
 		p.BuildConfigs.TagFrom = "stage"
 	}
 	//if !pl.BuildConfigs.Enable {
@@ -171,7 +178,7 @@ func (p *Pipeline) CreateSecret(username, password string, isToken bool) (string
 }
 
 func (pl *Pipeline) CreateProject() error {
-	p, err := openshift.NewProject(pl.Namespace, "", "")
+	p, err := openshift.NewProject(pl.DeploymentConfigs.Project + "-"+ pl.Profile, "", "")
 	if err != nil {
 		log.Error("create namespace err :", err)
 		return err
@@ -287,7 +294,7 @@ func (p *Pipeline) CreateDeploymentConfig(force bool, injectSidecar func(in inte
 	log.Debug("Pipeline.CreateDeploymentConfig()")
 
 	// new dc instance
-	dc, err := openshift.NewDeploymentConfig(p.App, p.Namespace, p.Version)
+	dc, err := openshift.NewDeploymentConfig(p.App, p.DeploymentConfigs.Project + "-"+ p.Profile, p.Version)
 	if err != nil {
 		return err
 	}
@@ -322,12 +329,11 @@ func (p *Pipeline) InstantiateDeploymentConfig() error {
 
 func (p *Pipeline) CreateKongGateway(upstreamUrl string) error {
 	log.Debug("Pipeline.CreateKongGateway()")
-	uris := "/" + p.Project + "-" + p.App
-	uris = strings.Replace(uris, "-", "/", -1)
+	uris := p.GatewayConfigs.Uri
 	host := os.Getenv("KONG_HOST")
 	host = strings.Replace(host, "${profile}", p.Profile, -1)
 	apiRequest := &kong.ApiRequest{
-		Name:                   p.App,
+		Name:                   p.App + "-" + p.Project,
 		Hosts:                  []string{host},
 		Uris:                   []string{uris},
 		UpstreamURL:            "http://" + upstreamUrl,
@@ -350,7 +356,7 @@ func (p *Pipeline) CreateService() error {
 	log.Debug("Pipeline.CreateService()")
 
 	// new dc instance
-	svc := k8s.NewService(p.App, p.Namespace)
+	svc := k8s.NewService(p.App, p.DeploymentConfigs.Project + "-"+ p.Profile)
 
 	err := svc.Create(&p.Ports)
 	log.Debug("Pipeline.CreateService svc.Create result: ", err)
@@ -360,7 +366,7 @@ func (p *Pipeline) CreateService() error {
 func (p *Pipeline) CreateRoute() (string, error) {
 	log.Debug("Pipeline.CreateRoute()")
 	upstreamUrl := ""
-	route, err := openshift.NewRoute(p.App, p.Namespace)
+	route, err := openshift.NewRoute(p.App, p.DeploymentConfigs.Project + "-"+ p.Profile)
 	if err != nil {
 		return upstreamUrl, err
 	}
@@ -371,7 +377,8 @@ func (p *Pipeline) CreateRoute() (string, error) {
 
 func (p *Pipeline) CreateImageStreamTag() error {
 	log.Debug("Pipeline.CreateImageStreamTag")
-	ist, err := openshift.NewImageStreamTags(p.App, p.Version, p.Namespace)
+	namespace := p.DeploymentConfigs.Project + "-" + p.Profile
+	ist, err := openshift.NewImageStreamTags(p.App, p.Version, namespace)
 	if err != nil {
 		log.Error("Pipeline.CreateImageStreamTag.NewImageStreamTags", err)
 		return err
@@ -422,14 +429,6 @@ func (p *Pipeline) Deploy() error {
 			log.Error(err.Error())
 			return fmt.Errorf("failed on CreateDeploymentConfig! %s", err.Error())
 		}
-
-		//// deploy
-		//err = p.Deploy()
-		//if err != nil {
-		//	log.Error(err.Error())
-		//	return fmt.Errorf("failed on Deploy! %s", err.Error())
-		//}
-
 		rc := k8s.NewReplicationController(p.App, p.Namespace)
 		// rc.Watch(message, handler)
 		err = rc.Watch(func() error {
@@ -457,7 +456,9 @@ func (p *Pipeline) Deploy() error {
 	}
 
 	//create kong-gateway
-	err = p.CreateKongGateway(upstreamUrl)
+	if p.GatewayConfigs.Enable {
+		err = p.CreateKongGateway(upstreamUrl)
+	}
 	return err
 }
 
@@ -483,7 +484,7 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 		log.Error("Pipeline run Create RoleBinding err :", err)
 		return err
 	}
-	if p.BuildConfigs.TagFrom == p.Profile {
+	if p.BuildConfigs.TagFrom == p.Profile && p.DeploymentConfigs.Project == p.Project {
 		// create secret for building image
 		secret, err := p.CreateSecret(username, password, isToken)
 		if err != nil {

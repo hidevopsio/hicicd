@@ -46,7 +46,7 @@ func (a *ApiRequest) Post(baseUrl string) error {
 	}
 	api, err := a.Get(baseUrl)
 	if err == nil {
-		if api.Name == a.Name && api.UpstreamURL == a.UpstreamURL {
+		if api.Name == a.Name {
 			return nil
 		}
 		 err := a.Update(baseUrl)

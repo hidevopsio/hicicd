@@ -82,6 +82,8 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 	} else {
 		message = "failed, " + err.Error()
 	}
+	//bc := os.Getenv("BUILD_CONSOLE")
+
 	ctx.ResponseBody(message, nil)
 }
 
