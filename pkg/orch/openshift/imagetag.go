@@ -54,7 +54,12 @@ func (ist *ImageStreamTag) Create(fromNamespace string) (*v1.ImageStreamTag, err
 		log.Debug("image.tag.create", err)
 		return img, err
 	}
-	img, err := ist.Update(fromNamespace)
+	err = ist.Delete()
+	if err != nil {
+		log.Error("")
+		return nil, err
+	}
+	img, err := ist.Interface.Create(imageTag)
 	log.Debug("images.tag.update", err)
 	return img, err
 }

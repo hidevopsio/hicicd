@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	name = "hiweb"
-	namespace = "hidevopsio"
-	fromNamespace = "hidevopsio-dev"
+	name = "admin"
+	namespace = "youxuan-stage"
+	fromNamespace = "demo-stage"
 	version = "v1"
 	fullName = name + ":" + version
 )

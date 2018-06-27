@@ -48,9 +48,9 @@ func TestPost(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	api := ApiRequest{
-		Name: "comment-consumer-moses-stage-legacy",
+		Name: "cscmcc-accounts",
 	}
-	baseUrl := "http://kong-admin-kong-gateway-stage.apps.cloud.vpclub.cn"
+	baseUrl := "http://kong-admin-kong-gateway-prod.apps.cloud.vpclub.cn"
 	err := api.Delete(baseUrl)
 	assert.Equal(t, nil, err)
 }
