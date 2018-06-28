@@ -75,7 +75,7 @@ type Build struct {
 }
 
 type Plugins struct {
-	Plugin Plugin `xml:"plugin"`
+	Plugin []Plugin `xml:"plugin"`
 }
 
 type Plugin struct {
@@ -158,8 +158,15 @@ func (t *TypeInfo) ParsePom(content string) error {
 	log.Info("pom.xml parse resource:", resource.Packaging)
 	if resource.Packaging == WarPakaging || err != nil {
 		t.AppType = "java-war"
-	} else if resource.Packaging == JavaPomPackaging || (resource.Build.Plugins.Plugin.GroupId == GroupId && resource.Build.Plugins.Plugin.ArtifactId == ArtifactId) {
-		t.AppType = JavaLib
+	} else if resource.Packaging == JavaPomPackaging {
+		t.AppType = "java-lib"
+	} else {
+		for _, plugin := range resource.Build.Plugins.Plugin  {
+			if plugin.GroupId == GroupId && plugin.ArtifactId == ArtifactId {
+				return nil
+			}
+		}
+		t.AppType = "java-lib"
 	}
-	return err
+	return nil
 }

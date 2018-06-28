@@ -22,6 +22,8 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
 	"github.com/hidevopsio/hicicd/pkg/ci/factories"
 	"github.com/hidevopsio/hicicd/pkg/ci"
+	"os"
+	"strings"
 )
 
 type CicdResponse struct {
@@ -72,7 +74,6 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 	message := "success"
 	if err == nil {
 		pipeline.Init(&pl)
-
 		go func() {
 			err = pipeline.Run(c.Username, c.Password, c.ScmToken, c.Uid, false)
 			if err != nil {
@@ -82,8 +83,9 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 	} else {
 		message = "failed, " + err.Error()
 	}
-	//bc := os.Getenv("BUILD_CONSOLE")
-
+	bc := os.Getenv("BUILD_CONSOLE")
+	bc = strings.Replace(bc, "${namespace}", pl.Namespace, -1)
+	bc = strings.Replace(bc, "${app}", pl.App, -1)
 	ctx.ResponseBody(message, nil)
 }
 

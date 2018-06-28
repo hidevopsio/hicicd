@@ -45,8 +45,8 @@ func (c *RepositoryController) PostAppType(ctx *web.Context) {
 	if err == nil {
 		t.Uri = api.Uris[0]
 	}else {
-		uris := "/" + project.Namespace + "-" + project.Name
-		t.Uri = strings.Replace(uris, "-", "/", -1)
+		name := strings.Replace(project.Name, "-", "/", -1)
+		t.Uri = "/" + project.Namespace + "/" + name
 	}
 	host := os.Getenv("KONG_HOST")
 	host = strings.Replace(host, "${profile}", project.Profile, -1)

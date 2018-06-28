@@ -20,7 +20,7 @@ func TestRepositoryType(t *testing.T) {
 	assert.Equal(t, nil, err)
 	t1 := new(TypeInfo)
 	ref := "master"
-	pid := 1151
+	pid := 1265
 	err = t1.RepositoryType(baseUrl, gs.PrivateToken, ref, pid)
 	assert.Equal(t, nil, err)
 	fmt.Printf("log : %v", t1)

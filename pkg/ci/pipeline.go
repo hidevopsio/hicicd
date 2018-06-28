@@ -394,7 +394,7 @@ func (p *Pipeline) CreateImageStreamTag() error {
 		log.Error("Pipeline.CreateImageStreamTag.NewImageStreamTags", err)
 		return err
 	}
-	_, err = ist.Create(p.BuildConfigs.Namespace)
+	_, err = ist.Create(p.BuildConfigs.Project+ "-" + p.BuildConfigs.TagFrom)
 	return err
 }
 

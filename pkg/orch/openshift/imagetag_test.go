@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	name = "admin"
-	namespace = "youxuan-stage"
-	fromNamespace = "demo-stage"
+	name = "citic-activity-h5api"
+	namespace = "vphonor-prod"
+	fromNamespace = "vphonor-stage"
 	version = "v1"
 	fullName = name + ":" + version
 )

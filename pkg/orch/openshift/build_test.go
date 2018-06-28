@@ -32,7 +32,7 @@ func TestBuildCreation(t *testing.T) {
 
 	// put below configs in yaml file
 	project := "demo"
-	profile := "dev"
+	profile := "stage"
 	namespace := project + "-" + profile
 	appName := "hello-world"
 	scmUrl := os.Getenv("SCM_URL") + "/" + project + "/" + appName + ".git"

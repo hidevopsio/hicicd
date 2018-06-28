@@ -13,12 +13,12 @@ dictionary:
   profile:
   - stage
   - profile
-
-  node_selector:
-    foo:
+  selector:
+    node_selector:
     - bar
     - biz
-
-    profile:
-    - prod
-    - stage
+    java_selector:
+    - jdk8
+  profile:
+  - prod
+  - stage

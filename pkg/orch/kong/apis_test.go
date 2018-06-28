@@ -18,13 +18,13 @@ func TestGet(t *testing.T) {
 }
 
 func TestPost(t *testing.T) {
-	upstreamUrl := "comment-consumer-moses-stage.apps.cloud.vpclub.cn"
-	app := "moses-comment-consumer"
-	uris := "/moses/comment/consumer"
+	upstreamUrl := "hiweb-hidevopsio.apps.cloud.vpclub.cn"
+	app := "hiweb"
+	uris := "/hidevopsio/hiweb"
 	uris = strings.Replace(uris, "-", "/", -1)
 	log.Debug("Pipeline.CreateKongGateway()")
 	uris = strings.Replace(uris, "-", "/", -1)
-	host := "stagecould.vpclub.cn"
+	host := "hicloud.vpclub.cn"
 	apiRequest := &ApiRequest{
 		Name:                   app,
 		Hosts:                  []string{host},
@@ -48,7 +48,7 @@ func TestPost(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	api := ApiRequest{
-		Name: "cscmcc-accounts",
+		Name: "express-consumer",
 	}
 	baseUrl := "http://kong-admin-kong-gateway-prod.apps.cloud.vpclub.cn"
 	err := api.Delete(baseUrl)
