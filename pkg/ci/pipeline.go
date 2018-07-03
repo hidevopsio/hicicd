@@ -66,6 +66,7 @@ type BuildConfigs struct {
 	Rebuild     bool         `json:"rebuild"`
 	Project     string       `json:"project"`
 	Namespace   string       `json:"namespace"`
+	Branch      string       `json:"branch"`
 }
 
 type IstioConfigs struct {
@@ -114,6 +115,7 @@ type Configuration struct {
 type GatewayConfigs struct {
 	Enable bool   `json:"enable"`
 	Uri    string `json:"uri"`
+	UpstreamUrl string `json:"upstream_url"`
 }
 
 // @Title Init
@@ -167,10 +169,12 @@ func (p *Pipeline) Init(pl *Pipeline) {
 	} else {
 		p.BuildConfigs.TagFrom = "stage"
 	}
-	//if !pl.BuildConfigs.Enable {
-	//	p.BuildConfigs.Enable = pl.BuildConfigs.Enable
-	//}
-
+	if pl.Scm.Ref == "master" {
+		p.BuildConfigs.Branch = ""
+	} else {
+		p.BuildConfigs.Branch = pl.Scm.Ref
+	}
+	p.GatewayConfigs.UpstreamUrl = p.App + "." + p.Namespace + ":8080"
 	log.Debug(p)
 
 }
@@ -260,7 +264,7 @@ func (p *Pipeline) Build(secret string, completedHandler func() error) error {
 	}
 
 	scmUrl := p.CombineScmUrl()
-	buildConfig, err := openshift.NewBuildConfig(p.BuildConfigs.Namespace, p.App, scmUrl, p.Scm.Ref, secret, p.Version, p.BuildConfigs.ImageStream, p.BuildConfigs.Rebuild)
+	buildConfig, err := openshift.NewBuildConfig(p.BuildConfigs.Namespace, p.App, scmUrl, p.BuildConfigs.Branch, secret, p.Version, p.BuildConfigs.ImageStream, p.BuildConfigs.Rebuild)
 	if err != nil {
 		return err
 	}
@@ -344,9 +348,10 @@ func (p *Pipeline) CreateKongGateway(upstreamUrl string) error {
 	uris := p.GatewayConfigs.Uri
 	host := os.Getenv("KONG_HOST")
 	host = strings.Replace(host, "${profile}", p.Profile, -1)
+	hosts := strings.Split(host, ",")
 	apiRequest := &kong.ApiRequest{
 		Name:                   p.App + "-" + p.Project,
-		Hosts:                  []string{host},
+		Hosts:                  hosts,
 		Uris:                   []string{uris},
 		UpstreamURL:            "http://" + upstreamUrl,
 		StripUri:               true,
@@ -394,7 +399,7 @@ func (p *Pipeline) CreateImageStreamTag() error {
 		log.Error("Pipeline.CreateImageStreamTag.NewImageStreamTags", err)
 		return err
 	}
-	_, err = ist.Create(p.BuildConfigs.Project+ "-" + p.BuildConfigs.TagFrom)
+	_, err = ist.Create(p.BuildConfigs.Project + "-" + p.BuildConfigs.TagFrom)
 	return err
 }
 
@@ -459,6 +464,7 @@ func (p *Pipeline) Deploy() error {
 
 	// create route
 	upstreamUrl, err := p.CreateRoute()
+	log.Debug("CreateRoute get upstream url :", upstreamUrl)
 	if err != nil {
 		log.Error(err.Error())
 		return fmt.Errorf("failed on CreateRoute! %s", err.Error())
@@ -466,7 +472,7 @@ func (p *Pipeline) Deploy() error {
 
 	//create kong-gateway
 	if p.GatewayConfigs.Enable {
-		err = p.CreateKongGateway(upstreamUrl)
+		err = p.CreateKongGateway(p.GatewayConfigs.UpstreamUrl)
 	}
 	return err
 }

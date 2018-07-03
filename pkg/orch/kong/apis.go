@@ -54,8 +54,8 @@ func (a *ApiRequest) Post(baseUrl string) error {
 	}
 	apiRequest := &kong.ApiRequest{}
 	copier.Copy(apiRequest, a)
-	_, err = c.Apis.Post(apiRequest)
-	log.Info("kong post api error:", err)
+	r, err := c.Apis.Post(apiRequest)
+	log.Info("kong post api call back:", r)
 	return err
 }
 

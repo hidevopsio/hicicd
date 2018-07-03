@@ -18,16 +18,15 @@ func TestGet(t *testing.T) {
 }
 
 func TestPost(t *testing.T) {
-	upstreamUrl := "hiweb-hidevopsio.apps.cloud.vpclub.cn"
-	app := "hiweb"
-	uris := "/hidevopsio/hiweb"
-	uris = strings.Replace(uris, "-", "/", -1)
+	upstreamUrl := "hello-world.demo-stage:8080"
+	app := "hello-world"
+	uris := "/demo/hello/world"
 	log.Debug("Pipeline.CreateKongGateway()")
-	uris = strings.Replace(uris, "-", "/", -1)
-	host := "hicloud.vpclub.cn"
+	host := "stagecould.vpclub.cn,stage.vpclub.cn"
+	hosts := strings.Split(host, ",")
 	apiRequest := &ApiRequest{
 		Name:                   app,
-		Hosts:                  []string{host},
+		Hosts:                  hosts,
 		Uris:                   []string{uris},
 		UpstreamURL:            "http://" + upstreamUrl,
 		StripUri:               true,

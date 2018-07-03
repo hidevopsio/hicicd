@@ -84,9 +84,9 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 		message = "failed, " + err.Error()
 	}
 	bc := os.Getenv("BUILD_CONSOLE")
-	bc = strings.Replace(bc, "${namespace}", pl.Namespace, -1)
+	bc = strings.Replace(bc, "${namespace}", pl.Project, -1)
 	bc = strings.Replace(bc, "${app}", pl.App, -1)
-	ctx.ResponseBody(message, nil)
+	ctx.ResponseBody(message, bc)
 }
 
 func parseToken(claims jwt.MapClaims, prop string) string {

@@ -12,7 +12,7 @@ dictionary:
     force_update: false
   profile:
   - stage
-  - profile
+  - prod
   selector:
     node_selector:
     - bar

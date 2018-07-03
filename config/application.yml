@@ -9,6 +9,6 @@ logging:
 
 dataSources:
 - type: bolt
-  database: hi.db
+  database: data/hi.db
   mode: 0600
   timeout: 1
