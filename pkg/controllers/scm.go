@@ -3,9 +3,9 @@ package controllers
 import (
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
 	"github.com/hidevopsio/hiboot/pkg/log"
-	"github.com/hidevopsio/hicicd/pkg/auth"
 	"net/http"
 	"github.com/hidevopsio/hicicd/pkg/scm"
+	"github.com/hidevopsio/hicicd/pkg/app"
 )
 
 // Operations about object
@@ -26,8 +26,8 @@ func (c *ScmController) Before(ctx *web.Context) {
 
 func (c *ScmController) PostListGroups(ctx *web.Context) {
 	log.Debug("ScmController.GetAllProject()")
-	permission := &auth.Permission{}
-	groupMember, err := permission.ListGroups(c.ScmToken, c.Url, c.Uid)
+	g := &app.Group{}
+	groupMember, err := g.ListGroups(c.ScmToken, c.Url, c.Uid, 1)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
@@ -37,13 +37,13 @@ func (c *ScmController) PostListGroups(ctx *web.Context) {
 
 func (c *ScmController) PostListGroupProjects(ctx *web.Context) {
 	log.Debug("ScmController.List Group Projects()")
-	var group scm.Group
-	err := ctx.RequestBody(&group)
+	var g scm.Group
+	err := ctx.RequestBody(&g)
 	if err != nil {
 		return
 	}
-	permission := &auth.Permission{}
-	projects, err := permission.ListGroupProjects(c.ScmToken, c.Url, group.ID, group.Page)
+	p := &app.Group{}
+	projects, err := p.ListGroupProjects(c.ScmToken, c.Url, g.ID, g.Page)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
@@ -59,8 +59,8 @@ func (c *ScmController) PostListProjects(ctx *web.Context) {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
 	}
-	permission := &auth.Permission{}
-	projects, err := permission.ListProjects(c.ScmToken, c.Url, project.Search, project.Page)
+	p := &app.Project{}
+	projects, err := p.ListProjects(c.ScmToken, c.Url, project.Search, project.Page)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
@@ -76,8 +76,8 @@ func (c *ScmController) PostGetProjectMember(ctx *web.Context)  {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
 	}
-	permission := &auth.Permission{}
-	projects, err := permission.GetProjectMember(c.ScmToken, c.Url, projectMember.Pid, c.Uid, projectMember.Gid)
+	p := &app.Project{}
+	projects, err := p.GetProjectMember(c.ScmToken, c.Url, projectMember.Pid, c.Uid, projectMember.Gid)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
@@ -95,8 +95,8 @@ func (c *ScmController) PostSearch(ctx *web.Context){
 		return
 	}
 	log.Info("ScmController ScmController search", search.Keyword)
-	permission := &auth.Permission{}
-	projects, err := permission.Search(c.Url, c.ScmToken, search.Keyword)
+	p := &app.Project{}
+	projects, err := p.Search(c.Url, c.ScmToken, search.Keyword)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return

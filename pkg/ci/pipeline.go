@@ -500,6 +500,7 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 		return err
 	}
 	if p.BuildConfigs.TagFrom == p.Profile && p.BuildConfigs.Project == p.Project {
+		//TODO check if tag from is exist or not
 		// create secret for building image
 		secret, err := p.CreateSecret(username, password, isToken)
 		if err != nil {

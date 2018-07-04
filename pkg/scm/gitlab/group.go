@@ -12,14 +12,18 @@ type Group struct {
 	scm.Group
 }
 
-func (g *Group) ListGroups(token, baseUrl string) ([]scm.Group, error) {
+func (g *Group) ListGroups(token, baseUrl string, page int) ([]scm.Group, error) {
 	log.Debug("group.ListGroups()")
 	scmGroups := []scm.Group{}
 	scmGroup := &scm.Group{}
 	c := gitlab.NewClient(&http.Client{}, token)
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before c.group.ListGroups(so)")
-	opt := &gitlab.ListGroupsOptions{}
+	opt := &gitlab.ListGroupsOptions{
+		ListOptions: gitlab.ListOptions{
+			Page: page,
+		},
+	}
 	groups, _, err := c.Groups.ListGroups(opt)
 	if err != nil {
 		return nil, err

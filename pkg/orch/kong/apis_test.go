@@ -5,13 +5,15 @@ import (
 	"github.com/magiconair/properties/assert"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"strings"
+	"os"
 )
 
 func TestGet(t *testing.T) {
 	api := ApiRequest{
-		Name: "moses-comment-consumer",
+		Name: "hello-world",
 	}
-	baseUrl := "http://kong-admin-kong-gateway-stage.apps.cloud.vpclub.cn"
+	baseUrl := os.Getenv("KONG_ADMIN_URL")
+	baseUrl = strings.Replace(baseUrl, "${profile}", "stage", -1)
 	a, err := api.Get(baseUrl)
 	assert.Equal(t, nil, err)
 	log.Info("result: ", a)
@@ -22,7 +24,8 @@ func TestPost(t *testing.T) {
 	app := "hello-world"
 	uris := "/demo/hello/world"
 	log.Debug("Pipeline.CreateKongGateway()")
-	host := "stagecould.vpclub.cn,stage.vpclub.cn"
+	host := os.Getenv("KONG_HOST")
+	host = strings.Replace(host, "${profile}", "stage", -1)
 	hosts := strings.Split(host, ",")
 	apiRequest := &ApiRequest{
 		Name:                   app,
@@ -38,7 +41,7 @@ func TestPost(t *testing.T) {
 		HttpsOnly:              false,
 		HttpIfTerminated:       true,
 	}
-	baseUrl := "http://kong-admin-kong-gateway-stage.apps.cloud.vpclub.cn"
+	baseUrl := os.Getenv("KONG_ADMIN_URL")
 	baseUrl = strings.Replace(baseUrl, "${profile}", "stage", -1)
 	err := apiRequest.Post(baseUrl)
 	assert.Equal(t, nil, err)
@@ -47,9 +50,10 @@ func TestPost(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	api := ApiRequest{
-		Name: "express-consumer",
+		Name: "hello-world",
 	}
-	baseUrl := "http://kong-admin-kong-gateway-prod.apps.cloud.vpclub.cn"
+	baseUrl := os.Getenv("KONG_ADMIN_URL")
+	baseUrl = strings.Replace(baseUrl, "${profile}", "stage", -1)
 	err := api.Delete(baseUrl)
 	assert.Equal(t, nil, err)
 }

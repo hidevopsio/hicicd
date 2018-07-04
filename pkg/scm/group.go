@@ -1,7 +1,7 @@
 package scm
 
 type GroupInterface interface {
-	ListGroups(token, baseUrl string) ([]Group, error)
+	ListGroups(token, baseUrl string, page int) ([]Group, error)
 	GetGroup(token, baseUrl string, gid int) (*Group, error)
 	ListGroupProjects(token, baseUrl string, gid, page int) ([]Project, error)
 }
