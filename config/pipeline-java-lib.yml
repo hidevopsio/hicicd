@@ -1,6 +1,6 @@
 
 pipeline:
-  name: java-war
+  name: java-lib
   identifiers:
   - pom.xml
   buildConfigs:

@@ -21,7 +21,7 @@ func (d *DictionaryController) Post(ctx *web.Context) {
 	dictionary := &admin.Dictionary{}
 	err := ctx.RequestBody(dictionary)
 	if err == nil {
-		err := d.DictionaryService.CreateDictionaryService(dictionary)
+		err := d.DictionaryService.Add(dictionary)
 		if err != nil {
 			ctx.ResponseError(err.Error(), http.StatusExpectationFailed)
 		}
@@ -32,7 +32,7 @@ func (d *DictionaryController) Post(ctx *web.Context) {
 
 func (d *DictionaryController) Get(ctx *web.Context) {
 	id := ctx.URLParam("id")
-	dictionary, err := d.DictionaryService.GetDictionaryService(id)
+	dictionary, err := d.DictionaryService.Get(id)
 	if err != nil {
 		ctx.ResponseError("Resource is not found", http.StatusNotFound)
 	} else {
@@ -42,7 +42,7 @@ func (d *DictionaryController) Get(ctx *web.Context) {
 
 func (d *DictionaryController) Delete(ctx *web.Context) {
 	id := ctx.URLParam("id")
-	err := d.DictionaryService.DeleteDictionaryService(id)
+	err := d.DictionaryService.Delete(id)
 	if err != nil {
 		ctx.ResponseError("Resource is not found", http.StatusNotFound)
 	} else {

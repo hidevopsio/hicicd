@@ -38,6 +38,7 @@ func TestPipelineCreateRoleBinding(t *testing.T) {
 		Name: "test",
 		Namespace: "demo-test",
 	}
-	err := p.CreateRoleBinding(username)
+	metaName := "admin"
+	err := p.CreateRoleBinding(username, metaName)
 	assert.Equal(t, nil, err)
 }

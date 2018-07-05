@@ -20,7 +20,7 @@ func (c *GroupController) Before(ctx *web.Context) {
 	c.BaseController.Before(ctx)
 }
 
-func (c *GroupController) GetListGroups(ctx *web.Context) {
+func (c *GroupController) Get(ctx *web.Context) {
 	log.Debug("GroupController.GetAllProject()")
 	page, err := ctx.URLParamInt("page")
 	if err != nil {
@@ -36,7 +36,7 @@ func (c *GroupController) GetListGroups(ctx *web.Context) {
 	ctx.ResponseBody("success", &groupMember)
 }
 
-func (c *GroupController) GetListGroupProjects(ctx *web.Context) {
+func (c *GroupController) GetProjects(ctx *web.Context) {
 	log.Debug("GroupController.List Group Projects()")
 	page, err := ctx.URLParamInt("page")
 	gid, err := ctx.URLParamInt("gid")

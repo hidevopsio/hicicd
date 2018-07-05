@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	name = "citic-activity-h5api"
-	namespace = "vphonor-prod"
-	fromNamespace = "vphonor-stage"
+	name = "hiweb"
+	namespace = "hidevopsio"
+	fromNamespace = "hidevopsio-dev"
 	version = "v1"
 	fullName = name + ":" + version
 )

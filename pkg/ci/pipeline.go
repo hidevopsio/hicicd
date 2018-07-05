@@ -175,6 +175,15 @@ func (p *Pipeline) Init(pl *Pipeline) {
 		p.BuildConfigs.Branch = pl.Scm.Ref
 	}
 	p.GatewayConfigs.UpstreamUrl = p.App + "." + p.Namespace + ":8080"
+	if pl.DeploymentConfigs.Enable == false {
+		p.DeploymentConfigs.Enable = false
+	}
+	if pl.BuildConfigs.Enable == false {
+		p.BuildConfigs.Enable = false
+	}
+	if pl.GatewayConfigs.Enable == false {
+		p.GatewayConfigs.Enable = false
+	}
 	log.Debug(p)
 
 }
@@ -392,6 +401,22 @@ func (p *Pipeline) CreateRoute() (string, error) {
 	return upstreamUrl, err
 }
 
+func (p * Pipeline) GetImageStreamTag() error  {
+	log.Debug("pipeline get image stream tag :")
+	ist, err := openshift.NewImageStreamTags(p.App, p.Version, p.BuildConfigs.Project + "-" + p.BuildConfigs.TagFrom)
+	if err != nil {
+		log.Error("Pipeline.CreateImageStreamTag.NewImageStreamTags", err)
+		return err
+	}
+	image, err := ist.Get()
+	if err != nil {
+		log.Error("images not found :", err)
+		return err
+	}
+	log.Debug("pipeline get image stream tag name:", image.Name)
+	return nil
+}
+
 func (p *Pipeline) CreateImageStreamTag() error {
 	log.Debug("Pipeline.CreateImageStreamTag")
 	ist, err := openshift.NewImageStreamTags(p.App, p.Version, p.Namespace)
@@ -500,7 +525,7 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 		return err
 	}
 	if p.BuildConfigs.TagFrom == p.Profile && p.BuildConfigs.Project == p.Project {
-		//TODO check if tag from is exist or not
+
 		// create secret for building image
 		secret, err := p.CreateSecret(username, password, isToken)
 		if err != nil {
@@ -512,6 +537,11 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 			return p.Deploy()
 		})
 	} else {
+		//TODO check if tag from is exist or not
+		err = p.GetImageStreamTag()
+		if err != nil {
+			return nil
+		}
 		err = p.CreateImageStreamTag()
 		if err != nil {
 			log.Error("Pipeline.Run.CreateImageStreamTag error", err)

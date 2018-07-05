@@ -12,10 +12,11 @@ func TestListGroups(t *testing.T) {
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
 	log.Debugf("url: %v, username: %v", baseUrl, username)
+	page := 1
 	gs := new(Session)
 	err := gs.GetSession(baseUrl, username, password)
 	group := new(Group)
-	g, err := group.ListGroups(gs.PrivateToken, baseUrl)
+	g, err := group.ListGroups(gs.PrivateToken, baseUrl, page)
 	assert.Equal(t, nil, err)
 	log.Infof("groups :%v", g)
 }

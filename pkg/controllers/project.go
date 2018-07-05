@@ -21,7 +21,7 @@ func (c *ProjectController) Before(ctx *web.Context) {
 }
 
 
-func (c *ProjectController) GetListProjects(ctx *web.Context) {
+func (c *ProjectController) Get(ctx *web.Context) {
 	log.Debug("ProjectController All Projects()")
 	search := ctx.URLParam("search")
 	page, err := ctx.URLParamInt("page")
@@ -38,7 +38,7 @@ func (c *ProjectController) GetListProjects(ctx *web.Context) {
 	ctx.ResponseBody("success", &projects)
 }
 
-func (c *ProjectController) GetProjectMember(ctx *web.Context)  {
+func (c *ProjectController) GetMember(ctx *web.Context)  {
 	log.Debug("ProjectController Project Member()")
 	gid, err := ctx.URLParamInt("gid")
 	pid, err := ctx.URLParamInt("pid")
