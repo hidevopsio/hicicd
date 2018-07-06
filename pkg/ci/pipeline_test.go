@@ -33,12 +33,13 @@ func TestPipelineCreateProject(t *testing.T) {
 }
 
 func TestPipelineCreateRoleBinding(t *testing.T) {
-	username := "test"
+	username := "chulei"
 	p := &Pipeline{
 		Name: "test",
-		Namespace: "demo-test",
+		Namespace: "demo-dev",
 	}
 	metaName := "admin"
-	err := p.CreateRoleBinding(username, metaName)
+	roleRefName := "master"
+	err := p.CreateRoleBinding(username, metaName, roleRefName)
 	assert.Equal(t, nil, err)
 }

@@ -101,7 +101,7 @@ func TestCicdRunJava(t *testing.T) {
 			Profile: "test",
 			App:     "hello-world",
 			Version: "v1",
-			BuildConfigs: ci.BuildConfigs{Skip: true},
+			BuildConfigs: ci.BuildConfigs{Enable: true},
 			//DeploymentConfigs: ci.DeploymentConfigs{Skip: true},
 		})
 	}
