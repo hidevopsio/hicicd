@@ -23,7 +23,7 @@ func (c *DestinationController) Before(ctx *web.Context) {
 	c.BaseController.Before(ctx)
 }
 
-func (c *DestinationController) PostAdd(ctx *web.Context) {
+func (c *DestinationController) Post(ctx *web.Context) {
 	log.Debug("destination  add:{}")
 	var destination istio.Destination
 	err := ctx.RequestBody(&destination)

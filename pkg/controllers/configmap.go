@@ -21,7 +21,7 @@ func (c *ConfigMapController) Before(ctx *web.Context) {
 	c.BaseController.Before(ctx)
 }
 
-func (c *ConfigMapController) PostAdd(ctx *web.Context) {
+func (c *ConfigMapController) Post(ctx *web.Context) {
 	log.Debug("ConfigMap  add:{}")
 	var configMap k8s.ConfigMaps
 	err := ctx.RequestBody(&configMap)
@@ -40,7 +40,7 @@ func (c *ConfigMapController) PostAdd(ctx *web.Context) {
 	return
 }
 
-func (c *ConfigMapController) PostDelete(ctx *web.Context)  {
+func (c *ConfigMapController) Delete(ctx *web.Context)  {
 	log.Debug("ConfigMap  Delete:{}")
 	var configMap k8s.ConfigMaps
 	err := ctx.RequestBody(&configMap)
@@ -57,15 +57,13 @@ func (c *ConfigMapController) PostDelete(ctx *web.Context)  {
 	ctx.ResponseBody(message, nil)
 }
 
-func (c *ConfigMapController) PostGet(ctx *web.Context)  {
+func (c *ConfigMapController) Get(ctx *web.Context)  {
 	log.Debug("ConfigMap  get:{}")
-	var configMap k8s.ConfigMaps
-	err := ctx.RequestBody(&configMap)
-	if err != nil {
-		ctx.ResponseError(err.Error(), http.StatusRequestedRangeNotSatisfiable)
-		return
-	}
-	co, err := configMap.Get()
+	name := ctx.URLParam("name")
+	namespace := ctx.URLParam("namespace")
+	configMap := &k8s.ConfigMaps{}
+	config := k8s.NewConfigMaps(name, namespace, configMap.Data)
+	co, err := config.Get()
 	if err != nil {
 		ctx.ResponseError( err.Error(), http.StatusRequestedRangeNotSatisfiable)
 		return

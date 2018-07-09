@@ -560,3 +560,5 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 	// finally, all steps are done well, let tell the client ...
 	return nil
 }
+
+

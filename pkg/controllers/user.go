@@ -75,8 +75,8 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 			exp, err:=strconv.ParseInt(expired, 10, 64)
 			log.Debug("login expired time exp:", exp)
 			jwtToken, err := web.GenerateJwtToken(web.JwtMap{
-				"url": url,
-				"username": request.Username,
+					"url": url,
+					"username": request.Username,
 					"password": request.Password, // TODO: token is not working?
 					"scmToken": privateToken,
 					"uid": uid,
