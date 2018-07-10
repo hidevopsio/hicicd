@@ -30,10 +30,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
 	"github.com/hidevopsio/hicicd/pkg/auth"
-	"github.com/hidevopsio/hicicd/pkg/orch/kong"
 	"os"
 	"strings"
 	"encoding/json"
+	"github.com/kevholditch/gokong"
 )
 
 type Scm struct {
@@ -113,8 +113,8 @@ type Configuration struct {
 }
 
 type GatewayConfigs struct {
-	Enable bool   `json:"enable"`
-	Uri    string `json:"uri"`
+	Enable      bool   `json:"enable"`
+	Uri         string `json:"uri"`
 	UpstreamUrl string `json:"upstream_url"`
 }
 
@@ -358,23 +358,26 @@ func (p *Pipeline) CreateKongGateway(upstreamUrl string) error {
 	host := os.Getenv("KONG_HOST")
 	host = strings.Replace(host, "${profile}", p.Profile, -1)
 	hosts := strings.Split(host, ",")
-	apiRequest := &kong.ApiRequest{
+	apiRequest := &gokong.ApiRequest{
 		Name:                   p.App + "-" + p.Project,
 		Hosts:                  hosts,
 		Uris:                   []string{uris},
-		UpstreamURL:            "http://" + upstreamUrl,
-		StripUri:               true,
-		PreserveHost:           false,
-		Retries:                5,
-		UpstreamConnectTimeout: 6000,
-		UpstreamSendTimeout:    6000,
-		UpstreamReadTimeout:    6000,
+		UpstreamUrl:            "http://" + upstreamUrl,
+		StripUri:               false,
+		PreserveHost:           true,
+		Retries:                "3",
+		UpstreamConnectTimeout: 1000,
+		UpstreamSendTimeout:    2000,
+		UpstreamReadTimeout:    3000,
 		HttpsOnly:              false,
 		HttpIfTerminated:       true,
 	}
 	baseUrl := os.Getenv("KONG_ADMIN_URL")
 	baseUrl = strings.Replace(baseUrl, "${profile}", p.Profile, -1)
-	err := apiRequest.Post(baseUrl)
+	config := &gokong.Config{
+		HostAddress: baseUrl,
+	}
+	_, err := gokong.NewClient(config).Apis().Create(apiRequest)
 	return err
 }
 
@@ -401,9 +404,9 @@ func (p *Pipeline) CreateRoute() (string, error) {
 	return upstreamUrl, err
 }
 
-func (p * Pipeline) GetImageStreamTag() error  {
+func (p *Pipeline) GetImageStreamTag() error {
 	log.Debug("pipeline get image stream tag :")
-	ist, err := openshift.NewImageStreamTags(p.App, p.Version, p.BuildConfigs.Project + "-" + p.BuildConfigs.TagFrom)
+	ist, err := openshift.NewImageStreamTags(p.App, p.Version, p.BuildConfigs.Project+"-"+p.BuildConfigs.TagFrom)
 	if err != nil {
 		log.Error("Pipeline.CreateImageStreamTag.NewImageStreamTags", err)
 		return err
@@ -560,5 +563,3 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 	// finally, all steps are done well, let tell the client ...
 	return nil
 }
-
-

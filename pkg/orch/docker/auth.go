@@ -5,8 +5,12 @@ import (
 	"fmt"
 )
 
-func AuthCheck(endpoint string) error {
-	client, err := docker.NewClient(endpoint)
+type Image struct {
+	Endpoint string `json:"endpoint"`
+}
+
+func (i *Image) AuthCheck() error {
+	client, err := docker.NewClient(i.Endpoint)
 	if err != nil {
 		panic(err)
 	}

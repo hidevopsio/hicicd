@@ -86,6 +86,12 @@
   revision = "6f8212e8d10df7383609d3c377ca08884d8f3ec0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/kevholditch/gokong"
+  packages = ["."]
+  revision = "7d19229ba60bfbc428474f89086da307a82c59d1"
+
+[[projects]]
   name = "github.com/ghodss/yaml"
   packages = ["."]
   revision = "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"

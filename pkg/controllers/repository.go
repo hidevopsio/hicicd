@@ -8,7 +8,7 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/info"
 	"os"
 	"strings"
-	"github.com/hidevopsio/hicicd/pkg/orch/kong"
+	"github.com/kevholditch/gokong"
 )
 
 // Operations about object
@@ -37,12 +37,14 @@ func (c *RepositoryController) PostAppType(ctx *web.Context) {
 		ctx.ResponseError(err.Error(), http.StatusPreconditionFailed)
 		return
 	}
-	a := new(kong.ApiRequest)
-	a.Name = project.Name + "-" + project.Namespace
+	name := project.Name + "-" + project.Namespace
 	baseUrl := os.Getenv("KONG_ADMIN_URL")
 	baseUrl = strings.Replace(baseUrl, "${profile}", project.Profile, -1)
-	api, err := a.Get(baseUrl)
-	if err == nil {
+	config := &gokong.Config{
+		HostAddress: baseUrl,
+	}
+	api, err := gokong.NewClient(config).Apis().GetByName(name)
+	if api != nil {
 		t.Uri = api.Uris[0]
 	}else {
 		name := strings.Replace(project.Name, "-", "/", -1)
