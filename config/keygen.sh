@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-openssl genrsa -out app.rsa 1024
-openssl rsa -in app.rsa -pubout > app.rsa.pub
+openssl genrsa -out ssl/app.rsa 1024
+openssl rsa -in ssl/app.rsa -pubout > ssl/app.rsa.pub

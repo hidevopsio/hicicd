@@ -201,27 +201,27 @@ func (p *Pipeline) CreateSecret(username, password string, isToken bool) (string
 	return secretName, err
 }
 
-func (pl *Pipeline) CreateProject() error {
-	p, err := openshift.NewProject(pl.Namespace, "", "")
+func (p *Pipeline) CreateProject() error {
+	project, err := openshift.NewProject(p.Namespace, "", "")
 	if err != nil {
 		log.Error("create namespace err :", err)
 		return err
 	}
-	pro, err := p.Get()
+	prj, err := project.Get()
 	if err == nil {
-		log.Debug("exists project debug:", pro.Name)
+		log.Debug("exists project debug:", prj.Name)
 		return err
 	}
-	project, err := p.Create()
+	newProject, err := project.Create()
 	if err != nil {
 		return err
 	}
 	//init namespace
-	err = pl.InitProject()
+	err = p.InitProject()
 	if err != nil {
 		return err
 	}
-	log.Debug("create project debug", project)
+	log.Debug("create project debug", newProject)
 	return nil
 }
 

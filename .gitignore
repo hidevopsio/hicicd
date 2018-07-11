@@ -4,7 +4,8 @@
 *.so
 *.dylib
 *.jar
-
+*.db
+hicicd
 # Test binary, build with `go test -c`
 *.test
 
