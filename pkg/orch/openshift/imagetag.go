@@ -23,6 +23,7 @@ type ImageStreamTag struct {
 }
 
 func NewImageStreamTags(name, version, namespace string) (*ImageStreamTag, error) {
+
 	clientSet, err := image.NewForConfig(orch.Config)
 	return &ImageStreamTag{
 		Name:      name,

@@ -10,7 +10,7 @@ import (
 // Operations about object
 type DictionaryController struct {
 	BaseController
-	DictionaryService *service.DictionaryService `component:"service"`
+	DictionaryService *service.DictionaryService `inject:"dictionaryService"`
 }
 
 func init() {

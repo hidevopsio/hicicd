@@ -89,7 +89,7 @@
   branch = "master"
   name = "github.com/kevholditch/gokong"
   packages = ["."]
-  revision = "7d19229ba60bfbc428474f89086da307a82c59d1"
+  revision = "ab1e75d5f714d02463d0fe72f8fa4be079136ad6"
 
 [[projects]]
   name = "github.com/ghodss/yaml"
