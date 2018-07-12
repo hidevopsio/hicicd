@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 	log "github.com/kataras/golog"
 	"github.com/hidevopsio/hiboot/pkg/utils/gotest"
+	"sync"
 )
 
 
@@ -37,15 +38,16 @@ type Client struct {
 
 var (
 	client *Client
+	once sync.Once
+
 )
 
 
 func GetClientInstance() *Client  {
 
-	if client == nil {
+	once.Do(func() {
 		client = &Client{}
-	}
-
+	})
 	return client
 }
 
