@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"github.com/hidevopsio/hicicd/pkg/orch"
 	imagev1 "github.com/openshift/api/image/v1"
+	"github.com/openshift/client-go/build/clientset/versioned/fake"
 )
 
 type Scm struct {
@@ -45,6 +46,23 @@ type BuildConfig struct {
 
 	BuildConfigs buildv1.BuildConfigInterface
 	Builds       buildv1.BuildInterface
+}
+
+
+
+func NewBuildClientSet() (buildv1.BuildV1Interface, error) {
+
+	cli := orch.GetClientInstance()
+
+	// get the fake ClientSet for testing
+	if cli.IsTestRunning() {
+		return fake.NewSimpleClientset().BuildV1(), nil
+	}
+
+	// get the real ClientSet
+	clientSet, err := buildv1.NewForConfig(cli.Config())
+
+	return clientSet, err
 }
 
 // @Title NewBuildConfig
@@ -93,7 +111,11 @@ func NewBuildConfig(namespace, name, scmUrl, scmRef, scmSecret, version, s2iImag
 		}
 	}
 
-	clientSet, err := buildv1.NewForConfig(orch.Config)
+	clientSet, err := NewBuildClientSet()
+	if err != nil {
+		return nil, err
+	}
+
 	buildConfig := &BuildConfig{
 		BuildConfigs: clientSet.BuildConfigs(namespace),
 		Builds:       clientSet.Builds(namespace),

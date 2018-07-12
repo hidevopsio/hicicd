@@ -9,26 +9,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func TestRoleBindingGet(t *testing.T) {
-	name := "admin"
-	namespace := "demo-dev"
-	roleBinding, err := NewRoleBinding(name, namespace)
-	assert.Equal(t, nil, err)
-	binding, err := roleBinding.Get()
-	assert.Equal(t, nil, err)
-	log.Debug(binding)
-}
-
-func TestRoleBindingDelete(t *testing.T) {
-	name := "admin"
-	namespace := "demo-test"
-	roleBinding, err := NewRoleBinding(name, namespace)
-	assert.Equal(t, nil, err)
-	err = roleBinding.Delete()
-	assert.Equal(t, nil, err)
-}
-
-func TestRoleBindingCreate(t *testing.T) {
+func TestRoleBindingCrd(t *testing.T) {
 	name := "admin"
 	namespace := "demo-test"
 	roleBinding, err := NewRoleBinding(name, namespace)
@@ -55,6 +36,14 @@ func TestRoleBindingCreate(t *testing.T) {
 	role, err := roleBinding.Create(roleBinding1)
 	log.Debug(role)
 	log.Debug(err)
+
+	// Get
+	binding, err := roleBinding.Get()
+	assert.Equal(t, nil, err)
+	assert.Equal(t, name, binding.Name)
+
+	err = roleBinding.Delete()
+	assert.Equal(t, nil, err)
 }
 
 

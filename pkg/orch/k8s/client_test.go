@@ -1,13 +1,12 @@
-package fake
+package k8s
 
 import (
-	"fmt"
-
+	"testing"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"testing"
-	testclient "k8s.io/client-go/kubernetes/fake"
+	"fmt"
+	"github.com/stretchr/testify/assert"
 )
 
 type KubernetesAPI struct {
@@ -43,22 +42,16 @@ func TestNewNamespaceWithSuffix(t *testing.T) {
 
 	api := &KubernetesAPI{
 		Suffix: "unit-test",
-		Client:  testclient.NewSimpleClientset(),
+		Client:  NewClientSet(),
 	}
 
 	for _, c := range cases {
 		// create the postfixed namespace
 		err := api.NewNamespaceWithSuffix(c.ns)
-		if err != nil {
-			t.Fatal(err.Error())
-		}
+		assert.Equal(t, nil, err)
 
-		_, err = api.Client.CoreV1().Namespaces().Get("test-unit-test", v1.GetOptions{})
+		_, err = api.Client.CoreV1().Namespaces().Get("test-unit-test", metav1.GetOptions{})
+		assert.Equal(t, nil, err)
 
-		if err != nil {
-			t.Fatal(err.Error())
-		}
 	}
 }
-
-

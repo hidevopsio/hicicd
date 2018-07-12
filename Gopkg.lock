@@ -238,7 +238,7 @@
   branch = "master"
   name = "github.com/hidevopsio/hiboot"
   packages = ["pkg/inject","pkg/log","pkg/model","pkg/starter/db","pkg/starter/db/bolt","pkg/starter/web","pkg/system","pkg/utils","pkg/utils/reflector"]
-  revision = "c66fb60e8976cb7cae6fbffc3b4cdda24ae22022"
+  revision = "22fa047f254d3bbb930d276761920bcd5e10ca4a"
 
 [[projects]]
   name = "github.com/howeyc/fsnotify"

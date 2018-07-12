@@ -3,10 +3,9 @@ package openshift
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/hidevopsio/hiboot/pkg/log"
-	image "github.com/openshift/client-go/image/clientset/versioned/typed/image/v1"
+	imagev1 "github.com/openshift/client-go/image/clientset/versioned/typed/image/v1"
 	"github.com/openshift/api/image/v1"
 	corev1 "k8s.io/api/core/v1"
-	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 const (
@@ -19,11 +18,11 @@ type ImageStreamTag struct {
 	FullName  string
 	Namespace string
 	Version   string
-	Interface image.ImageStreamTagInterface
+	Interface imagev1.ImageStreamTagInterface
 }
 
 func NewImageStreamTags(name, version, namespace string) (*ImageStreamTag, error) {
-	clientSet, err := image.NewForConfig(orch.Config)
+	clientSet, err := NewImageClientSet()
 	return &ImageStreamTag{
 		Name:      name,
 		Namespace: namespace,

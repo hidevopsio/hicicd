@@ -2,6 +2,7 @@ package openshift
 
 import (
 	"github.com/openshift/client-go/authorization/clientset/versioned/typed/authorization/v1"
+	"github.com/openshift/client-go/authorization/clientset/versioned/fake"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/hidevopsio/hicicd/pkg/orch"
 	"github.com/hidevopsio/hiboot/pkg/log"
@@ -41,9 +42,27 @@ func (rb *RoleBinding) Init() (*authorization_v1.RoleBinding) {
 	return roleBinding
 }
 
+
+
+func NewRoleBindingClientSet() (v1.AuthorizationV1Interface, error) {
+
+	cli := orch.GetClientInstance()
+
+	// get the fake ClientSet for testing
+	if cli.IsTestRunning() {
+		return fake.NewSimpleClientset().AuthorizationV1(), nil
+	}
+
+	// get the real ClientSet
+	clientSet, err := v1.NewForConfig(cli.Config())
+
+	return clientSet, err
+}
+
+
 func NewRoleBinding(name, namespace string) (*RoleBinding, error) {
 	log.Debug("NewPolicy()")
-	client, err := v1.NewForConfig(orch.Config)
+	client, err := NewRoleBindingClientSet()
 	if err != nil {
 		return nil, err
 	}

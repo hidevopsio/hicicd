@@ -2,7 +2,6 @@ package k8s
 
 import (
 	"k8s.io/client-go/kubernetes/typed/core/v1"
-	"github.com/hidevopsio/hicicd/pkg/orch"
 	core_v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/hidevopsio/hiboot/pkg/log"
@@ -16,11 +15,12 @@ type ConfigMaps struct {
 }
 
 func NewConfigMaps(name, namespace string, data map[string]string) *ConfigMaps {
+	clientSet := NewClientSet()
 	return &ConfigMaps{
 		Name:      name,
 		Namespace: namespace,
 		Data:      data,
-		Interface: orch.ClientSet.CoreV1().ConfigMaps(namespace),
+		Interface: clientSet.CoreV1().ConfigMaps(namespace),
 	}
 }
 

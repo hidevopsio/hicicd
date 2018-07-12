@@ -12,30 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package openshift
+
+package k8s
+
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/fake"
+	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
-func TestRouteCrd(t *testing.T)  {
-	projectName := "demo"
-	profile := "dev"
-	namespace := projectName + "-" + profile
-	app := "hello-world"
 
-	route, err := NewRoute(app, namespace)
-	assert.Equal(t, nil, err)
+func NewClientSet() kubernetes.Interface {
 
-	url, err := route.Create(8080)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, "", url)
+	cli := orch.GetClientInstance()
 
-	r, err := route.Get()
-	assert.Equal(t, nil, err)
-	assert.Equal(t, app, r.Name)
+	// get the fake ClientSet for testing
+	if cli.IsTestRunning() {
+		return fake.NewSimpleClientset()
+	}
 
-	err = route.Delete()
-	assert.Equal(t, nil, err)
+	// get the real ClientSet
+	clientSet, err := kubernetes.NewForConfig(cli.Config())
+	if err != nil {
+		panic(err.Error())
+	}
+	return clientSet
 }

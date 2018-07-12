@@ -17,7 +17,6 @@ package orch
 
 
 import (
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 
@@ -26,44 +25,64 @@ import (
 	"flag"
 	"path/filepath"
 	log "github.com/kataras/golog"
+	"github.com/hidevopsio/hiboot/pkg/utils/gotest"
 )
+
+
+type Client struct {
+	isTestRunning bool
+	config     *rest.Config
+	kubeconfig *string
+}
 
 var (
-	Config     *rest.Config
-	ClientSet  *kubernetes.Clientset
-
-	Kubeconfig *string
+	client *Client
 )
 
 
+func GetClientInstance() *Client  {
+
+	if client == nil {
+		client = &Client{}
+	}
+
+	return client
+}
+
 func init() {
+
+	cli := GetClientInstance()
+
+	cli.isTestRunning = gotest.IsRunning()
 
 	var err error
 
 	if os.Getenv("KUBERNETES_SERVICE_HOST") == "" {
 		log.Info("Kubernetes External Client Mode")
 		if home := homedir.HomeDir(); home != "" {
-			Kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+			cli.kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 		} else {
-			Kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+			cli.kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 		}
-		Config, err = clientcmd.BuildConfigFromFlags("", *Kubeconfig)
+		cli.config, err = clientcmd.BuildConfigFromFlags("", *cli.kubeconfig)
 		if err != nil {
 			panic(err.Error())
 		}
 	} else {
 		log.Info("Kubernetes Internal Client Mode")
-		Config, err = rest.InClusterConfig()
+		cli.config, err = rest.InClusterConfig()
 		if err != nil {
 			panic(err.Error())
 		}
 		kubecfg := ""
-		Kubeconfig = &kubecfg
+		cli.kubeconfig = &kubecfg
 	}
+}
 
-	// creates the ClientSet
-	ClientSet, err = kubernetes.NewForConfig(Config)
-	if err != nil {
-		panic(err.Error())
-	}
+func (c *Client) Config() *rest.Config  {
+	return c.config
+}
+
+func (c *Client) IsTestRunning() bool  {
+	return c.isTestRunning
 }

@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/jinzhu/copier"
-	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
 type Service struct{
@@ -34,11 +33,11 @@ type Service struct{
 }
 
 func NewService(name, namespace string) *Service {
-
+	clientSet := NewClientSet()
 	return &Service{
 		Name: name,
 		Namespace: namespace,
-		Interface: orch.ClientSet.CoreV1().Services(namespace),
+		Interface: clientSet.CoreV1().Services(namespace),
 	}
 }
 

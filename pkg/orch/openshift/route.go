@@ -17,6 +17,7 @@ package openshift
 
 import (
 	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
+	"github.com/openshift/client-go/route/clientset/versioned/fake"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/openshift/api/route/v1"
 	"github.com/hidevopsio/hiboot/pkg/log"
@@ -35,9 +36,26 @@ type Route struct{
 	Interface routev1.RouteInterface
 }
 
+
+func NewRouteClientSet() (routev1.RouteV1Interface, error) {
+
+	cli := orch.GetClientInstance()
+
+	// get the fake ClientSet for testing
+	if cli.IsTestRunning() {
+		return fake.NewSimpleClientset().RouteV1(), nil
+	}
+
+	// get the real ClientSet
+	clientSet, err := routev1.NewForConfig(cli.Config())
+
+	return clientSet, err
+}
+
+
 func NewRoute(name, namespace string) (*Route, error)  {
 	log.Debug("NewRoute()")
-	clientSet, err := routev1.NewForConfig(orch.Config)
+	clientSet, err := NewRouteClientSet()
 	if err != nil {
 		return nil, err
 	}

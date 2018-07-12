@@ -19,6 +19,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	imagev1 "github.com/openshift/client-go/image/clientset/versioned/typed/image/v1"
+	"github.com/openshift/client-go/image/clientset/versioned/fake"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"github.com/hidevopsio/hicicd/pkg/orch"
@@ -38,8 +39,23 @@ type ImageStream struct{
 	Interface imagev1.ImageStreamInterface
 }
 
+func NewImageClientSet() (imagev1.ImageV1Interface, error) {
+
+	cli := orch.GetClientInstance()
+
+	// get the fake ClientSet for testing
+	if cli.IsTestRunning() {
+		return fake.NewSimpleClientset().ImageV1(), nil
+	}
+
+	// get the real ClientSet
+	clientSet, err := imagev1.NewForConfig(cli.Config())
+
+	return clientSet, err
+}
+
 func NewImageStream(name, namespace string) (*ImageStream, error) {
-	clientSet, err := imagev1.NewForConfig(orch.Config)
+	clientSet, err := NewImageClientSet()
 
 	return &ImageStream{
 		Name:      name,
