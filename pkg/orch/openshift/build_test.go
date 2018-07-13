@@ -56,7 +56,7 @@ func TestBuildCreation(t *testing.T) {
 
 	log.Debugf("workDir: %v", os.Getenv("PWD"))
 
-	buildConfig, err := NewBuildConfig(namespace, appName, scmUrl, scmRef, secret, version, s2iImageStream, false)
+	buildConfig, err := NewBuildConfig(namespace, appName, scmUrl, scmRef, secret, version, s2iImageStream, true)
 	assert.Equal(t, nil, err)
 
 	bc, err := buildConfig.Create()

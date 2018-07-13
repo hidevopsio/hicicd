@@ -325,7 +325,7 @@ func (p *Pipeline) CreateDeploymentConfig(force bool, injectSidecar func(in inte
 	var l map[string]string
 	labels, _ := json.Marshal(p.DeploymentConfigs.Labels)
 	err = json.Unmarshal(labels, &l)
-	err = dc.Create(&p.DeploymentConfigs.Env, l, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, injectSidecar)
+	err = dc.Create(&p.DeploymentConfigs.Env, l, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, p.Profile, injectSidecar)
 	if err != nil {
 		log.Error("dc.Create ", err)
 		return err

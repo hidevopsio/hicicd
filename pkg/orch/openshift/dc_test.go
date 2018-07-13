@@ -48,12 +48,12 @@ func TestDeploymentConfigCreation(t *testing.T) {
 
 	ports := []orch.Ports{
 		{
-			ContainerPort:     8080,
-			Protocol: "TCP",
+			ContainerPort: 8080,
+			Protocol:      "TCP",
 		},
 		{
-			ContainerPort:     7575,
-			Protocol: "TCP",
+			ContainerPort: 7575,
+			Protocol:      "TCP",
 		},
 	}
 
@@ -67,36 +67,86 @@ func TestDeploymentConfigCreation(t *testing.T) {
 }
 
 func TestDeploymentConfigInstantiation(t *testing.T) {
-
-	log.Debug("TestDeploymentConfigInstantiation()")
-
-	projectName := "moses"
-	profile := "stage"
+	projectName := "demo"
+	profile := "dev"
 	namespace := projectName + "-" + profile
-	app := "admin"
+	app := "demo-consumer"
+	healthEndPoint := "http://localhost:8080/health"
 	version := "v1"
+	env := []system.Env{
+		{
+			Name:  "SPRING_PROFILES_ACTIVE",
+			Value: profile,
+		},
+		{
+			Name:  "APP_OPTIONS",
+			Value: "-Xms128m -Xmx512m -Xss512k -XX:+ExitOnOutOfMemoryError",
+		},
+		{
+			Name:  "TZ",
+			Value: "Asia/Shanghai",
+		},
+	}
+
+	ports := []orch.Ports{
+		{
+			ContainerPort: 8080,
+			Protocol:      "TCP",
+		},
+		{
+			ContainerPort: 7575,
+			Protocol:      "TCP",
+		},
+	}
+	log.Debug("TestDeploymentConfigInstantiation()")
 	dc, err := NewDeploymentConfig(app, namespace, version)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, app, dc.Name)
-
+	err = dc.Create(&env, map[string]string{}, &ports, 1, false, healthEndPoint, nil)
+	assert.Equal(t, nil, err)
 	cfg, err := dc.Instantiate()
 	assert.Equal(t, nil, err)
 	assert.Equal(t, app, cfg.Name)
 }
 
-func TestDeploymentConfigDeletion(t *testing.T) {
-
-	log.Debug("TestDeploymentConfigDeletion()")
-
+func TestDeploymentConfig(t *testing.T) {
 	projectName := "demo"
 	profile := "dev"
 	namespace := projectName + "-" + profile
 	app := "demo-consumer"
+	healthEndPoint := "http://localhost:8080/health"
 	version := "v1"
+	env := []system.Env{
+		{
+			Name:  "SPRING_PROFILES_ACTIVE",
+			Value: profile,
+		},
+		{
+			Name:  "APP_OPTIONS",
+			Value: "-Xms128m -Xmx512m -Xss512k -XX:+ExitOnOutOfMemoryError",
+		},
+		{
+			Name:  "TZ",
+			Value: "Asia/Shanghai",
+		},
+	}
+
+	ports := []orch.Ports{
+		{
+			ContainerPort: 8080,
+			Protocol:      "TCP",
+		},
+		{
+			ContainerPort: 7575,
+			Protocol:      "TCP",
+		},
+	}
+	log.Debug("TestDeploymentConfigDeletion()")
 	dc, err := NewDeploymentConfig(app, namespace, version)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, app, dc.Name)
-
+	err = dc.Create(&env, map[string]string{}, &ports, 1, false, healthEndPoint, nil)
+	assert.Equal(t, nil, err)
 	err = dc.Delete()
 	assert.Equal(t, nil, err)
 }

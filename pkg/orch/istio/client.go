@@ -69,8 +69,9 @@ func (c *Client) Delete(typ string) error {
 }
 
 func NewClient() (*crd.Client, error) {
-	log.Debug("create config kubeconfig", *orch.Kubeconfig)
-	configClient, err := newClient(*orch.Kubeconfig)
+	cli := orch.GetClientInstance()
+	log.Debug("create config kubeconfig", cli.Config())
+	configClient, err := newClient(*cli.Kubeconfig())
 	if err != nil {
 		log.Error("create config configClient error", err)
 		return nil, err

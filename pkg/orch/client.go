@@ -43,7 +43,7 @@ var (
 )
 
 
-func GetClientInstance() *Client  {
+func GetClientInstance() *Client {
 
 	once.Do(func() {
 		client = &Client{}
@@ -87,4 +87,8 @@ func (c *Client) Config() *rest.Config  {
 
 func (c *Client) IsTestRunning() bool  {
 	return c.isTestRunning
+}
+
+func (c *Client) Kubeconfig() *string  {
+	return c.kubeconfig
 }

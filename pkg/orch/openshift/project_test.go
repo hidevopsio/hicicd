@@ -18,7 +18,6 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/hidevopsio/hiboot/pkg/log"
-	"k8s.io/apimachinery/pkg/api/errors"
 )
 
 func init() {
@@ -26,30 +25,17 @@ func init() {
 }
 
 func TestProjectLit(t *testing.T) {
-	// get all projects
-	project, err := NewProject("", "", "")
+	projectName := "project-crud"
+	project, err := NewProject(projectName, projectName, "project for testing")
 	assert.Equal(t, nil, err)
 
 	pl, err := project.List()
 	assert.Equal(t, nil, err)
-	assert.NotEqual(t, 0, len(pl.Items))
+	assert.Equal(t, 0, len(pl.Items))
 	log.Debugf("There are %d projects in the cluster", len(pl.Items))
 
 	for i, p := range pl.Items {
 		log.Debugf("index %d: project: %s", i, p.Name)
-	}
-}
-
-func TestProjectCreate(t *testing.T) {
-	namespace := "demo-test"
-	projects, err := NewProject(namespace, "", "")
-	assert.Equal(t, nil, err)
-
-	_, err = projects.Get()
-	if errors.IsNotFound(err) {
-		projects.Create()
-	} else {
-		log.Debugf("%v is already exist", err)
 	}
 }
 

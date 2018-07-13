@@ -71,9 +71,11 @@ func NewDeploymentConfig(name, namespace, version string) (*DeploymentConfig, er
 	}, nil
 }
 
-func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, ports interface{}, replicas int32, force bool, healthEndPoint string, injectSidecar func(in interface{}) (interface{}, error)) error {
+func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, ports interface{}, replicas int32, force bool, healthEndPoint, profile string, injectSidecar func(in interface{}) (interface{}, error)) error {
 	log.Debug("DeploymentConfig.Create()", force)
-
+	if profile == "" {
+		profile = "stage"
+	}
 	// env
 	e := make([]corev1.EnvVar, 0)
 	copier.Copy(&e, env)
@@ -151,6 +153,9 @@ func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, po
 					DNSPolicy:     corev1.DNSClusterFirst,
 					RestartPolicy: corev1.RestartPolicyAlways,
 					SchedulerName: "default-scheduler",
+					NodeSelector: map[string]string{
+						"nodesge": "pod" + profile,
+					},
 				},
 			},
 			Test: false,

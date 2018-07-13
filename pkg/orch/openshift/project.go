@@ -72,6 +72,9 @@ func (p *Project) Create() (*v1.Project, error)  {
 			Labels: map[string]string{
 				"project": p.Name,
 			},
+			Annotations: map[string]string{
+				"scheduler.alpha.kubernetes.io/node-selector": "nodesge=pod"+"prod",
+			},
 		},
 	}
 	// create project
