@@ -62,7 +62,7 @@ func TestDeploymentConfigCreation(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, app, dc.Name)
 	// create dc
-	err = dc.Create(&env, map[string]string{}, &ports, 1, false, healthEndPoint, nil)
+	err = dc.Create(&env, map[string]string{}, &ports, 1, false, healthEndPoint, "", nil)
 	assert.Equal(t, nil, err)
 }
 
@@ -102,7 +102,7 @@ func TestDeploymentConfigInstantiation(t *testing.T) {
 	dc, err := NewDeploymentConfig(app, namespace, version)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, app, dc.Name)
-	err = dc.Create(&env, map[string]string{}, &ports, 1, false, healthEndPoint, nil)
+	err = dc.Create(&env, map[string]string{}, &ports, 1, false, healthEndPoint,"",  nil)
 	assert.Equal(t, nil, err)
 	cfg, err := dc.Instantiate()
 	assert.Equal(t, nil, err)
@@ -145,7 +145,7 @@ func TestDeploymentConfig(t *testing.T) {
 	dc, err := NewDeploymentConfig(app, namespace, version)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, app, dc.Name)
-	err = dc.Create(&env, map[string]string{}, &ports, 1, false, healthEndPoint, nil)
+	err = dc.Create(&env, map[string]string{}, &ports, 1, false, healthEndPoint, "", nil)
 	assert.Equal(t, nil, err)
 	err = dc.Delete()
 	assert.Equal(t, nil, err)

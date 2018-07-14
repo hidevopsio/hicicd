@@ -1,194 +1,29 @@
-// Copyright 2018 John Deng (hi.devops.io@gmail.com).
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-package ci
+package service
 
 import (
 	"fmt"
-	"github.com/imdario/mergo"
-	"github.com/hidevopsio/hiboot/pkg/log"
-	"github.com/hidevopsio/hiboot/pkg/system"
-	"github.com/hidevopsio/hiboot/pkg/utils"
 	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
 	"github.com/hidevopsio/hicicd/pkg/orch/openshift"
-	"github.com/hidevopsio/hicicd/pkg/orch"
+	"os"
+	"strings"
 	"github.com/hidevopsio/hicicd/pkg/orch/istio"
-	"github.com/jinzhu/copier"
-	"path/filepath"
+	"github.com/hidevopsio/hicicd/pkg/auth"
+	"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hicicd/pkg/entity"
+	"encoding/json"
+	"github.com/kevholditch/gokong"
+	"github.com/hidevopsio/hiboot/pkg/utils/copier"
 	authorization_v1 "github.com/openshift/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
-	"github.com/hidevopsio/hicicd/pkg/auth"
-	"os"
-	"strings"
-	"encoding/json"
-	"github.com/kevholditch/gokong"
 )
 
-type Scm struct {
-	Type string `json:"type"`
-	Url  string `json:"url"`
-	Ref  string `json:"ref"`
+type PipelineService struct {
+	entity.Pipeline
 }
 
-type DeploymentConfigs struct {
-	HealthEndPoint string       `json:"health_end_point"`
-	Enable         bool         `json:"enable"`
-	ForceUpdate    bool         `json:"force_update"`
-	Replicas       int32        `json:"replicas"`
-	Env            []system.Env `json:"env"`
-	Labels         Labels       `json:"labels"`
-	Project        string       `json:"project"`
-}
 
-type Labels struct {
-	App     string `json:"app"`
-	Version string `json:"version"`
-	Cluster string `json:"cluster"`
-}
-
-type BuildConfigs struct {
-	Enable      bool         `json:"enable"` // TODO: ? Always, IfNotPresent, Never
-	TagFrom     string       `json:"tag_from"`
-	ImageStream string       `json:"image_stream"`
-	Env         []system.Env `json:"env"`
-	Rebuild     bool         `json:"rebuild"`
-	Project     string       `json:"project"`
-	Namespace   string       `json:"namespace"`
-	Branch      string       `json:"branch"`
-}
-
-type IstioConfigs struct {
-	Enable              bool   `json:"enable"`
-	Version             string `json:"version"`
-	Namespace           string `json:"namespace"`
-	DockerHub           string `json:"docker_hub"`
-	MeshConfigFile      string `json:"mesh_config_file"`
-	InjectConfigFile    string `json:"inject_config_file"`
-	MeshConfigMapName   string `json:"mesh_config_map_name"`
-	InjectConfigMapName string `json:"inject_config_map_name"`
-	DebugMode           bool   `json:"debug_mode"`
-	SidecarProxyUID     uint64 `json:"sidecar_proxy_uid"`
-	Verbosity           int    `json:"verbosity"`
-	EnableCoreDump      bool   `json:"enable_core_dump"`
-	ImagePullPolicy     string `json:"image_pull_policy"`
-	IncludeIPRanges     string `json:"includeIPRanges"`
-	ExcludeIPRanges     string `json:"exclude_ip_ranges"`
-	IncludeInboundPorts string `json:"include_inbound_ports"`
-	ExcludeInboundPorts string `json:"exclude_inbound_ports"`
-}
-
-type Pipeline struct {
-	Name              string            `json:"name" validate:"required"`
-	App               string            `json:"app" validate:"required"`
-	Profile           string            `json:"profile"`
-	Project           string            `json:"project" validate:"required"`
-	Cluster           string            `json:"cluster"`
-	Namespace         string            `json:"namespace"`
-	Scm               Scm               `json:"scm"`
-	Version           string            `json:"version"`
-	DockerRegistry    string            `json:"docker_registry"`
-	Identifiers       []string          `json:"identifiers"`
-	ConfigFiles       []string          `json:"config_files"`
-	Ports             []orch.Ports      `json:"ports"`
-	BuildConfigs      BuildConfigs      `json:"build_configs"`
-	DeploymentConfigs DeploymentConfigs `json:"deployment_configs"`
-	IstioConfigs      IstioConfigs      `json:"istio_configs"`
-	GatewayConfigs    GatewayConfigs    `json:"gateway_configs"`
-}
-
-type Configuration struct {
-	Pipeline Pipeline `mapstructure:"pipeline"`
-}
-
-type GatewayConfigs struct {
-	Enable      bool   `json:"enable"`
-	Uri         string `json:"uri"`
-	UpstreamUrl string `json:"upstream_url"`
-}
-
-// @Title Init
-// @Description set default value
-// @Param pipeline
-// @Return error
-func (p *Pipeline) Init(pl *Pipeline) {
-	log.Debug("Pipeline.EnsureParam()")
-	// load config file
-	if pl != nil {
-
-		b := &system.Builder{
-			Path:       filepath.Join(utils.GetWorkDir(), "config"),
-			Name:       "pipeline",
-			FileType:   "yaml",
-			Profile:    pl.Name,
-			ConfigType: Configuration{},
-		}
-		cp, err := b.Build()
-		if err != nil {
-			return
-		}
-		c := cp.(*Configuration)
-		mergo.Merge(&c.Pipeline, pl, mergo.WithOverride)
-		mergo.Merge(p, c.Pipeline, mergo.WithOverride)
-
-	}
-
-	utils.Replace(p, p)
-
-	if "" == p.Namespace {
-		if "" == pl.Profile {
-			p.Namespace = p.Project
-		} else {
-			p.Namespace = p.Project + "-" + p.Profile
-		}
-	}
-
-	if "" == p.BuildConfigs.Namespace {
-		if "" == pl.Profile {
-			p.BuildConfigs.Namespace = p.BuildConfigs.Project
-		} else {
-			p.BuildConfigs.Namespace = p.BuildConfigs.Project + "-" + p.Profile
-		}
-	}
-
-	if "" == p.Profile {
-		p.BuildConfigs.TagFrom = ""
-	} else if p.Profile == "dev" || p.Profile == "test" {
-		p.BuildConfigs.TagFrom = "dev"
-	} else {
-		p.BuildConfigs.TagFrom = "stage"
-	}
-	if pl.Scm.Ref == "master" {
-		p.BuildConfigs.Branch = ""
-	} else {
-		p.BuildConfigs.Branch = pl.Scm.Ref
-	}
-	p.GatewayConfigs.UpstreamUrl = p.App + "." + p.Namespace + ":8080"
-	if pl.DeploymentConfigs.Enable == false {
-		p.DeploymentConfigs.Enable = false
-	}
-	if pl.BuildConfigs.Enable == false {
-		p.BuildConfigs.Enable = false
-	}
-	if pl.GatewayConfigs.Enable == false {
-		p.GatewayConfigs.Enable = false
-	}
-	log.Debug(p)
-
-}
-
-func (p *Pipeline) CreateSecret(username, password string, isToken bool) (string, error) {
+func (p *PipelineService) CreateSecret(username, password string, isToken bool) (string, error) {
 	log.Debug("Pipeline.CreateSecret()")
 	if username == "" {
 		return "", fmt.Errorf("unkown username")
@@ -201,15 +36,10 @@ func (p *Pipeline) CreateSecret(username, password string, isToken bool) (string
 	return secretName, err
 }
 
-func (p *Pipeline) CreateProject() error {
-	project, err := openshift.NewProject(p.Namespace, "", "")
+func (p *PipelineService) CreateProject() error {
+	project, err := openshift.NewProject(p.Namespace, "", "", p.NodeSelector)
 	if err != nil {
 		log.Error("create namespace err :", err)
-		return err
-	}
-	prj, err := project.Get()
-	if err == nil {
-		log.Debug("exists project debug:", prj.Name)
 		return err
 	}
 	newProject, err := project.Create()
@@ -225,7 +55,7 @@ func (p *Pipeline) CreateProject() error {
 	return nil
 }
 
-func (p *Pipeline) CreateRoleBinding(username, metaName, roleRefName string) error {
+func (p *PipelineService) CreateRoleBinding(username, metaName, roleRefName string) error {
 	roleBinding, err := openshift.NewRoleBinding(metaName, p.Namespace)
 	if err != nil {
 		return err
@@ -265,7 +95,7 @@ func (p *Pipeline) CreateRoleBinding(username, metaName, roleRefName string) err
 	return err
 }
 
-func (p *Pipeline) Build(secret string, completedHandler func() error) error {
+func (p *PipelineService) Build(secret string, completedHandler func() error) error {
 	log.Debug("Pipeline.Build()")
 
 	if !p.BuildConfigs.Enable {
@@ -294,27 +124,27 @@ func (p *Pipeline) Build(secret string, completedHandler func() error) error {
 	return err
 }
 
-func (p *Pipeline) CombineScmUrl() string {
+func (p *PipelineService) CombineScmUrl() string {
 	scmUrl := p.Scm.Url + "/" + p.Project + "/" + p.App + "." + p.Scm.Type
 	return scmUrl
 }
 
-func (p *Pipeline) RunUnitTest() error {
+func (p *PipelineService) RunUnitTest() error {
 	log.Debug("Pipeline.RunUnitTest()")
 	return nil
 }
 
-func (p *Pipeline) RunIntegrationTest() error {
+func (p *PipelineService) RunIntegrationTest() error {
 	log.Debug("Pipeline.RunIntegrationTest()")
 	return nil
 }
 
-func (p *Pipeline) Analysis() error {
+func (p *PipelineService) Analysis() error {
 	log.Debug("Pipeline.Analysis()")
 	return nil
 }
 
-func (p *Pipeline) CreateDeploymentConfig(force bool, injectSidecar func(in interface{}) (interface{}, error)) error {
+func (p *PipelineService) CreateDeploymentConfig(force bool, injectSidecar func(in interface{}) (interface{}, error)) error {
 	log.Debug("Pipeline.CreateDeploymentConfig()")
 
 	// new dc instance
@@ -325,7 +155,7 @@ func (p *Pipeline) CreateDeploymentConfig(force bool, injectSidecar func(in inte
 	var l map[string]string
 	labels, _ := json.Marshal(p.DeploymentConfigs.Labels)
 	err = json.Unmarshal(labels, &l)
-	err = dc.Create(&p.DeploymentConfigs.Env, l, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, p.Profile, injectSidecar)
+	err = dc.Create(&p.DeploymentConfigs.Env, l, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, p.NodeSelector, injectSidecar)
 	if err != nil {
 		log.Error("dc.Create ", err)
 		return err
@@ -334,7 +164,7 @@ func (p *Pipeline) CreateDeploymentConfig(force bool, injectSidecar func(in inte
 	return nil
 }
 
-func (p *Pipeline) InstantiateDeploymentConfig() error {
+func (p *PipelineService) InstantiateDeploymentConfig() error {
 	log.Debug("Pipeline.Deploy()")
 
 	// new dc instance
@@ -352,7 +182,7 @@ func (p *Pipeline) InstantiateDeploymentConfig() error {
 	return nil
 }
 
-func (p *Pipeline) CreateKongGateway(upstreamUrl string) error {
+func (p *PipelineService) CreateKongGateway(upstreamUrl string) error {
 	log.Debug("Pipeline.CreateKongGateway()")
 	uris := p.GatewayConfigs.Uri
 	host := os.Getenv("KONG_HOST")
@@ -381,7 +211,7 @@ func (p *Pipeline) CreateKongGateway(upstreamUrl string) error {
 	return err
 }
 
-func (p *Pipeline) CreateService() error {
+func (p *PipelineService) CreateService() error {
 	log.Debug("Pipeline.CreateService()")
 
 	// new dc instance
@@ -392,7 +222,7 @@ func (p *Pipeline) CreateService() error {
 	return err
 }
 
-func (p *Pipeline) CreateRoute() (string, error) {
+func (p *PipelineService) CreateRoute() (string, error) {
 	log.Debug("Pipeline.CreateRoute()")
 	upstreamUrl := ""
 	route, err := openshift.NewRoute(p.App, p.Namespace)
@@ -404,7 +234,7 @@ func (p *Pipeline) CreateRoute() (string, error) {
 	return upstreamUrl, err
 }
 
-func (p *Pipeline) GetImageStreamTag() error {
+func (p *PipelineService) GetImageStreamTag() error {
 	log.Debug("pipeline get image stream tag :")
 	ist, err := openshift.NewImageStreamTags(p.App, p.Version, p.BuildConfigs.Project+"-"+p.BuildConfigs.TagFrom)
 	if err != nil {
@@ -420,7 +250,7 @@ func (p *Pipeline) GetImageStreamTag() error {
 	return nil
 }
 
-func (p *Pipeline) CreateImageStreamTag() error {
+func (p *PipelineService) CreateImageStreamTag() error {
 	log.Debug("Pipeline.CreateImageStreamTag")
 	ist, err := openshift.NewImageStreamTags(p.App, p.Version, p.Namespace)
 	if err != nil {
@@ -431,7 +261,7 @@ func (p *Pipeline) CreateImageStreamTag() error {
 	return err
 }
 
-func (p *Pipeline) InitProject() error {
+func (p *PipelineService) InitProject() error {
 	//init Groups
 	roleBinding := &openshift.RoleBinding{
 		Namespace: p.Namespace,
@@ -454,7 +284,7 @@ func (p *Pipeline) InitProject() error {
 	return nil
 }
 
-func (p *Pipeline) Deploy() error {
+func (p *PipelineService) Deploy() error {
 	log.Info("p.Deploy()")
 	if p.DeploymentConfigs.Enable {
 
@@ -505,7 +335,7 @@ func (p *Pipeline) Deploy() error {
 	return err
 }
 
-func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) error {
+func (p *PipelineService) Run(username, password, token string, uid int, isToken bool) error {
 	log.Debug("Pipeline.Run()")
 	// TODO: check if the same app in the same namespace is already in running status.
 	permission := &auth.Permission{}
@@ -563,3 +393,4 @@ func (p *Pipeline) Run(username, password, token string, uid int, isToken bool) 
 	// finally, all steps are done well, let tell the client ...
 	return nil
 }
+

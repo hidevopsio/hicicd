@@ -20,10 +20,10 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hiboot/pkg/model"
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
-	"github.com/hidevopsio/hicicd/pkg/ci/factories"
-	"github.com/hidevopsio/hicicd/pkg/ci"
 	"os"
 	"strings"
+	"github.com/hidevopsio/hicicd/pkg/service"
+	"github.com/hidevopsio/hicicd/pkg/entity"
 )
 
 type CicdResponse struct {
@@ -31,8 +31,10 @@ type CicdResponse struct {
 }
 
 // Operations about object
-type CicdController struct {
+type PipelineController struct {
 	BaseController
+	PipelineService *service.PipelineService `inject:"pipelineService"`
+	SelectorService *service.SelectorService `inject:"selectorService"`
 }
 
 const (
@@ -44,10 +46,10 @@ const (
 )
 
 func init() {
-	web.Add(new(CicdController))
+	web.Add(new(PipelineController))
 }
 
-func (c *CicdController) Before(ctx *web.Context) {
+func (c *PipelineController) Before(ctx *web.Context) {
 	c.BaseController.Before(ctx)
 }
 
@@ -57,25 +59,27 @@ func (c *CicdController) Before(ctx *web.Context) {
 // @Success 200 {string}
 // @Failure 403 body is empty
 // @router / [post]
-func (c *CicdController) PostRun(ctx *web.Context) {
+func (p *PipelineController) PostRun(ctx *web.Context) {
 	log.Debug("CicdController.Run()")
-	var pl ci.Pipeline
+	var pl entity.Pipeline
 	err := ctx.RequestBody(&pl)
 	// replace pl.Scm.Url with c.Url if it is empty
 	if pl.Scm.Url == "" {
-		pl.Scm.Url = c.Url
+		pl.Scm.Url = p.Url
 	}
 	if err != nil {
 		return
 	}
-	// invoke models
-	pipelineFactory := new(factories.PipelineFactory)
-	pipeline, err := pipelineFactory.New(pl.Name)
 	message := "success"
 	if err == nil {
-		pipeline.Init(&pl)
+		selector, err := p.SelectorService.Get("1")
+		if err != nil {
+			return
+		}
+		selectorService := &service.PipelineService{}
+		selectorService.Init(&pl, selector)
 		go func() {
-			err = pipeline.Run(c.Username, c.Password, c.ScmToken, c.Uid, false)
+			err = selectorService.Run(p.Username, p.Password, p.ScmToken, p.Uid, false)
 			if err != nil {
 				message = err.Error()
 			}

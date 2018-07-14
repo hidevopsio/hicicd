@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ci
+package service
 
-type PipelineInterface interface {
-	Init(pl *Pipeline)
+type PipelineServiceInterface interface {
 	CreateSecret(username, password string, isToken bool) (string, error)
 	Build(secret string, completedHandler func() error) error
 	RunUnitTest() error

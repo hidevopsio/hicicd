@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"github.com/magiconair/properties/assert"
-	"github.com/hidevopsio/hicicd/pkg/admin"
+	"github.com/hidevopsio/hicicd/pkg/entity"
 )
 
 func TestPostDictionary(t *testing.T) {
@@ -21,26 +21,26 @@ func TestPostDictionary(t *testing.T) {
 		"uid": 190,
 	}, 1000, time.Hour)
 	assert.Equal(t, nil, err)
-	dictionary := &admin.Dictionary{
+	dictionary := &entity.Dictionary{
 		Id:"1",
 		Profiles: []string{"dev"},
-		Istio: admin.Istio{
+		Istio: entity.Istio{
 			Enable:false,
 		},
-		BuildConfigs: admin.BuildConfigs{
+		BuildConfigs: entity.BuildConfigs{
 			Enable:true,
 		},
-		Scm: admin.Scm{
+		Scm: entity.Scm{
 			Branches: []string{"master","development"},
 		},
-		DeploymentConfigs: admin.DeploymentConfigs{
+		DeploymentConfigs: entity.DeploymentConfigs{
 			Enable: false,
 			ForceUpdate: false,
 		},
 		Version:"v1",
-		ImageStreamTags: map[string][]admin.Image{
-			"java": []admin.Image{
-				admin.Image{
+		ImageStreamTags: map[string][]entity.Image{
+			"java": []entity.Image{
+				entity.Image{
 					Text: "java",
 					Repository: "s2i-java",
 					Tag :"1.0.5",

@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
 	"github.com/hidevopsio/hicicd/pkg/service"
-	"github.com/hidevopsio/hicicd/pkg/admin"
+	"github.com/hidevopsio/hicicd/pkg/entity"
 	"net/http"
 )
 
@@ -18,7 +18,7 @@ func init() {
 }
 
 func (d *DictionaryController) Post(ctx *web.Context) {
-	dictionary := &admin.Dictionary{}
+	dictionary := &entity.Dictionary{}
 	err := ctx.RequestBody(dictionary)
 	if err == nil {
 		err := d.DictionaryService.Add(dictionary)

@@ -118,8 +118,8 @@ func (i *Injector) generateTemplateFromParams(params *inject.Params) (string, er
 }
 
 func (i *Injector) Inject(in interface{}) (interface{}, error)  {
-
-	mesh, err := i.getMeshConfigFromConfigMap(*orch.Kubeconfig)
+	cli := orch.GetClientInstance()
+	mesh, err := i.getMeshConfigFromConfigMap(*cli.Kubeconfig())
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (i *Injector) Inject(in interface{}) (interface{}, error)  {
 		}
 		sidecarTemplate = config.Template
 	} else if i.InjectConfigMapName != "" {
-		if sidecarTemplate, err = i.getInjectConfigFromConfigMap(*orch.Kubeconfig); err != nil {
+		if sidecarTemplate, err = i.getInjectConfigFromConfigMap(*cli.Kubeconfig()); err != nil {
 			return nil, err
 		}
 	} else {

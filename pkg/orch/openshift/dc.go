@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/copier"
 	"github.com/hidevopsio/hicicd/pkg/orch"
+	"strings"
 )
 
 type DeploymentConfig struct {
@@ -55,7 +56,6 @@ func NewDeploymentConfigsClientSet() (appsv1.AppsV1Interface, error) {
 
 func NewDeploymentConfig(name, namespace, version string) (*DeploymentConfig, error) {
 	log.Debug("NewDeploymentConfig()")
-
 	clientSet, err := NewDeploymentConfigsClientSet()
 	if err != nil {
 		return nil, err
@@ -71,15 +71,15 @@ func NewDeploymentConfig(name, namespace, version string) (*DeploymentConfig, er
 	}, nil
 }
 
-func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, ports interface{}, replicas int32, force bool, healthEndPoint, profile string, injectSidecar func(in interface{}) (interface{}, error)) error {
+func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, ports interface{}, replicas int32, force bool, healthEndPoint, nodeSelector string, injectSidecar func(in interface{}) (interface{}, error)) error {
 	log.Debug("DeploymentConfig.Create()", force)
-	if profile == "" {
-		profile = "stage"
-	}
 	// env
 	e := make([]corev1.EnvVar, 0)
 	copier.Copy(&e, env)
-
+	selector := map[string]string{}
+	if nodeSelector != "" {
+		selector[strings.Split(nodeSelector, "=")[0]] = strings.Split(nodeSelector, "=")[1]
+	}
 	p := make([]corev1.ContainerPort, 0)
 	copier.Copy(&p, ports)
 	cfg := &v1.DeploymentConfig{
@@ -153,9 +153,7 @@ func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, po
 					DNSPolicy:     corev1.DNSClusterFirst,
 					RestartPolicy: corev1.RestartPolicyAlways,
 					SchedulerName: "default-scheduler",
-					NodeSelector: map[string]string{
-						"nodesge": "pod" + profile,
-					},
+					NodeSelector: selector,
 				},
 			},
 			Test: false,

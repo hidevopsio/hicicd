@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 package openshift
 
 import (
@@ -24,14 +23,15 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/orch"
 )
 
-type Project struct{
-	Name string
-	DisplayName string
-	Description string
+const NodeSelector  =  "openshift.io/node-selector"
 
-	Interface projectv1.ProjectInterface
+type Project struct {
+	Name         string
+	DisplayName  string
+	Description  string
+	NodeSelector string
+	Interface    projectv1.ProjectInterface
 }
-
 
 func NewProjectClientSet() (projectv1.ProjectV1Interface, error) {
 
@@ -48,8 +48,7 @@ func NewProjectClientSet() (projectv1.ProjectV1Interface, error) {
 	return clientSet, err
 }
 
-
-func NewProject(name, displayName, desc string) (*Project, error)  {
+func NewProject(name, displayName, desc, nodeSelector string) (*Project, error) {
 
 	clientSet, err := NewProjectClientSet()
 	if err != nil {
@@ -57,41 +56,48 @@ func NewProject(name, displayName, desc string) (*Project, error)  {
 	}
 
 	return &Project{
-		Name:        name,
-		DisplayName: displayName,
-		Description: desc,
-		Interface:   clientSet.Projects(),
+		Name:         name,
+		DisplayName:  displayName,
+		Description:  desc,
+		Interface:    clientSet.Projects(),
+		NodeSelector: nodeSelector,
 	}, nil
 }
 
-func (p *Project) Create() (*v1.Project, error)  {
+func (p *Project) Create() (*v1.Project, error) {
 	log.Debug("Project.Create()")
+	annotations := map[string]string{
+		NodeSelector: p.NodeSelector,
+	}
 	ps := &v1.Project{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: p.Name,
 			Labels: map[string]string{
 				"project": p.Name,
 			},
-			Annotations: map[string]string{
-				"scheduler.alpha.kubernetes.io/node-selector": "nodesge=pod"+"prod",
-			},
+			Annotations: annotations,
 		},
+	}
+	project, err := p.Get()
+	if err == nil {
+		return project, err
 	}
 	// create project
 	return p.Interface.Create(ps)
 }
 
-func (p *Project) Get() (*v1.Project, error)  {
+
+func (p *Project) Get() (*v1.Project, error) {
 	log.Debug("Project.Get()")
 	return p.Interface.Get(p.Name, metav1.GetOptions{})
 }
 
-func (p *Project) List() (*v1.ProjectList, error)  {
+func (p *Project) List() (*v1.ProjectList, error) {
 	log.Debug("Project.List()")
 	return p.Interface.List(metav1.ListOptions{})
 }
 
-func (p *Project) Delete() error  {
+func (p *Project) Delete() error {
 	log.Debug("Project.Delete()")
 	return p.Interface.Delete(p.Name, &metav1.DeleteOptions{})
 }
