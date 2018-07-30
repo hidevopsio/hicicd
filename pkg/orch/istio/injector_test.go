@@ -195,7 +195,7 @@ func TestInjectorInjectWithMockTemplate(t *testing.T) {
 func TestInjectorInject(t *testing.T) {
 
 	injector := &Injector{
-		Version: "0.7.1",
+		Version: "0.8.0",
 		Namespace: "istio-system",
 		DockerHub: "docker.io/istio",
 		MeshConfigMapName: "istio",
@@ -203,7 +203,7 @@ func TestInjectorInject(t *testing.T) {
 		SidecarProxyUID: uint64(1337),
 		Verbosity: 2,
 		ImagePullPolicy: "IfNotPresent",
-		IncludeIPRanges: "*",
+		IncludeIPRanges: "192.168.0.0/16",
 		ExcludeIPRanges: "",
 		IncludeInboundPorts: "*",
 		ExcludeInboundPorts: "",

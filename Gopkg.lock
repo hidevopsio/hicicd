@@ -711,14 +711,14 @@
 [[projects]]
   name = "istio.io/istio"
   packages = ["pilot/cmd","pilot/pkg/config/kube/crd","pilot/pkg/kube/inject","pilot/pkg/model","pilot/pkg/model/test","pilot/pkg/serviceregistry/kube","pilot/test/mock","pilot/test/util","pkg/log"]
-  revision = "62110d4f0373a7613e57b8a4d559ded9cb6a1cc8"
-  version = "0.7.1"
+  revision = "012136c399a23b6b8b1cff9b4d4169c0e0b05872"
+  branch = "release-0.8"
 
 [[projects]]
-  branch = "release-1.9"
+  branch = "release-0.8"
   name = "k8s.io/api"
-  packages = ["admission/v1beta1","admissionregistration/v1alpha1","admissionregistration/v1beta1","apps/v1","apps/v1beta1","apps/v1beta2","authentication/v1","authentication/v1beta1","authorization/v1","authorization/v1beta1","autoscaling/v1","autoscaling/v2beta1","batch/v1","batch/v1beta1","batch/v2alpha1","certificates/v1beta1","core/v1","events/v1beta1","extensions/v1beta1","networking/v1","policy/v1beta1","rbac/v1","rbac/v1alpha1","rbac/v1beta1","scheduling/v1alpha1","settings/v1alpha1","storage/v1","storage/v1alpha1","storage/v1beta1"]
-  revision = "53400f2739169693b7f1f64cf856f6d3d780d3db"
+  packages = ["."]
+  revision = "8d67e57e3612dae1a3423795bce93a372cfe4fa4"
 
 [[projects]]
   branch = "release-1.9"

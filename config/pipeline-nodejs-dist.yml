@@ -23,6 +23,7 @@ pipeline:
     - name: BUILD_SCRIPT
       value: |
         echo === npm_config_registry: ${npm_config_registry} ===
+        npm install fs-cheerio && node replacer.js
         if [ ! -f dist/index.html ]; then
           echo "no index.html in dist"
         fi

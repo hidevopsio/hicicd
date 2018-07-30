@@ -45,6 +45,7 @@ func (p *Project) ListProjects(baseUrl, token, search string, page int) ([]scm.P
 		listProjectsOptions = &gitlab.ListProjectsOptions{
 			ListOptions: gitlab.ListOptions{
 				Page: page,
+				PerPage: 200,
 			},
 			Search: &search,
 		}

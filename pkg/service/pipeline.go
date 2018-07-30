@@ -12,10 +12,10 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/entity"
 	"encoding/json"
 	"github.com/kevholditch/gokong"
-	"github.com/hidevopsio/hiboot/pkg/utils/copier"
 	authorization_v1 "github.com/openshift/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
+	"github.com/jinzhu/copier"
 )
 
 type PipelineService struct {
@@ -193,7 +193,7 @@ func (p *PipelineService) CreateKongGateway(upstreamUrl string) error {
 		Hosts:                  hosts,
 		Uris:                   []string{uris},
 		UpstreamUrl:            "http://" + upstreamUrl,
-		StripUri:               false,
+		StripUri:               true,
 		PreserveHost:           true,
 		Retries:                "3",
 		UpstreamConnectTimeout: 1000,

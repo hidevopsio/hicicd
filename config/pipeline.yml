@@ -23,7 +23,7 @@ pipeline:
       version: ${version}
   istioConfigs:
     enable: false
-    version: 0.7.1  # use env variable instead ?
+    version: 0.8.0  # use env variable instead ?
     namespace: istio-system
     dockerHub: docker.io/istio
     meshConfigMapName: istio
@@ -32,7 +32,7 @@ pipeline:
     verbosity: 2
     enableCoreDump: true
     imagePullPolicy: IfNotPresent
-    includeIPRanges: "*"
+    includeIPRanges: "192.168.0.0/16"
     includeInboundPorts: "*"
   ports:
   - name: http-8080

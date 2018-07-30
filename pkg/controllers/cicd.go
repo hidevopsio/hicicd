@@ -26,7 +26,7 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/entity"
 )
 
-type CicdResponse struct {
+type PipelineResponse struct {
 	model.Response
 }
 
@@ -49,8 +49,8 @@ func init() {
 	web.Add(new(PipelineController))
 }
 
-func (c *PipelineController) Before(ctx *web.Context) {
-	c.BaseController.Before(ctx)
+func (p *PipelineController) Before(ctx *web.Context) {
+	p.BaseController.Before(ctx)
 }
 
 // @Title Deploy

@@ -142,7 +142,7 @@ func (p *Pipeline) Init(pl *Pipeline, selector *Selector) {
 		p.BuildConfigs.TagFrom = "stage"
 	}
 	if pl.Scm.Ref == "master" {
-		p.BuildConfigs.Branch = ""
+		p.BuildConfigs.Branch = "master"
 	} else {
 		p.BuildConfigs.Branch = pl.Scm.Ref
 	}
