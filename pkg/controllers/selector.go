@@ -10,11 +10,15 @@ import (
 
 type SelectorController struct {
 	BaseController
-	SelectorService *service.SelectorService `inject:"selectorService"`
+	SelectorService *service.SelectorService
 }
 
 func init() {
 	web.Add(new(SelectorController))
+}
+
+func (s *SelectorController) Init(selectorService *service.SelectorService) {
+	s.SelectorService = selectorService
 }
 
 func (s *SelectorController) Before(ctx *web.Context) {

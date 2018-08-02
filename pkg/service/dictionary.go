@@ -1,37 +1,42 @@
 package service
 
 import (
-	"github.com/hidevopsio/hiboot/pkg/starter/db"
 	"github.com/hidevopsio/hicicd/pkg/entity"
 	"encoding/json"
 	"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hiboot/pkg/starter/data/bolt"
 )
 
+type BoltRepository bolt.Repository
+
 type DictionaryService struct {
-	Repository db.KVRepository `inject:"repository,dataSourceType=bolt,namespace=dictionary"`
+	repository BoltRepository
+}
+
+func (ds *DictionaryService) Init(repository BoltRepository)  {
+	ds.repository = repository
 }
 
 func (ds *DictionaryService) Add(dictionary *entity.Dictionary) error {
 	d, err := json.Marshal(dictionary)
 	if err == nil {
-		ds.Repository.Put([]byte(dictionary.Id), d)
+		ds.repository.Put([]byte(dictionary.Id), d)
 	}
 	return nil
 }
 
 func (ds *DictionaryService) Get(id string) (*entity.Dictionary, error) {
-	d, err := ds.Repository.Get([]byte(id))
+	var dictionary entity.Dictionary
+	err := ds.repository.Get(id, &dictionary)
 	if err != nil {
 		return nil, err
 	}
-	var dictionary = &entity.Dictionary{}
-	err = json.Unmarshal(d, dictionary)
-	return dictionary, err
+	return &dictionary, err
 }
 
 
 func (ds *DictionaryService) Delete(id string) error  {
-	err := ds.Repository.Delete([]byte(id))
+	err := ds.repository.Delete([]byte(id))
 	log.Debug("Delete Dictionary Service:", err)
 	return err
 }

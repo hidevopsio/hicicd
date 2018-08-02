@@ -10,7 +10,11 @@ import (
 // Operations about object
 type DictionaryController struct {
 	BaseController
-	DictionaryService *service.DictionaryService `inject:"dictionaryService"`
+	DictionaryService *service.DictionaryService
+}
+
+func (d *DictionaryController) Init(dictionaryService *service.DictionaryService) {
+	d.DictionaryService = dictionaryService
 }
 
 func init() {

@@ -15,7 +15,6 @@
 package istio
 
 import (
-	"istio.io/istio/pilot/pkg/kube/inject"
 	"istio.io/istio/pilot/pkg/model"
 	"github.com/ghodss/yaml"
 	"github.com/openshift/api/apps/v1"
@@ -26,7 +25,9 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hicicd/pkg/orch"
 	"io/ioutil"
+	"github.com/hidevopsio/hicicd/pkg/orch/istio/inject"
 )
+
 
 type Injector struct {
 	Version             string `json:"version"`
@@ -139,9 +140,6 @@ func (i *Injector) Inject(in interface{}) (interface{}, error)  {
 			Mesh:                mesh,
 			ImagePullPolicy:     i.ImagePullPolicy,
 			IncludeIPRanges:     i.IncludeIPRanges,
-			ExcludeIPRanges:     i.ExcludeIPRanges,
-			IncludeInboundPorts: i.IncludeInboundPorts,
-			ExcludeInboundPorts: i.ExcludeInboundPorts,
 			DebugMode:           i.DebugMode,
 		}); err != nil {
 			return nil, err
