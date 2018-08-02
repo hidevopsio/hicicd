@@ -1,0 +1,4 @@
+bolt:
+  database: data/hi.db
+  mode: 0600
+  timeout: 1
