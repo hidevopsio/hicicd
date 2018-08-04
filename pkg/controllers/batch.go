@@ -14,11 +14,15 @@ import (
 // Operations about object
 type BatchController struct {
 	BaseController
-	SelectorService *service.SelectorService `inject:"selectorService"`
+	SelectorService *service.SelectorService
 }
 
 func init() {
 	web.Add(new(BatchController))
+}
+
+func (b *BatchController) Init(selectorService *service.SelectorService) {
+	b.SelectorService = selectorService
 }
 
 func (p *BatchController) Before(ctx *web.Context) {
@@ -75,7 +79,7 @@ func (p *BatchController) Get(ctx *web.Context) {
 			return
 		}
 		selectorService := &service.PipelineService{}
-		selectorService.Init(&pl, selector)
+		selectorService.Initialize(&pl, selector)
 		go func() {
 			err = selectorService.Run(p.Username, p.Password, p.ScmToken, p.Uid, false)
 			if err != nil {

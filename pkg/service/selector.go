@@ -11,6 +11,9 @@ type SelectorService struct {
 }
 
 func (ss *SelectorService) Init(repository BoltRepository)  {
+	log.Debug(ss)
+	log.Debug(repository)
+	log.Debug(ss.repository)
 	ss.repository = repository
 }
 

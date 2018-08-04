@@ -999,7 +999,6 @@
     "pilot/test/util",
     "pkg/log"
   ]
-  revision = "62110d4f0373a7613e57b8a4d559ded9cb6a1cc8"
   version = "0.8.0"
 
 [[projects]]

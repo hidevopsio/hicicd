@@ -95,7 +95,7 @@ type GatewayConfigs struct {
 // @Description set default value
 // @Param pipeline
 // @Return error
-func (p *Pipeline) Init(pl *Pipeline, selector *Selector) {
+func (p *Pipeline) Initialize(pl *Pipeline, selector *Selector) {
 	log.Debug("Pipeline.EnsureParam()")
 	// load config file
 	if pl != nil {

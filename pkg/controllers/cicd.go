@@ -33,8 +33,11 @@ type PipelineResponse struct {
 // Operations about object
 type PipelineController struct {
 	BaseController
-	PipelineService *service.PipelineService `inject:"pipelineService"`
-	SelectorService *service.SelectorService `inject:"selectorService"`
+	SelectorService *service.SelectorService
+}
+
+func (p *PipelineController) Init(selectorService *service.SelectorService) {
+	p.SelectorService = selectorService
 }
 
 const (
@@ -76,10 +79,10 @@ func (p *PipelineController) PostRun(ctx *web.Context) {
 		if err != nil {
 			return
 		}
-		selectorService := &service.PipelineService{}
-		selectorService.Init(&pl, selector)
+		pipelineService := &service.PipelineService{}
+		pipelineService.Initialize(&pl, selector)
 		go func() {
-			err = selectorService.Run(p.Username, p.Password, p.ScmToken, p.Uid, false)
+			err = pipelineService.Run(p.Username, p.Password, p.ScmToken, p.Uid, false)
 			if err != nil {
 				message = err.Error()
 			}
