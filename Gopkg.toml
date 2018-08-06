@@ -30,6 +30,10 @@
   branch = "master"
 
 [[constraint]]
+  name = "github.com/hidevopsio/hioak"
+  branch = "master"
+
+[[constraint]]
   name = "github.com/imdario/mergo"
   version = "0.3.4"
 
@@ -54,14 +58,6 @@
   version = "1.7.6"
 
 [[constraint]]
-  name = "github.com/openshift/api"
-  version = "3.9.0"
-
-[[constraint]]
-  name = "github.com/openshift/client-go"
-  version = "3.9.0"
-
-[[constraint]]
   name = "github.com/stretchr/tesf-api-v3tify"
   version = "1.2.1"
 
@@ -70,25 +66,19 @@
   branch = "f-api-v3"
 
 [[constraint]]
-  branch = "release-1.9"
-  name = "k8s.io/api"
-
-[[constraint]]
+  name = "github.com/kevholditch/gokong"
   branch = "master"
-  name = "k8s.io/apimachinery"
+
 
 [[constraint]]
-  name = "k8s.io/client-go"
-  version = "6.0.0"
+  name = "k8s.io/kubernetes"
+  version = "v1.10.4"
 
 [[constraint]]
-  name = "istio.io/istio"
-  version = "0.8.0"
+  name = "k8s.io/api"
+  version = "kubernetes-1.10.4"
+
 
 [[constraint]]
   branch = "master"
   name = "github.com/docker/distribution"
-
-[[constraint]]
-  name = "github.com/kevholditch/gokong"
-  branch = "master"

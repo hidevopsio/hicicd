@@ -4,7 +4,7 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
 	"net/http"
 	"github.com/hidevopsio/hiboot/pkg/log"
-	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
+	"github.com/hidevopsio/hioak/pkg/k8s"
 )
 
 // Operations about object

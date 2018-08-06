@@ -8,15 +8,6 @@
   version = "v0.21.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/Azure/go-ansiterm"
-  packages = [
-    ".",
-    "winterm"
-  ]
-  revision = "d6e3b3328b783f23731bc4d058875b0371ff8109"
-
-[[projects]]
   name = "github.com/BurntSushi/toml"
   packages = ["."]
   revision = "b26d9c308763d68093482582cea63d69be07a0f0"
@@ -27,18 +18,6 @@
   name = "github.com/Joker/jade"
   packages = ["."]
   revision = "8828253bfc54f2f91aaef5f32b44a244b0a98e4f"
-
-[[projects]]
-  name = "github.com/Microsoft/go-winio"
-  packages = ["."]
-  revision = "67921128fb397dd80339870d2193d6b1e6856fd4"
-  version = "v0.4.8"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/Nvveen/Gotty"
-  packages = ["."]
-  revision = "cd527374f1e5bff4938207604a14f2e38a9cf512"
 
 [[projects]]
   name = "github.com/ajg/form"
@@ -64,12 +43,6 @@
   version = "v1.3.1"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/containerd/continuity"
-  packages = ["pathdriver"]
-  revision = "246e49050efdf45e8f17fbbcf1547ee376f9939e"
-
-[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -89,51 +62,6 @@
     "reference"
   ]
   revision = "83389a148052d74ac602f5f1d62f86ff2f3c4aa5"
-
-[[projects]]
-  name = "github.com/docker/docker"
-  packages = [
-    "api/types",
-    "api/types/blkiodev",
-    "api/types/container",
-    "api/types/filters",
-    "api/types/mount",
-    "api/types/network",
-    "api/types/registry",
-    "api/types/strslice",
-    "api/types/swarm",
-    "api/types/swarm/runtime",
-    "api/types/versions",
-    "opts",
-    "pkg/fileutils",
-    "pkg/homedir",
-    "pkg/idtools",
-    "pkg/ioutils",
-    "pkg/longpath",
-    "pkg/mount",
-    "pkg/pools",
-    "pkg/stdcopy",
-    "pkg/system"
-  ]
-  revision = "3dfb26ab3cbf961298f8ce3f94659b5fe4146ceb"
-
-[[projects]]
-  name = "github.com/docker/go-connections"
-  packages = ["nat"]
-  revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
-  version = "v0.3.0"
-
-[[projects]]
-  name = "github.com/docker/go-units"
-  packages = ["."]
-  revision = "47565b4f722fb6ceae66b95f853feed578a4a51c"
-  version = "v0.3.3"
-
-[[projects]]
-  name = "github.com/docker/libnetwork"
-  packages = ["ipamutils"]
-  revision = "6d23f11e681f24ee31802939e243fe8be41a75eb"
-  version = "v0.8.0-dev.2"
 
 [[projects]]
   branch = "master"
@@ -169,17 +97,6 @@
   version = "v1.4.7"
 
 [[projects]]
-  name = "github.com/fsouza/go-dockerclient"
-  packages = [
-    ".",
-    "internal/archive",
-    "internal/jsonmessage",
-    "internal/term"
-  ]
-  revision = "8842d40dbf5ee062d80f9dc429db31a0fe0cdc73"
-  version = "v1.2.2"
-
-[[projects]]
   branch = "master"
   name = "github.com/gavv/monotime"
   packages = ["."]
@@ -207,8 +124,8 @@
     "sortkeys",
     "types"
   ]
-  revision = "1adfc126b41513cc696b209667c8656ea7aac67c"
-  version = "v1.0.0"
+  revision = "636bf0302bc95575d69441b25a2603156ffdddf1"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -225,11 +142,10 @@
     "ptypes/any",
     "ptypes/duration",
     "ptypes/struct",
-    "ptypes/timestamp",
-    "ptypes/wrappers"
+    "ptypes/timestamp"
   ]
-  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
-  version = "v1.0.0"
+  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
@@ -256,8 +172,8 @@
     "compiler",
     "extensions"
   ]
-  revision = "ee43cbb60db7bd22502942cccbc39059117352ab"
-  version = "v0.1.0"
+  revision = "7c663266750e7d82587642f65e60bc4083f1f84e"
+  version = "v0.2.0"
 
 [[projects]]
   branch = "master"
@@ -330,6 +246,18 @@
     "pkg/utils/reflector"
   ]
   revision = "54a674b41c83765d9f57edecc8a1fa8daad56c13"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hidevopsio/hioak"
+  packages = [
+    "pkg",
+    "pkg/istio",
+    "pkg/istio/inject",
+    "pkg/k8s",
+    "pkg/openshift"
+  ]
+  revision = "5d301da669afbbaf7fb0d6f2f9bcff29d5dce69d"
 
 [[projects]]
   name = "github.com/howeyc/fsnotify"
@@ -566,21 +494,6 @@
   version = "v1.0.0-rc1"
 
 [[projects]]
-  name = "github.com/opencontainers/image-spec"
-  packages = [
-    "specs-go",
-    "specs-go/v1"
-  ]
-  revision = "d60099175f88c47cd379c4738d158884749ed235"
-  version = "v1.0.1"
-
-[[projects]]
-  name = "github.com/opencontainers/runc"
-  packages = ["libcontainer/user"]
-  revision = "baf6536d6259209c3edfa2b22237af82942d3dfa"
-  version = "v0.1.1"
-
-[[projects]]
   name = "github.com/openshift/api"
   packages = [
     "apps/v1",
@@ -692,12 +605,6 @@
   name = "github.com/shurcooL/sanitized_anchor_name"
   packages = ["."]
   revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
-
-[[projects]]
-  name = "github.com/sirupsen/logrus"
-  packages = ["."]
-  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
-  version = "v1.0.5"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -972,8 +879,8 @@
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
   version = "v2.2.1"
 
+
 [[projects]]
-  branch = "master"
   name = "istio.io/api"
   packages = [
     "authentication/v1alpha1",
@@ -981,28 +888,25 @@
     "mixer/v1",
     "mixer/v1/config/client",
     "networking/v1alpha3",
-    "rbac/v1alpha1",
-    "routing/v1alpha1"
+    "rbac/v1alpha1"
   ]
-  revision = "78da6e6eb4ad4f158fb58e02f94efde4abf4cabf"
+  revision = "123b0a79a4dba5bd653dcac09cf731b8002e5341"
+  version = "1.0.0"
 
 [[projects]]
   name = "istio.io/istio"
   packages = [
     "pilot/cmd",
-    "pilot/pkg/config/kube/crd",
-    "pilot/pkg/kube/inject",
     "pilot/pkg/model",
     "pilot/pkg/model/test",
     "pilot/pkg/serviceregistry/kube",
-    "pilot/test/mock",
-    "pilot/test/util",
+    "pkg/cache",
     "pkg/log"
   ]
-  version = "0.8.0"
+  revision = "3a136c90ec5e308f236e0d7ebb5c4c5e405217f4"
+  version = "1.0.0"
 
 [[projects]]
-  branch = "release-1.9"
   name = "k8s.io/api"
   packages = [
     "admission/v1beta1",
@@ -1035,23 +939,16 @@
     "storage/v1alpha1",
     "storage/v1beta1"
   ]
-  revision = "9273ee02527c608cecc74969b3e489f5dba686da"
-
-[[projects]]
-  branch = "release-1.9"
-  name = "k8s.io/apiextensions-apiserver"
-  packages = [
-    "pkg/apis/apiextensions",
-    "pkg/apis/apiextensions/v1beta1",
-    "pkg/client/clientset/clientset",
-    "pkg/client/clientset/clientset/scheme",
-    "pkg/client/clientset/clientset/typed/apiextensions/v1beta1",
-    "pkg/features"
-  ]
-  revision = "9c19edfd52157adc354e1b72596534b47f23cb44"
+  revision = "8b7507fac302640dd5f1efbf9643199952cc58db"
+  version = "kubernetes-1.10.4"
 
 [[projects]]
   branch = "master"
+  name = "k8s.io/apiextensions-apiserver"
+  packages = ["pkg/features"]
+  revision = "bbc7cdef4bf8da668090a3e2719849c5c4e4af3a"
+
+[[projects]]
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/api/errors",
@@ -1093,7 +990,8 @@
     "pkg/watch",
     "third_party/forked/golang/reflect"
   ]
-  revision = "e9ff529c66f83aeac6dff90f11ea0c5b7c4d626a"
+  revision = "17529ec7eadb8de8e7dc835201455f53571f655a"
+  version = "kubernetes-1.10.4"
 
 [[projects]]
   branch = "master"
@@ -1196,7 +1094,6 @@
   version = "v6.0.0"
 
 [[projects]]
-  branch = "release-1.9"
   name = "k8s.io/kubernetes"
   packages = [
     "pkg/apis/autoscaling",
@@ -1208,11 +1105,12 @@
     "pkg/util/parsers",
     "pkg/util/pointer"
   ]
-  revision = "0bb928e5430a14db8eb0aae627077338e67e6060"
+  revision = "5ca598b4ba5abb89bb773071ce452e33fb66339d"
+  version = "v1.10.4"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "96d51160dc6fefde931d01cb43b35210c31193b0490d7a890a89fed333c969fd"
+  inputs-digest = "9bc70f3a872c964f7b7b709760c5d22595bde11d0cdb4ec2c9495a6b11c1da34"
   solver-name = "gps-cdcl"
   solver-version = 1

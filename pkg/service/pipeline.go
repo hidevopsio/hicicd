@@ -2,11 +2,11 @@ package service
 
 import (
 	"fmt"
-	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
-	"github.com/hidevopsio/hicicd/pkg/orch/openshift"
+	"github.com/hidevopsio/hioak/pkg/k8s"
+	"github.com/hidevopsio/hioak/pkg/openshift"
 	"os"
 	"strings"
-	"github.com/hidevopsio/hicicd/pkg/orch/istio"
+	"github.com/hidevopsio/hioak/pkg/istio"
 	"github.com/hidevopsio/hicicd/pkg/auth"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hicicd/pkg/entity"

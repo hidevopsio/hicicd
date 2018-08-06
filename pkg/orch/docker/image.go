@@ -1,5 +1,0 @@
-package docker
-
-func PullImage()  {
-	
-}

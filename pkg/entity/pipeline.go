@@ -2,7 +2,7 @@ package entity
 
 import (
 	"github.com/hidevopsio/hiboot/pkg/system"
-	"github.com/hidevopsio/hicicd/pkg/orch"
+	"github.com/hidevopsio/hioak/pkg"
 	"path/filepath"
 	"github.com/hidevopsio/hiboot/pkg/utils"
 	"github.com/imdario/mergo"
