@@ -78,6 +78,10 @@
   name = "k8s.io/api"
   version = "kubernetes-1.10.4"
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/markbates/goth"
+
 
 [[constraint]]
   branch = "master"
