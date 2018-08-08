@@ -8,12 +8,13 @@ import (
 	"net/http"
 	"io/ioutil"
 	"github.com/hidevopsio/hicicd/pkg/utils"
+	"net/url"
 )
 
 func TestGetAccessToken(t *testing.T)  {
-	code := "e480550bd1f668633581e3a5cf180b7fcf97eb4faec0f6ee002634dcac9663a3"
-	//s := url.QueryEscape(CallbackUrl)
-	session := NewClient(BaseUrl, AccessTokenUrl, ApplicationId, CallbackUrl, Secret)
+	code := "96fc01a62b8e782c5fec5be62e3a5fd4aa769a131b8f422e7569084276fe3c88"
+	s := url.QueryEscape(CallbackUrl)
+	session := NewClient(BaseUrl, AccessTokenUrl, ApplicationId, s, Secret)
 	_, err := session.GetAccessToken(code)
 	assert.Equal(t, err, nil)
 }
@@ -46,3 +47,6 @@ func TestHttpsConnection(t *testing.T) {
 		t.Fatalf("HTTPS request should have timed out")
 	}
 }
+
+
+

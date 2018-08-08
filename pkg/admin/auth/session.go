@@ -6,7 +6,6 @@ import (
 	"github.com/juju/errors"
 )
 
-const code = "09fa0bbe85fe580a0c4ab9f07b8da37e63724a053783ab17e8686ca9761c13bc"
 
 type Session struct {
 	AuthURL       string
@@ -51,4 +50,8 @@ func (session *Session) GetAccessToken(code string) (*SessionRespons, error) {
 	_, err := Client("POST", baseUrl, sessionRespons)
 	log.Info(sessionRespons)
 	return sessionRespons, err
+}
+
+func GetUser(accessToken string) {
+
 }

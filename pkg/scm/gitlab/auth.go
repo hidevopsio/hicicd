@@ -56,3 +56,4 @@ func (s *Session) GetToken() string {
 func (s *Session) GetId() int {
 	return s.ID
 }
+
