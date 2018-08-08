@@ -52,6 +52,3 @@ func (session *Session) GetAccessToken(code string) (*SessionRespons, error) {
 	return sessionRespons, err
 }
 
-func GetUser(accessToken string) {
-
-}

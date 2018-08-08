@@ -25,23 +25,23 @@ func (b *BatchController) Init(selectorService *service.SelectorService) {
 	b.SelectorService = selectorService
 }
 
-func (p *BatchController) Before(ctx *web.Context) {
-	p.BaseController.Before(ctx)
+func (b *BatchController) Before(ctx *web.Context) {
+	b.BaseController.Before(ctx)
 }
 
-func (p *BatchController) Get(ctx *web.Context) {
+func (b *BatchController) Get(ctx *web.Context) {
 	log.Debug("BatchController.Run()")
 	search := ctx.URLParam("search")
 	profile := ctx.URLParam("profile")
 	pr := &app.Project{}
-	projects, err := pr.ListProjects(p.ScmToken, p.Url, search, 1)
+	projects, err := pr.ListProjects(b.ScmToken, b.Url, search, 1)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
 	}
 	for _, project := range projects  {
 		t := new(info.TypeInfo)
-		err = t.RepositoryType(p.Url, p.ScmToken, "development", project.ID)
+		err = t.RepositoryType(b.Url, b.ScmToken, "development", project.ID)
 		uri := project.Namespace + "-" + project.Name
 		uri  = strings.Replace(uri, "-", "/", -1)
 		pl := entity.Pipeline{
@@ -71,17 +71,17 @@ func (p *BatchController) Get(ctx *web.Context) {
 			Version: "v1",
 		}
 		if pl.Scm.Url == "" {
-			pl.Scm.Url = p.Url
+			pl.Scm.Url = b.Url
 		}
 		message := "success"
-		selector, err := p.SelectorService.Get("1")
+		selector, err := b.SelectorService.Get("1")
 		if err != nil {
 			return
 		}
 		selectorService := &service.PipelineService{}
 		selectorService.Initialize(&pl, selector)
 		go func() {
-			err = selectorService.Run(p.Username, p.Password, p.ScmToken, p.Uid, false)
+			err = selectorService.Run(b.Username, b.Password, b.ScmToken, b.Uid, false)
 			if err != nil {
 				message = err.Error()
 			}

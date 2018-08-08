@@ -12,6 +12,7 @@ func TestUser_GetUser(t *testing.T) {
 	baseUrl := os.Getenv("SCM_URL")
 	log.Debugf("accessToken: %v", token)
 	user := new(User)
-	err := user.GetUser(baseUrl, token)
+	u, err := user.GetUser(baseUrl, token)
 	assert.Equal(t, nil, err)
+	assert.Equal(t, "chulei", u.Username)
 }

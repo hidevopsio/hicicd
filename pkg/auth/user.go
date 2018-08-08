@@ -68,3 +68,5 @@ func (u *User) GetSession(baseUrl, username, password string) error {
 
 	return err
 }
+
+
