@@ -2,8 +2,7 @@ package service
 
 import (
 	"github.com/hidevopsio/hicicd/pkg/entity"
-	"encoding/json"
-	"github.com/hidevopsio/hiboot/pkg/log"
+		"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hiboot/pkg/starter/data/bolt"
 )
 
@@ -18,19 +17,13 @@ func (ds *DictionaryService) Init(repository BoltRepository)  {
 }
 
 func (ds *DictionaryService) Add(dictionary *entity.Dictionary) error {
-	d, err := json.Marshal(dictionary)
-	if err == nil {
-		ds.repository.Put([]byte(dictionary.Id), d)
-	}
+	ds.repository.Put(dictionary)
 	return nil
 }
 
 func (ds *DictionaryService) Get(id string) (*entity.Dictionary, error) {
 	var dictionary entity.Dictionary
 	err := ds.repository.Get(id, &dictionary)
-	if err != nil {
-		return nil, err
-	}
 	return &dictionary, err
 }
 

@@ -2,8 +2,7 @@ package service
 
 import (
 	"github.com/hidevopsio/hicicd/pkg/entity"
-	"encoding/json"
-	"github.com/hidevopsio/hiboot/pkg/log"
+		"github.com/hidevopsio/hiboot/pkg/log"
 )
 
 type SelectorService struct {
@@ -18,11 +17,8 @@ func (ss *SelectorService) Init(repository BoltRepository)  {
 }
 
 func (ss *SelectorService) Add(selectors *entity.Selector) error {
-	s, err := json.Marshal(selectors)
-	if err == nil {
-		ss.repository.Put([]byte(selectors.Id), s)
-	}
-	return nil
+	err := ss.repository.Put(selectors)
+	return err
 }
 
 func (ss *SelectorService) Get(id string) (*entity.Selector, error) {

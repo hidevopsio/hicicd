@@ -31,7 +31,8 @@ type deploymentConfigs struct {
 }
 
 type buildConfigs struct {
-	Enable bool `json:"enable"`
+	Enable  bool `json:"enable"`
+	Rebuild bool `json:"rebuild"`
 }
 
 type Istio struct {
