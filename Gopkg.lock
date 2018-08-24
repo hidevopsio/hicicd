@@ -949,3 +949,29 @@
   ]
   revision = "78700dec6369ba22221b72770783300f143df150"
   version = "v6.0.0"
+
+[[projects]]
+  name = "istio.io/api"
+  packages = [
+    "authentication/v1alpha1",
+    "mesh/v1alpha1",
+    "mixer/v1",
+    "mixer/v1/config/client",
+    "networking/v1alpha3",
+    "rbac/v1alpha1"
+  ]
+  revision = "123b0a79a4dba5bd653dcac09cf731b8002e5341"
+  version = "release-1.0"
+
+[[projects]]
+  name = "istio.io/istio"
+  packages = [
+    "pilot/cmd",
+    "pilot/pkg/model",
+    "pilot/pkg/model/test",
+    "pilot/pkg/serviceregistry/kube",
+    "pkg/cache",
+    "pkg/log"
+  ]
+  revision = "3a136c90ec5e308f236e0d7ebb5c4c5e405217f4"
+  version = "1.0.0"
