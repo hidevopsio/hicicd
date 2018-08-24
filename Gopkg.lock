@@ -998,7 +998,7 @@
     "storage/v1alpha1",
     "storage/v1beta1"
   ]
-  revision = "a23a15f48750514427719a852ed8cb602a6672f7"
+  revision = "c277a32c3ff0465997ce6befeaf5cdc8fbd098eb"
   version = "kubernetes-1.13.0-alpha.0"
 
 [[projects]]
