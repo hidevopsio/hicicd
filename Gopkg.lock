@@ -272,7 +272,7 @@
   revision = "5cd0aceaa96a078713c47fad966bd76b8d6a07d6"
 
 [[projects]]
-  branch = "master"
+  branch = "development"
   name = "github.com/hidevopsio/hioak"
   packages = [
     "pkg",
@@ -281,7 +281,7 @@
     "pkg/k8s",
     "pkg/openshift"
   ]
-  revision = "5d301da669afbbaf7fb0d6f2f9bcff29d5dce69d"
+  revision = "17707daef7803cf3420a7af0f3f8d298f22eda57"
 
 [[projects]]
   name = "github.com/howeyc/fsnotify"
