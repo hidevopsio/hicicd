@@ -253,37 +253,6 @@
   revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/hidevopsio/hiboot"
-  packages = [
-    "pkg/inject",
-    "pkg/log",
-    "pkg/model",
-    "pkg/starter",
-    "pkg/starter/data",
-    "pkg/starter/data/bolt",
-    "pkg/starter/web",
-    "pkg/system",
-    "pkg/utils",
-    "pkg/utils/gotest",
-    "pkg/utils/mapstruct",
-    "pkg/utils/reflector"
-  ]
-  revision = "5cd0aceaa96a078713c47fad966bd76b8d6a07d6"
-
-[[projects]]
-  branch = "development"
-  name = "github.com/hidevopsio/hioak"
-  packages = [
-    "pkg",
-    "pkg/istio",
-    "pkg/istio/inject",
-    "pkg/k8s",
-    "pkg/openshift"
-  ]
-  revision = "17707daef7803cf3420a7af0f3f8d298f22eda57"
-
-[[projects]]
   name = "github.com/howeyc/fsnotify"
   packages = ["."]
   revision = "441bbc86b167f3c1f4786afae9931403b99fdacf"
