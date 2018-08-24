@@ -958,7 +958,8 @@
     "mixer/v1",
     "mixer/v1/config/client",
     "networking/v1alpha3",
-    "rbac/v1alpha1"
+    "rbac/v1alpha1",
+    "routing/v1alpha2"
   ]
   revision = "123b0a79a4dba5bd653dcac09cf731b8002e5341"
   version = "release-1.0"
