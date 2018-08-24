@@ -336,40 +336,6 @@
   packages = ["."]
   revision = "03be101463868edc5a81f094fc68a5f6c1b5503a"
 
-[[projects]]
-  name = "github.com/kataras/iris"
-  packages = [
-    ".",
-    "cache",
-    "cache/cfg",
-    "cache/client",
-    "cache/client/rule",
-    "cache/entry",
-    "cache/ruleset",
-    "cache/uri",
-    "context",
-    "core/errors",
-    "core/handlerconv",
-    "core/host",
-    "core/maintenance",
-    "core/maintenance/version",
-    "core/memstore",
-    "core/netutil",
-    "core/router",
-    "core/router/macro",
-    "core/router/macro/interpreter/ast",
-    "core/router/macro/interpreter/lexer",
-    "core/router/macro/interpreter/parser",
-    "core/router/macro/interpreter/token",
-    "core/router/node",
-    "httptest",
-    "middleware/i18n",
-    "middleware/logger",
-    "middleware/recover",
-    "view"
-  ]
-  revision = "eba6adbd78bb547b220f7fe7fbda331532134e87"
-  version = "v10.6.6"
 
 [[projects]]
   branch = "master"
@@ -379,16 +345,6 @@
     "terminal"
   ]
   revision = "825e39f34365e7db2c9fbc3692c16220e3bd7418"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/kataras/survey"
-  packages = [
-    ".",
-    "core",
-    "terminal"
-  ]
-  revision = "00934ae069eda15df26fa427ac393e67e239380c"
 
 [[projects]]
   branch = "master"

@@ -68,8 +68,3 @@
 [[constraint]]
   branch = "master"
   name = "github.com/markbates/goth"
-
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/docker/distribution"
