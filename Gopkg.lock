@@ -839,3 +839,22 @@
   inputs-digest = "bd3f19d53597b946bb99ac0c2c7f080da732dd71592a6957d614ec7c1f1a5225"
   solver-name = "gps-cdcl"
   solver-version = 1
+
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hidevopsio/hiboot"
+  packages = ["pkg/log","pkg/model","pkg/starter/web","pkg/system","pkg/utils"]
+  revision = "7267706a8b51a580395932c005f3b0b2417d3197"
+
+[[projects]]
+  branch = "development"
+  name = "github.com/hidevopsio/hioak"
+  packages = [
+    "pkg",
+    "pkg/istio",
+    "pkg/istio/inject",
+    "pkg/k8s",
+    "pkg/openshift"
+  ]
+  revision = "4485530cb9ff4a6e2402249a3a35dbcfac3abd2f"
