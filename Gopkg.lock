@@ -272,18 +272,6 @@
   version = "v0.2.0"
 
 [[projects]]
-  name = "github.com/hidevopsio/hioak"
-  packages = [
-    "pkg",
-    "pkg/istio",
-    "pkg/istio/inject",
-    "pkg/k8s",
-    "pkg/openshift"
-  ]
-  revision = "813e891347f3f4d97b0566bf6a03ee477df9273b"
-  version = "v0.0.1"
-
-[[projects]]
   name = "github.com/howeyc/fsnotify"
   packages = ["."]
   revision = "441bbc86b167f3c1f4786afae9931403b99fdacf"
