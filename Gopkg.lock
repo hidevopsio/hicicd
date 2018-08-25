@@ -326,12 +326,6 @@
   revision = "987a633949d087ba52207b587792e8c67d65780b"
 
 [[projects]]
-  name = "github.com/iris-contrib/middleware"
-  packages = ["jwt"]
-  revision = "1060fbb0ce08a72c50c612e8e5bdc8076c28343d"
-  version = "v10"
-
-[[projects]]
   branch = "master"
   name = "github.com/jinzhu/copier"
   packages = ["."]
@@ -1168,9 +1162,9 @@
   solver-version = 1
 
 [[projects]]
+  version = "v0.0.1"
   name = "github.com/hidevopsio/hioak"
   packages = [
     "."
   ]
   revision = "85e46221e3fe8d910c6b25acc346861ffa678a29"
-  branch = "development"
