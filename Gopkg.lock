@@ -1178,3 +1178,11 @@
   inputs-digest = "4c69f0be6381802026f4df59d716fcc74ab848d73c0412aac30aad3b6332be54"
   solver-name = "gps-cdcl"
   solver-version = 1
+
+[[projects]]
+  name = "github.com/hidevopsio/hioak"
+  packages = [
+    "."
+  ]
+  revision = "85e46221e3fe8d910c6b25acc346861ffa678a29"
+  branch = "development"
