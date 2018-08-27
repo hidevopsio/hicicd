@@ -27,16 +27,6 @@ func TestPostDictionary(t *testing.T) {
 		Istio: entity.Istio{
 			Enable:false,
 		},
-		BuildConfigs: entity.BuildConfigs{
-			Enable:true,
-		},
-		Scm: entity.Scm{
-			Branches: []string{"master","development"},
-		},
-		DeploymentConfigs: entity.DeploymentConfigs{
-			Enable: false,
-			ForceUpdate: false,
-		},
 		Version:"v1",
 		ImageStreamTags: map[string][]entity.Image{
 			"java": []entity.Image{

@@ -9,9 +9,9 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hicicd/pkg/auth"
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
-	"github.com/hidevopsio/hicicd/pkg/ci"
 	"github.com/hidevopsio/hiboot/pkg/utils"
 	"fmt"
+	"github.com/hidevopsio/hicicd/pkg/entity"
 )
 
 
@@ -39,13 +39,13 @@ func login(expired int64, unit time.Duration) (*web.Token, error) {
 	return token, err
 }
 
-func requestCicdPipeline(ta *web.TestApplication, token *web.Token, statusCode int, pl *ci.Pipeline) {
+func requestCicdPipeline(t *testing.T, ta *web.TestApplication, token *web.Token, statusCode int, pl *entity.Pipeline) {
 	tk := string(*token)
 
 	log.Println("token: ", tk)
 
 	authToken := fmt.Sprintf("Bearer %v", tk)
-
+	app := web.NewTestApplication(t, new(ConfigMapController))
 	ta.Post("/cicd/run").WithHeader(
 		"Authorization", authToken,
 	).WithJSON(pl).Expect().Status(statusCode)
@@ -63,7 +63,7 @@ func TestCicdRunWithExpiredToken(t *testing.T) {
 	if err == nil {
 		time.Sleep(1000 * time.Millisecond)
 
-		requestCicdPipeline(ta, token, http.StatusUnauthorized, &ci.Pipeline{
+		requestCicdPipeline(ta, token, http.StatusUnauthorized, &entity.Pipeline{
 			Name:    "java",
 			Project: "demo",
 			Profile: "dev",
@@ -76,7 +76,7 @@ func TestCicdRunWithoutToken(t *testing.T) {
 	log.Println("TestCicdRunWithoutToken()")
 
 	web.NewTestApplication(t).
-		Post("/cicd/run").WithJSON(ci.Pipeline{
+		Post("/cicd/run").WithJSON(entity.Pipeline{
 			Project: "demo",
 			App:     "hello-world",
 			Profile: "dev",
@@ -95,13 +95,13 @@ func TestCicdRunJava(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	if err == nil {
-		requestCicdPipeline(ta, jwtToken, http.StatusOK, &ci.Pipeline{
+		requestCicdPipeline(ta, jwtToken, http.StatusOK, &entity.Pipeline{
 			Name:    "java",
 			Project: "demo",
 			Profile: "test",
 			App:     "hello-world",
 			Version: "v1",
-			BuildConfigs: ci.BuildConfigs{Enable: true},
+			BuildConfigs: entity.BuildConfigs{Enable: true},
 			//DeploymentConfigs: ci.DeploymentConfigs{Skip: true},
 		})
 	}
@@ -116,7 +116,7 @@ func TestCicdRunNodejs(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	if err == nil {
-		requestCicdPipeline(ta, jwtToken, http.StatusOK, &ci.Pipeline{
+		requestCicdPipeline(ta, jwtToken, http.StatusOK, &entity.Pipeline{
 			Name:    "nodejs",
 			Project: "demo",
 			Profile: "dev",

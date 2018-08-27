@@ -8,7 +8,7 @@ import (
 	"github.com/magiconair/properties/assert"
 	"os"
 	"net/http"
-	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
+	"github.com/hidevopsio/hioak/pkg/k8s"
 )
 
 func TestCreate(t *testing.T) {
