@@ -39,7 +39,7 @@ func login(expired int64, unit time.Duration) (*web.Token, error) {
 	return token, err
 }
 
-func requestCicdPipeline(t *testing.T, ta *web.TestApplication, token *web.Token, statusCode int, pl *entity.Pipeline) {
+func requestCicdPipeline(ta *web.TestApplication, token *web.Token, statusCode int, pl *entity.Pipeline) {
 	tk := string(*token)
 
 	log.Println("token: ", tk)
