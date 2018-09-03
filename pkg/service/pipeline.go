@@ -16,7 +16,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
 	"github.com/jinzhu/copier"
-)
+	"github.com/hidevopsio/hioak/pkg"
+			)
 
 type PipelineService struct {
 	entity.Pipeline
@@ -93,6 +94,12 @@ func (p *PipelineService) CreateRoleBinding(username, metaName, roleRefName stri
 	r.UserNames = append(r.UserNames, username)
 	_, err = roleBinding.Create(r)
 	return err
+}
+
+func (p *PipelineService) Token() string {
+	cli := orch.GetClientInstance()
+	token := cli.Config().BearerToken
+	return token
 }
 
 func (p *PipelineService) Build(secret string, completedHandler func() error) error {
@@ -387,10 +394,5 @@ func (p *PipelineService) Run(username, password, token string, uid int, isToken
 		return fmt.Errorf("failed on Build! %s", err.Error())
 	}
 
-	// interact with developer
-	// deploy to test ? yes/no
-
-	// finally, all steps are done well, let tell the client ...
 	return nil
 }
-

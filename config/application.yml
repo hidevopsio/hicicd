@@ -1,8 +1,13 @@
 # filename should be application.yml
 
 app:
-  project: devops
-  name: hi
+  project: hidevops
+  name: hicicd
+  profiles:
+    include:
+    - jwt
+    - gorm
+    - grpc
 
 logging:
   level: debug

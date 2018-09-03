@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"github.com/hidevopsio/hicicd/pkg/service"
 	"github.com/hidevopsio/hicicd/pkg/entity"
 	"net/http"
@@ -18,7 +18,7 @@ func (d *DictionaryController) Init(dictionaryService *service.DictionaryService
 }
 
 func init() {
-	web.Add(new(DictionaryController))
+	web.RestController(new(DictionaryController))
 }
 
 func (d *DictionaryController) Post(ctx *web.Context) {
@@ -53,4 +53,3 @@ func (d *DictionaryController) Delete(ctx *web.Context) {
 		ctx.ResponseBody("success", nil)
 	}
 }
-

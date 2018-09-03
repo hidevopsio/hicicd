@@ -1,0 +1,10 @@
+# grpc client configs
+
+grpc:
+  client:
+    hiadmin-client:
+      host: hiadmin
+      port: 7575
+    hiagent-client:
+      host: hiadmin
+      port: 7575

@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"github.com/hidevopsio/hicicd/pkg/entity"
 	"github.com/hidevopsio/hicicd/pkg/service"
 	"github.com/hidevopsio/hiboot/pkg/log"
@@ -18,7 +18,7 @@ type BatchController struct {
 }
 
 func init() {
-	web.Add(new(BatchController))
+	web.RestController(new(BatchController))
 }
 
 func (b *BatchController) Init(selectorService *service.SelectorService) {
@@ -39,30 +39,30 @@ func (b *BatchController) Get(ctx *web.Context) {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
 	}
-	for _, project := range projects  {
+	for _, project := range projects {
 		t := new(info.TypeInfo)
 		err = t.RepositoryType(b.Url, b.ScmToken, "development", project.ID)
 		uri := project.Namespace + "-" + project.Name
-		uri  = strings.Replace(uri, "-", "/", -1)
+		uri = strings.Replace(uri, "-", "/", -1)
 		pl := entity.Pipeline{
 			App: project.Name,
 			BuildConfigs: entity.BuildConfigs{
-				Enable: true,
+				Enable:  true,
 				Project: search,
 			},
 			Cluster: t.ClusterName,
 			DeploymentConfigs: entity.DeploymentConfigs{
 				ForceUpdate: true,
-				Enable: true,
+				Enable:      true,
 			},
-			GatewayConfigs:entity.GatewayConfigs{
-				Uri: uri,
+			GatewayConfigs: entity.GatewayConfigs{
+				Uri:    uri,
 				Enable: true,
 			},
 			IstioConfigs: entity.IstioConfigs{
 				Enable: false,
 			},
-			Name: t.AppType,
+			Name:    t.AppType,
 			Profile: profile,
 			Project: search,
 			Scm: entity.Scm{

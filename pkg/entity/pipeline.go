@@ -4,9 +4,10 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/system"
 	"github.com/hidevopsio/hioak/pkg"
 	"path/filepath"
-	"github.com/hidevopsio/hiboot/pkg/utils"
 	"github.com/imdario/mergo"
 	"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hiboot/pkg/utils/io"
+	"github.com/hidevopsio/hiboot/pkg/utils/replacer"
 )
 
 type Scm struct {
@@ -100,7 +101,7 @@ func (p *Pipeline) Initialize(pl *Pipeline, selector *Selector) {
 	// load config file
 	if pl != nil {
 		b := &system.Builder{
-			Path:       filepath.Join(utils.GetWorkDir(), "config"),
+			Path:       filepath.Join(io.GetWorkDir(), "config"),
 			Name:       "pipeline",
 			FileType:   "yaml",
 			Profile:    pl.Name,
@@ -116,7 +117,7 @@ func (p *Pipeline) Initialize(pl *Pipeline, selector *Selector) {
 
 	}
 
-	utils.Replace(p, p)
+	replacer.Replace(p, p)
 
 	if "" == p.Namespace {
 		if "" == pl.Profile {

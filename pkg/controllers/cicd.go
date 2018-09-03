@@ -19,11 +19,13 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hiboot/pkg/model"
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"os"
 	"strings"
 	"github.com/hidevopsio/hicicd/pkg/service"
 	"github.com/hidevopsio/hicicd/pkg/entity"
+	"strconv"
+	"github.com/hidevopsio/hicicd/pkg/protobuf"
 )
 
 type PipelineResponse struct {
@@ -33,11 +35,13 @@ type PipelineResponse struct {
 // Operations about object
 type PipelineController struct {
 	BaseController
-	SelectorService *service.SelectorService
+	remoteDeploymentClient protobuf.RemoteDeploymentServiceClient
+	SelectorService        *service.SelectorService
 }
 
-func (p *PipelineController) Init(selectorService *service.SelectorService) {
+func (p *PipelineController) Init(selectorService *service.SelectorService, remoteDeploymentClient protobuf.RemoteDeploymentServiceClient) {
 	p.SelectorService = selectorService
+	p.remoteDeploymentClient = remoteDeploymentClient
 }
 
 const (
@@ -49,7 +53,7 @@ const (
 )
 
 func init() {
-	web.Add(new(PipelineController))
+	web.RestController(new(PipelineController))
 }
 
 func (p *PipelineController) Before(ctx *web.Context) {
@@ -82,7 +86,11 @@ func (p *PipelineController) PostRun(ctx *web.Context) {
 		pipelineService := &service.PipelineService{}
 		pipelineService.Initialize(&pl, selector)
 		go func() {
-			err = pipelineService.Run(p.Username, p.Password, p.ScmToken, p.Uid, false)
+			username := p.JwtProperty("username")
+			password := p.JwtProperty("password")
+			scmToken := p.JwtProperty("scmToken")
+			uid, _ := strconv.Atoi(p.JwtProperty("uid"))
+			err = pipelineService.Run(username, password, scmToken, uid, false)
 			if err != nil {
 				message = err.Error()
 			}

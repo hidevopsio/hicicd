@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"net/http"
 	"github.com/hidevopsio/hicicd/pkg/scm"
 	"github.com/hidevopsio/hicicd/pkg/app"
+	"strconv"
 )
 
 // Operations about object
@@ -13,11 +14,8 @@ type ScmController struct {
 	BaseController
 }
 
-
-
-
 func init() {
-	web.Add(new(ScmController))
+	web.RestController(new(ScmController))
 }
 
 func (c *ScmController) Before(ctx *web.Context) {
@@ -26,8 +24,11 @@ func (c *ScmController) Before(ctx *web.Context) {
 
 func (c *ScmController) PostListGroups(ctx *web.Context) {
 	log.Debug("ScmController.GetAllProject()")
+	url := c.JwtProperty("url")
+	scmToken := c.JwtProperty("scmToken")
+	uid, _ := strconv.Atoi(c.JwtProperty("uid"))
 	g := &app.Group{}
-	groupMember, err := g.ListGroups(c.ScmToken, c.Url, c.Uid, 1)
+	groupMember, err := g.ListGroups(scmToken, url, uid, 1)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
@@ -68,7 +69,7 @@ func (c *ScmController) PostListProjects(ctx *web.Context) {
 	ctx.ResponseBody("success", &projects)
 }
 
-func (c *ScmController) PostGetProjectMember(ctx *web.Context)  {
+func (c *ScmController) PostGetProjectMember(ctx *web.Context) {
 	log.Debug("ScmController Project Member()")
 	var projectMember scm.ProjectMember
 	err := ctx.RequestBody(&projectMember)
@@ -85,8 +86,7 @@ func (c *ScmController) PostGetProjectMember(ctx *web.Context)  {
 	ctx.ResponseBody("success", &projects)
 }
 
-
-func (c *ScmController) PostSearch(ctx *web.Context){
+func (c *ScmController) PostSearch(ctx *web.Context) {
 	log.Debug("ScmController Post Search()")
 	var search scm.Search
 	err := ctx.RequestBody(&search)

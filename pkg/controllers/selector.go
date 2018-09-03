@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hicicd/pkg/entity"
 	"github.com/hidevopsio/hicicd/pkg/service"
@@ -14,7 +14,7 @@ type SelectorController struct {
 }
 
 func init() {
-	web.Add(new(SelectorController))
+	web.RestController(new(SelectorController))
 }
 
 func (s *SelectorController) Init(selectorService *service.SelectorService) {
@@ -39,7 +39,6 @@ func (s *SelectorController) Post(ctx *web.Context) {
 	ctx.ResponseBody("success", selector)
 }
 
-
 func (s *SelectorController) Get(ctx *web.Context) {
 	log.Debug("Selector get")
 	id := ctx.URLParam("id")
@@ -51,7 +50,6 @@ func (s *SelectorController) Get(ctx *web.Context) {
 	ctx.ResponseBody("success", selector)
 	return
 }
-
 
 func (s *SelectorController) Delete(ctx *web.Context) {
 	log.Debug("Selector delete")

@@ -15,8 +15,10 @@
 package main
 
 import (
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
+	_ "github.com/hidevopsio/hiboot/pkg/starter/actuator"
 	_ "github.com/hidevopsio/hicicd/pkg/controllers"
+	//_ "github.com/hidevopsio/hicicd/pkg/rpc"
 )
 
 func main() {

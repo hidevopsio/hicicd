@@ -16,29 +16,35 @@ package controllers
 
 import (
 	"github.com/hidevopsio/hicicd/pkg/auth"
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"time"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"os"
 	"net/http"
 	"strconv"
+	"github.com/hidevopsio/hiboot/pkg/starter/jwt"
 )
 
 type UserRequest struct {
 	Url      string `json:"url"`
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
+	Uid      string `json:"uid"`
 }
-
 
 // Operations about object
 type UserController struct {
 	web.Controller
+	jwtToken jwt.Token
 }
 
 // new UserController instance
 func init() {
-	web.Add(new(UserController))
+	web.RestController(new(UserController))
+}
+
+func (c *UserController) Init(jwtToken jwt.Token) {
+	c.jwtToken = jwtToken
 }
 
 // @Title Login
@@ -62,7 +68,7 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 	}
 	if url == "" {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
-	}else {
+	} else {
 		// invoke models
 		user := &auth.User{}
 		privateToken, uid, _, err := user.Login(url, request.Username, request.Password)
@@ -72,23 +78,23 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 			if expired == "" {
 				expired = "24"
 			}
-			exp, err:=strconv.ParseInt(expired, 10, 64)
+			exp, err := strconv.ParseInt(expired, 10, 64)
 			log.Debug("login expired time exp:", exp)
-			jwtToken, err := web.GenerateJwtToken(web.JwtMap{
-					"url": url,
-					"username": request.Username,
-					"password": request.Password, // TODO: token is not working?
-					"scmToken": privateToken,
-					"uid": uid,
-				}, exp, time.Minute)
-				if err == nil {
-					data := map[string]interface{}{
-						"token": &jwtToken,
-					}
-					ctx.ResponseBody("success", &data)
-				} else {
-					ctx.ResponseError(err.Error(), http.StatusInternalServerError)
+			jwtToken, err := c.jwtToken.Generate(jwt.Map{
+				"url":      url,
+				"username": request.Username,
+				"password": request.Password, // TODO: token is not working?
+				"scmToken": privateToken,
+				"uid":      uid,
+			}, 10, time.Minute)
+			if err == nil {
+				data := map[string]interface{}{
+					"token": &jwtToken,
 				}
+				ctx.ResponseBody("success", &data)
+			} else {
+				ctx.ResponseError(err.Error(), http.StatusInternalServerError)
+			}
 
 		} else {
 			ctx.ResponseError(err.Error(), http.StatusForbidden)

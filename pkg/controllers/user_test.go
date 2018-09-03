@@ -5,7 +5,7 @@ import (
 	"os"
 	"net/http"
 	"github.com/hidevopsio/hiboot/pkg/log"
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 )
 
 var userRequest UserRequest
