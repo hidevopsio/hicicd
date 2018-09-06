@@ -23,6 +23,7 @@ type ImageStreamTag struct {
 }
 
 func NewImageStreamTags(name, version, namespace string) (*ImageStreamTag, error) {
+
 	clientSet, err := image.NewForConfig(orch.Config)
 	return &ImageStreamTag{
 		Name:      name,
@@ -48,11 +49,20 @@ func (ist *ImageStreamTag) Create(fromNamespace string) (*v1.ImageStreamTag, err
 			},
 		},
 	}
-	img, err := ist.Interface.Create(imageTag)
+	_, err := ist.Get()
 	if err != nil {
+		img, err := ist.Interface.Create(imageTag)
+		log.Debug("image.tag.create", err)
+		return img, err
+	}
+	err = ist.Delete()
+	if err != nil {
+		log.Error("")
 		return nil, err
 	}
-	return img, nil
+	img, err := ist.Interface.Create(imageTag)
+	log.Debug("images.tag.update", err)
+	return img, err
 }
 
 func (ist *ImageStreamTag) Get() (*v1.ImageStreamTag, error) {
@@ -80,14 +90,17 @@ func (ist *ImageStreamTag) Delete() error {
 	return err
 }
 
-func (ist *ImageStreamTag) Update() (*v1.ImageStreamTag, error) {
+func (ist *ImageStreamTag) Update(fromNamespace string) (*v1.ImageStreamTag, error) {
 	img := &v1.ImageStreamTag{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      ist.Name,
+			Name:      ist.FullName,
 			Namespace: ist.Namespace,
-			Labels: map[string]string{
-				"app":     ist.Name,
-				"version": ist.Version,
+		},
+		Tag: &v1.TagReference{
+			From: &corev1.ObjectReference{
+				Name:      ist.FullName,
+				Namespace: fromNamespace,
+				Kind:      Kind,
 			},
 		},
 	}

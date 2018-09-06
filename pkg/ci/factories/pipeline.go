@@ -15,6 +15,9 @@ const (
 	JavaWarPipelineType = "java-war"
 	NodeJsPipelineType  = "nodejs"
 	GitbookPipelineType = "gitbook"
+	JavaCqrsType        = "java-cqrs"
+	NodeJsDist          = "nodejs-dist"
+	JavaLib             = "java-lib"
 )
 
 func (pf *PipelineFactory) New(pipelineType string) (ci.PipelineInterface, error) {
@@ -26,6 +29,12 @@ func (pf *PipelineFactory) New(pipelineType string) (ci.PipelineInterface, error
 		return new(impl.JavaWarPipeline), nil
 	case NodeJsPipelineType:
 		return new(impl.NodeJsPipeline), nil
+	case JavaCqrsType:
+		return new(impl.JavaCqrsPipeline), nil
+	case NodeJsDist:
+		return new(impl.NodeJsDistPipeline), nil
+	case JavaLib:
+		return new(impl.JavaLibPipeline), nil
 	default:
 		return nil, errors.New(fmt.Sprintf("pipeline type %d not recognized\n", pipelineType))
 	}

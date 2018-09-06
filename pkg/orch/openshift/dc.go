@@ -54,8 +54,8 @@ func NewDeploymentConfig(name, namespace, version string) (*DeploymentConfig, er
 	}, nil
 }
 
-func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas int32, force bool, healthEndPoint string, injectSidecar func(in interface{}) (interface{}, error)) error {
-	log.Debug("DeploymentConfig.Create()")
+func (dc *DeploymentConfig) Create(env interface{}, labels map[string]string, ports interface{}, replicas int32, force bool, healthEndPoint string, injectSidecar func(in interface{}) (interface{}, error)) error {
+	log.Debug("DeploymentConfig.Create()", force)
 
 	// env
 	e := make([]corev1.EnvVar, 0)
@@ -63,7 +63,6 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 
 	p := make([]corev1.ContainerPort, 0)
 	copier.Copy(&p, ports)
-
 	cfg := &v1.DeploymentConfig{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "apps.openshift.io/v1",
@@ -71,10 +70,7 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: dc.FullName,
-			Labels: map[string]string{
-				"app": dc.Name,
-				"version": dc.Version,
-			},
+			Labels: labels,
 		},
 		Spec: v1.DeploymentConfigSpec{
 			Replicas: replicas,
@@ -91,10 +87,7 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 			Template: &corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: dc.Name,
-					Labels: map[string]string{
-						"app":  dc.Name,
-						"version": dc.Version,
-					},
+					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
@@ -183,6 +176,11 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 			result, err = dc.Interface.Update(cfg)
 			if err == nil {
 				log.Infof("Updated DeploymentConfig %v.", result.Name)
+				_, err := dc.Instantiate()
+				if err != nil {
+					log.Error(err.Error())
+				}
+				return err
 			} else {
 				return err
 			}
@@ -203,12 +201,12 @@ func (dc *DeploymentConfig) Create(env interface{}, ports interface{}, replicas 
 
 func (dc *DeploymentConfig) Get() (*v1.DeploymentConfig, error) {
 	log.Debug("DeploymentConfig.Get()")
-	return dc.Interface.Get(dc.Name, metav1.GetOptions{})
+	return dc.Interface.Get(dc.FullName, metav1.GetOptions{})
 }
 
 func (dc *DeploymentConfig) Delete() error {
 	log.Debug("DeploymentConfig.Delete()")
-	return dc.Interface.Delete(dc.Name, &metav1.DeleteOptions{})
+	return dc.Interface.Delete(dc.FullName, &metav1.DeleteOptions{})
 }
 
 func (dc *DeploymentConfig) Instantiate() (*v1.DeploymentConfig, error)  {
@@ -219,12 +217,12 @@ func (dc *DeploymentConfig) Instantiate() (*v1.DeploymentConfig, error)  {
 			Kind: "DeploymentRequest",
 			APIVersion: "v1",
 		},
-		Name: dc.Name,
+		Name: dc.FullName,
 		Force: true,
 		Latest: true,
 	}
 
-	d, err := dc.Interface.Instantiate(dc.Name, request)
+	d, err := dc.Interface.Instantiate(dc.FullName, request)
 	if nil == err {
 		log.Infof("Instantiated Build %v", d.Name)
 	}

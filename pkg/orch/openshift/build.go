@@ -26,6 +26,7 @@ import (
 	"github.com/jinzhu/copier"
 	"fmt"
 	"github.com/hidevopsio/hicicd/pkg/orch"
+	imagev1 "github.com/openshift/api/image/v1"
 )
 
 type Scm struct {
@@ -50,28 +51,31 @@ type BuildConfig struct {
 // @Description Create new BuildConfig Instance
 // @Param namespace, appName, gitUrl, imageTag, s2iImageStream string
 // @Return *BuildConfig, error
-func NewBuildConfig(namespace, name, scmUrl, scmRef, scmSecret, version, s2iImageStream string) (*BuildConfig, error) {
+func NewBuildConfig(namespace, name, scmUrl, scmRef, scmSecret, version, s2iImageStream string, rebuild bool) (*BuildConfig, error) {
 
 	log.Debug("NewBuildConfig()")
 
 	// TODO: for the sake of decoupling, the image stream creation should be here or not?
 	// create imagestream
+	var err error
 	imageStream, err := NewImageStream(name, namespace)
 	if err != nil {
 		return nil, err
 	}
 
 	var from corev1.ObjectReference
-	is, err := imageStream.Get()
-
-	// the images stream is exist with 0 tags, then delete it
-	if len(is.Status.Tags) == 0 {
-		imageStream.Delete()
+	var is *imagev1.ImageStream
+	if !rebuild {
 		is, err = imageStream.Get()
+		// the images stream is exist with 0 tags, then delete it
+		if len(is.Status.Tags) == 0 {
+			imageStream.Delete()
+			is, err = imageStream.Get()
+		}
 	}
 
 	// create new images stream if it is not found
-	if errors.IsNotFound(err) {
+	if errors.IsNotFound(err) || rebuild{
 		_, err := imageStream.Create(version)
 		if err != nil {
 			return nil, err
@@ -228,6 +232,7 @@ func (b *BuildConfig) Build(env []system.Env) (*v1.Build, error) {
 
 	build, err := b.BuildConfigs.Instantiate(b.Name, &buildRequest)
 	if nil != err {
+		log.Error("b.BuildConfigs.Instantiate err", err)
 		return nil, err
 	}
 	log.Infof("Instantiated Build %v", build.Name)
@@ -241,6 +246,7 @@ func (b *BuildConfig) Watch(build *v1.Build, completedHandler func() error) erro
 	})
 
 	if nil != err {
+		log.Error("BuildConfig.Watch err ", err)
 		return err
 	}
 
@@ -248,6 +254,7 @@ func (b *BuildConfig) Watch(build *v1.Build, completedHandler func() error) erro
 		select {
 		case event, ok := <-w.ResultChan():
 			if !ok {
+				log.Info("resultChan: ", ok)
 				return fmt.Errorf("resultChan: %v", ok)
 			}
 			switch event.Type {
@@ -262,14 +269,17 @@ func (b *BuildConfig) Watch(build *v1.Build, completedHandler func() error) erro
 					log.Debugf("bld.Status.Phase: %v", bld.Status.Phase)
 					switch bld.Status.Phase {
 					case v1.BuildPhaseComplete:
+						log.Info("bld.Status.Phase", bld.Status.Phase)
 						var err error
 						if nil != completedHandler {
 							err = completedHandler()
 						}
 						w.Stop()
+						log.Error("bld.Status.Phase completedHandler", err)
 						return err
 					case v1.BuildPhaseError, v1.BuildPhaseCancelled, v1.BuildPhaseFailed:
 						w.Stop()
+						log.Error("bld.Status.Phase BuildPhaseError", fmt.Errorf(bld.Status.Message))
 						return fmt.Errorf(bld.Status.Message)
 
 					}
@@ -282,7 +292,7 @@ func (b *BuildConfig) Watch(build *v1.Build, completedHandler func() error) erro
 			}
 		}
 	}
-
+	log.Info("build.watch", err)
 	return err
 }
 

@@ -61,6 +61,7 @@ func (rc *ReplicationController) Watch(completedHandler func() error) error {
 		select {
 		case event, ok := <-w.ResultChan():
 			if !ok {
+				log.Error("failed on RC watching %v", ok)
 				return fmt.Errorf("failed on RC watching %v", ok)
 			}
 			switch event.Type {

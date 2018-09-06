@@ -3,8 +3,10 @@ pipeline:
   name: nodejs
   identifiers: # unused
   - package.json
+  istioConfigs:
+    skip: true
   buildConfigs:
-    imagestream: s2i-nodejs:8.10.0
+    imagestream: s2i-nodejs:6.1-alpine
     env:
     - name: npm_config_registry
       value: ${npm_config_registry}
@@ -23,12 +25,25 @@ pipeline:
         echo === npm_config_registry: ${npm_config_registry} ===
         npm install --only=dev
         if [[ $? == 0 ]]; then
-          echo "Build Successful."
+          echo "npm install --only=dev Successful."
         else
-          echo "Build Failed!"
+          echo "npm install --only=dev Failed!"
           exit 1
         fi
-
+        npm install
+        if [[ $? == 0 ]]; then
+          echo "npm install Successful."
+        else
+          echo "npm install Failed!"
+          exit 1
+        fi
+        npm run build:dev
+        if [[ $? == 0 ]]; then
+          echo "npm run build:dev Successful."
+        else
+          echo "npm run build:dev Failed!"
+          exit 1
+        fi
   deploymentConfigs:
     healthEndPoint: http://localhost:8080/index.html
     env:
@@ -42,11 +57,4 @@ pipeline:
       value: ${project}
     - name: RUN_SCRIPT
       value: |
-        npm run build:${profile}
-        if [[ $? == 0 ]]; then
-          echo "Build Successful."
-        else
-          echo "Build Failed!"
-          exit 1
-        fi
         npm run start

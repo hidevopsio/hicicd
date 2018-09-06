@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	name = "hello-world"
-	namespace = "demo-test"
-	fromNamespace = "demo-dev"
+	name = "hiweb"
+	namespace = "hidevopsio"
+	fromNamespace = "hidevopsio-dev"
 	version = "v1"
 	fullName = name + ":" + version
 )
@@ -34,5 +34,12 @@ func TestDeleteTag(t *testing.T)  {
 	ist, err := NewImageStreamTags(name, version, namespace)
 	assert.Equal(t, nil, err)
 	err = ist.Delete()
+	assert.Equal(t, nil, err)
+}
+
+func TestUpdateTag(t *testing.T)  {
+	ist, err := NewImageStreamTags(name, version, namespace)
+	assert.Equal(t, nil, err)
+	_, err = ist.Update(fromNamespace)
 	assert.Equal(t, nil, err)
 }

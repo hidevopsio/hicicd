@@ -1,0 +1,45 @@
+
+pipeline:
+  name: nodejs
+  identifiers: # unused
+  - package.json
+  istioConfigs:
+    skip: true
+  buildConfigs:
+    imagestream: s2i-nodejs:6.1-alpine
+    env:
+    - name: npm_config_registry
+      value: ${npm_config_registry}
+    - name: npm_config_disturl
+      value: https://npm.taobao.org/dist/
+    - name: npm_config_phantomjs_cdnurl
+      value: https://npm.taobao.org/dist/phantomjs/
+    - name: npm_config_phantomjs_cdnurl
+      value: https://npm.taobao.org/dist/phantomjs/
+    - name: npm_config_electron_mirror
+      value: https://npm.taobao.org/mirrors/electron/
+    - name: npm_config_sass_binary_site
+      value: https://npm.taobao.org/mirrors/node-sass/
+    - name: BUILD_SCRIPT
+      value: |
+        echo === npm_config_registry: ${npm_config_registry} ===
+        if [ ! -f dist/index.html ]; then
+          echo "no index.html in dist"
+        fi
+
+  deploymentConfigs:
+    healthEndPoint: http://localhost:8080/index.html
+    env:
+    - name: NODE_ENV
+      value: ${profile}
+    - name: HOST
+      value: 0.0.0.0
+    - name: PORT
+      value: 8080
+    - name: project
+      value: ${project}
+    - name: URI
+      value: ${gatewayConfigs.uri}
+    - name: RUN_SCRIPT
+      value: |
+        npm run start

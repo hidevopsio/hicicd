@@ -23,12 +23,11 @@ func (c *DestinationController) Before(ctx *web.Context) {
 	c.BaseController.Before(ctx)
 }
 
-func (c *DestinationController) PostAdd(ctx *web.Context) {
-	log.Debug("egress  add:{}")
+func (c *DestinationController) Post(ctx *web.Context) {
+	log.Debug("destination  add:{}")
 	var destination istio.Destination
 	err := ctx.RequestBody(&destination)
 	if err != nil {
-		ctx.ResponseError(err.Error(), http.StatusUnavailableForLegalReasons)
 		return
 	}
 	config, err := istio.NewClient()

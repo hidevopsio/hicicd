@@ -27,7 +27,7 @@ func init() {
 
 func login(expired int64, unit time.Duration) (*web.Token, error) {
 	u := &auth.User{}
-	_, _, err := u.Login(userRequest.Url, userRequest.Username, userRequest.Password)
+	_, _, _, err := u.Login(userRequest.Url, userRequest.Username, userRequest.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func TestCicdRunJava(t *testing.T) {
 			Profile: "test",
 			App:     "hello-world",
 			Version: "v1",
-			BuildConfigs: ci.BuildConfigs{Skip: true},
+			BuildConfigs: ci.BuildConfigs{Enable: true},
 			//DeploymentConfigs: ci.DeploymentConfigs{Skip: true},
 		})
 	}
@@ -124,3 +124,24 @@ func TestCicdRunNodejs(t *testing.T) {
 		})
 	}
 }
+
+var jobChan chan int
+
+func worker(jobChan <- chan int)  {
+	for job := range jobChan{
+		fmt.Printf("执行任务 %d \n", job)
+	}
+}
+
+func TestGoChan(t *testing.T)  {
+	jobChan = make(chan int, 100)
+	//入队
+	for i := 1; i <= 10; i++{
+		jobChan <- i
+	}
+
+	close(jobChan)
+	go worker(jobChan)
+}
+
+

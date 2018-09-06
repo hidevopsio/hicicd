@@ -32,7 +32,7 @@ func TestBuildCreation(t *testing.T) {
 
 	// put below configs in yaml file
 	project := "demo"
-	profile := "dev"
+	profile := "stage"
 	namespace := project + "-" + profile
 	appName := "hello-world"
 	scmUrl := os.Getenv("SCM_URL") + "/" + project + "/" + appName + ".git"
@@ -56,7 +56,7 @@ func TestBuildCreation(t *testing.T) {
 
 	log.Debugf("workDir: %v", os.Getenv("PWD"))
 
-	buildConfig, err := NewBuildConfig(namespace, appName, scmUrl, scmRef, secret, version, s2iImageStream)
+	buildConfig, err := NewBuildConfig(namespace, appName, scmUrl, scmRef, secret, version, s2iImageStream, false)
 	assert.Equal(t, nil, err)
 
 	bc, err := buildConfig.Create()

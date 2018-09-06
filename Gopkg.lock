@@ -86,6 +86,12 @@
   revision = "6f8212e8d10df7383609d3c377ca08884d8f3ec0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/kevholditch/gokong"
+  packages = ["."]
+  revision = "ab1e75d5f714d02463d0fe72f8fa4be079136ad6"
+
+[[projects]]
   name = "github.com/ghodss/yaml"
   packages = ["."]
   revision = "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"
@@ -178,8 +184,8 @@
 [[projects]]
   branch = "master"
   name = "github.com/hidevopsio/hiboot"
-  packages = ["pkg/log","pkg/model","pkg/starter/web","pkg/system","pkg/utils"]
-  revision = "7267706a8b51a580395932c005f3b0b2417d3197"
+  packages = ["pkg/log","pkg/model","pkg/starter/web","pkg/starter/db","pkg/system","pkg/utils"]
+  revision = "17ee28ae938d75e2fc4d4c382f55795c111494fc"
 
 [[projects]]
   name = "github.com/howeyc/fsnotify"
@@ -470,10 +476,16 @@
   version = "v1.2.1"
 
 [[projects]]
+  name = "github.com/nccurry/go-kong"
+  packages = ["."]
+  revision = "a0c3ea87ccc9dd86b62ce482ef3712baf6010327"
+
+[[projects]]
+  branch = "f-api-v3"
   name = "github.com/xanzy/go-gitlab"
   packages = ["."]
-  revision = "109fd962a3876c6e486a5bc9507289d060e3c587"
-  version = "v0.9.0"
+  revision = "896163fa8f7a8178ada89ef13f7a72e728f0c010"
+
 
 [[projects]]
   branch = "master"

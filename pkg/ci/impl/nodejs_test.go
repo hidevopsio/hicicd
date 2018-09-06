@@ -25,12 +25,6 @@ func TestNodeJsPipeline(t *testing.T) {
 		DeploymentConfigs: ci.DeploymentConfigs{
 			ForceUpdate: true,
 		},
-		//DeploymentConfigs: ci.DeploymentConfigs{
-		//	Skip: true,
-		//},
-		//BuildConfigs: ci.BuildConfigs{
-		//	Skip: true,
-		//},
 	}
 	nodeJs.Init(pi)
 	baseUrl :=  os.Getenv("SCM_URL")

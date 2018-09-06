@@ -22,6 +22,8 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/starter/web"
 	"github.com/hidevopsio/hicicd/pkg/ci/factories"
 	"github.com/hidevopsio/hicicd/pkg/ci"
+	"os"
+	"strings"
 )
 
 type CicdResponse struct {
@@ -71,17 +73,21 @@ func (c *CicdController) PostRun(ctx *web.Context) {
 	pipeline, err := pipelineFactory.New(pl.Name)
 	message := "success"
 	if err == nil {
-		// Run Pipeline, password is a token, no need to pass username to pipeline
 		pipeline.Init(&pl)
-		err = pipeline.Run(c.Username, c.Password, c.ScmToken, c.Uid, false)
-		if err != nil {
-			message = err.Error()
-		}
+		go func() {
+			err = pipeline.Run(c.Username, c.Password, c.ScmToken, c.Uid, false)
+			if err != nil {
+				message = err.Error()
+			}
+		}()
 	} else {
 		message = "failed, " + err.Error()
 	}
-
-	ctx.ResponseBody(message, nil)
+	bc := os.Getenv("BUILD_CONSOLE")
+	bc = strings.Replace(bc, "${project}", pl.Project, -1)
+	bc = strings.Replace(bc, "${profile}", pl.Profile, -1)
+	bc = strings.Replace(bc, "${app}", pl.App, -1)
+	ctx.ResponseBody(message, bc)
 }
 
 func parseToken(claims jwt.MapClaims, prop string) string {

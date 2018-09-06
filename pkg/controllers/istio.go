@@ -20,7 +20,7 @@ type IResponse struct {
 }
 
 
-func (c *IstioController) PostDelete(ctx *web.Context)  {
+func (c *IstioController) Delete(ctx *web.Context)  {
 	log.Debug("istio delete controller type")
 	var route istio.RouterRule
 	ctx.RequestBody(&route)
@@ -44,7 +44,7 @@ func (c *IstioController) PostDelete(ctx *web.Context)  {
 }
 
 
-func (c *IstioController) PostGet(ctx *web.Context)  {
+func (c *IstioController) Get(ctx *web.Context)  {
 	log.Debug("istio get controller type")
 
 	var route istio.RouterRule

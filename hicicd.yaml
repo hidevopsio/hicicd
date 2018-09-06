@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ImageStream
+metadata:
+  labels:
+    app: hicicd
+  name: hicicd
+  namespace: hidevopsio
+spec:
+  tags:
+  - from:
+      kind: DockerImage
+      name: docker.vpclub.cn/openshift/hicicd:latest
+    name: latest

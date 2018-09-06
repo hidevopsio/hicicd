@@ -1,0 +1,24 @@
+dictionary:
+  scm:
+    branches:
+    - master
+    - development
+  istio:
+    enabled: true
+  build_configs:
+    enabled: true
+  deployment_configs:
+    enabled: true
+    force_update: false
+  profile:
+  - stage
+  - prod
+  selector:
+    node_selector:
+    - bar
+    - biz
+    java_selector:
+    - jdk8
+  profile:
+  - prod
+  - stage

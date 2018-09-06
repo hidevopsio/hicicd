@@ -84,3 +84,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/docker/distribution"
+
+[[constraint]]
+  name = "github.com/kevholditch/gokong"
+  branch = "master"

@@ -41,7 +41,7 @@ func (s *Session) GetSession(baseUrl, username, password string) error {
 	c.SetBaseURL(baseUrl + ApiVersion)
 	log.Debug("before c.Session.GetSession(so)")
 	session, _, err := c.Session.GetSession(so)
-	log.Debug("after c.Session.GetSession(so)")
+	log.Debug("after c.Session.GetSession(so)", err)
 
 	copier.Copy(s, session)
 

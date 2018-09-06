@@ -4,7 +4,7 @@ pipeline:
   identifiers:
   - pom.xml
   buildConfigs:
-    imagestream: s2i-java-war:latest
+    imagestream: s2i-java-war:1.0.6
     env:
     - name: MAVEN_MIRROR_URL
       value: ${MAVEN_MIRROR_URL}
@@ -20,6 +20,9 @@ pipeline:
           exit 1
         fi
   deploymentConfigs:
+    healthEndPoint: http://localhost:8080/health
     env:
     - name: APP_OPTIONS
       value: -Xms128m -Xmx512m -Xss512k
+    - name: SPRING_PROFILES_ACTIVE
+      value: ${profile}

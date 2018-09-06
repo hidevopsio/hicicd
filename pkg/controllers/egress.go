@@ -28,7 +28,6 @@ func (c *EgressController) PostAdd(ctx *web.Context) {
 	var egress  istio.Egress
 	err := ctx.RequestBody(&egress)
 	if err != nil {
-		ctx.ResponseError(err.Error(), http.StatusUnavailableForLegalReasons)
 		return
 	}
 	config, err := istio.NewClient()

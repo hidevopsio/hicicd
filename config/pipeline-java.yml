@@ -13,6 +13,8 @@ pipeline:
       value: ${MAVEN_MIRROR_URL}
     - name: MAVEN_CLEAR_REPO
       value: false
+    - name: CLEAR_SOURCE
+      value: true
     - name: BUILD_SCRIPT
       value: |
         mvn clean package -U -Dmaven.test.skip=true -Djava.net.preferIPv4Stack=true

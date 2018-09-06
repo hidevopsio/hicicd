@@ -4,6 +4,7 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/hidevopsio/hiboot/pkg/log"
+	"fmt"
 )
 
 
@@ -36,3 +37,11 @@ func TestDelete(t *testing.T) {
 	err = client.Delete(typ)
 	assert.Equal(t, nil, err)
 }
+
+func TestResolveConfig(t *testing.T) {
+	kubeconfig, err := ResolveConfig("")
+	fmt.Printf( kubeconfig)
+	log.Debug(err)
+}
+
+

@@ -28,8 +28,9 @@ func TestRouteCreation(t *testing.T)  {
 	route, err := NewRoute(app, namespace)
 	assert.Equal(t, nil, err)
 
-	err = route.Create(8080)
+	url, err := route.Create(8080)
 	assert.Equal(t, nil, err)
+	assert.Equal(t, "f", url)
 }
 
 func TestRouteDeletion(t *testing.T)  {

@@ -5,6 +5,10 @@ import (
 	"istio.io/istio/pilot/pkg/model"
 	"istio.io/istio/pilot/pkg/config/kube/crd"
 	"github.com/hidevopsio/hicicd/pkg/orch"
+	"os"
+	"github.com/hashicorp/go-multierror"
+	"fmt"
+	"os/user"
 )
 
 type Client struct {
@@ -41,6 +45,7 @@ func newClient(kubeconfig string) (*crd.Client, error) {
 		model.ServiceRole,
 		model.ServiceRoleBinding,
 	}
+	log.Debug("kubeconfig :", kubeconfig)
 	return crd.NewClient(kubeconfig, config, "")
 }
 
@@ -64,11 +69,46 @@ func (c *Client) Delete(typ string) error {
 }
 
 func NewClient() (*crd.Client, error) {
-	log.Debug("create config kubeconfig")
+	log.Debug("create config kubeconfig", *orch.Kubeconfig)
 	configClient, err := newClient(*orch.Kubeconfig)
 	if err != nil {
 		log.Error("create config configClient error", err)
 		return nil, err
 	}
 	return configClient, nil
+}
+
+func ResolveConfig(kubeconfig string) (string, error) {
+	// Consistency with kubectl
+	if kubeconfig == "" {
+		kubeconfig = os.Getenv("KUBECONFIG")
+	}
+	if kubeconfig == "" {
+		usr, err := user.Current()
+		if err == nil {
+			defaultCfg := usr.HomeDir + "/.kube/config"
+			_, err := os.Stat(kubeconfig)
+			if err != nil {
+				kubeconfig = defaultCfg
+			}
+		}
+	}
+	if kubeconfig != "" {
+		info, err := os.Stat(kubeconfig)
+		if err != nil {
+			if os.IsNotExist(err) {
+				err = fmt.Errorf("kubernetes configuration file %q does not exist", kubeconfig)
+			} else {
+				err = multierror.Append(err, fmt.Errorf("kubernetes configuration file %q", kubeconfig))
+			}
+			return "", err
+		}
+
+		// if it's an empty file, switch to in-cluster config
+		if info.Size() == 0 {
+			log.Info("using in-cluster configuration")
+			return "", nil
+		}
+	}
+	return kubeconfig, nil
 }

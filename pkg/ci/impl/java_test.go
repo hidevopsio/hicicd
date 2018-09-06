@@ -25,11 +25,11 @@ import (
 	"github.com/hidevopsio/hicicd/pkg/scm/gitlab"
 )
 
-func init()  {
+func init() {
 	log.SetLevel(log.DebugLevel)
 }
 
-func TestJavaPipeline(t *testing.T)  {
+func TestJavaPipeline(t *testing.T) {
 
 	log.Debug("Test Java Pipeline")
 
@@ -37,22 +37,22 @@ func TestJavaPipeline(t *testing.T)  {
 
 	username := os.Getenv("SCM_USERNAME")
 	password := os.Getenv("SCM_PASSWORD")
-	baseUrl :=  os.Getenv("SCM_URL")
+	baseUrl := os.Getenv("SCM_URL")
 	java.Init(&ci.Pipeline{
-		Name: "java",
+		Project:   "demo",
+		App:       "red-shop",
+		Name:    "nodejs",
 		Profile: "test",
-		App: "hello-world",
-		Project: "demo",
-		Version: "v2",
+		Version: "v1.0",
 		Scm: ci.Scm{
-			Url: baseUrl,
-			Ref: "v2",
+			Ref: "test",
 		},
-		BuildConfigs: ci.BuildConfigs{
-			Skip: false,
+		IstioConfigs: ci.IstioConfigs{
+			Enable: false,
 		},
-		DeploymentConfigs: ci.DeploymentConfigs{
-			ForceUpdate: true,
+		BuildConfigs : ci.BuildConfigs{
+			TagFrom:     "dev",
+			ImageStream: "s2i-nodejs:alpine",
 		},
 	})
 	gs := new(gitlab.Session)
@@ -60,15 +60,15 @@ func TestJavaPipeline(t *testing.T)  {
 	assert.Equal(t, nil, err)
 	log.Debug(gs)
 	assert.Equal(t, username, gs.Username)
+	java.Scm.Url = baseUrl
 	err = java.Run(username, password, gs.PrivateToken, gs.ID, false)
 	assert.Equal(t, nil, err)
 }
 
-
 type Book struct {
-	Id    int
-	Title string
-	Price float32
+	Id      int
+	Title   string
+	Price   float32
 	Authors []string
 }
 
@@ -80,6 +80,6 @@ func TestIterateStruct(t *testing.T) {
 		varName := e.Type().Field(i).Name
 		varType := e.Type().Field(i).Type
 		varValue := e.Field(i).Interface()
-		fmt.Printf("%v %v %v\n", varName,varType,varValue)
+		fmt.Printf("%v %v %v\n", varName, varType, varValue)
 	}
 }

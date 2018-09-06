@@ -9,16 +9,20 @@ pipeline:
     ref: master
   dockerRegistry: docker-registry.default.svc:5000
   buildConfigs:
-    skip: false
+    enable: true
+    rebuild: false
   deploymentConfigs:
-    skip: false
+    enable: true
     forceUpdate: false
     replicas: 1
     env:
     - name: TZ
       value: Asia/Shanghai
+    labels:
+      app: ${app}
+      version: ${version}
   istioConfigs:
-    skip: false
+    enable: false
     version: 0.7.1  # use env variable instead ?
     namespace: istio-system
     dockerHub: docker.io/istio
@@ -35,3 +39,5 @@ pipeline:
     port: 8080
     containerPort: 8080
     protocol: TCP
+  gatewayConfigs:
+    enable: true

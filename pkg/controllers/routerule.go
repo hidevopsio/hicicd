@@ -28,7 +28,6 @@ func (c *RouteruleController) PostAdd(ctx *web.Context) {
 	var rule  istio.RouterRule
 	err := ctx.RequestBody(&rule)
 	if err != nil {
-		ctx.ResponseError(err.Error(), http.StatusUnavailableForLegalReasons)
 		return
 	}
 	config, err := istio.NewClient()
