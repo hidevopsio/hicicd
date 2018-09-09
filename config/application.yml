@@ -6,7 +6,6 @@ app:
   profiles:
     include:
     - jwt
-    - gorm
     - grpc
 
 logging:

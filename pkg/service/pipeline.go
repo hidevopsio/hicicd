@@ -364,7 +364,7 @@ func (p *PipelineService) Run(username, password, token string, uid int, isToken
 		log.Error("Pipeline run Create RoleBinding err :", err)
 		return err
 	}
-	if p.BuildConfigs.TagFrom == p.Profile && p.BuildConfigs.Project == p.Project {
+	if p.BuildConfigs.TagEnable {
 
 		// create secret for building image
 		secret, err := p.CreateSecret(username, password, isToken)

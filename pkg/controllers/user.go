@@ -86,7 +86,7 @@ func (c *UserController) PostLogin(ctx *web.Context) {
 				"password": request.Password, // TODO: token is not working?
 				"scmToken": privateToken,
 				"uid":      uid,
-			}, 10, time.Minute)
+			}, 10, time.Hour)
 			if err == nil {
 				data := map[string]interface{}{
 					"token": &jwtToken,

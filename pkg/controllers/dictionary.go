@@ -1,55 +1,37 @@
 package controllers
 
 import (
-	"github.com/hidevopsio/hiboot/pkg/app/web"
+		"github.com/hidevopsio/hiboot/pkg/app/web"
 	"github.com/hidevopsio/hicicd/pkg/service"
-	"github.com/hidevopsio/hicicd/pkg/entity"
-	"net/http"
+	"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hiboot/pkg/model"
 )
 
-// Operations about object
+// RestController
 type DictionaryController struct {
 	BaseController
-	DictionaryService *service.DictionaryService
-}
-
-func (d *DictionaryController) Init(dictionaryService *service.DictionaryService) {
-	d.DictionaryService = dictionaryService
+	dictionaryService *service.DictionaryService
 }
 
 func init() {
 	web.RestController(new(DictionaryController))
 }
 
-func (d *DictionaryController) Post(ctx *web.Context) {
-	dictionary := &entity.Dictionary{}
-	err := ctx.RequestBody(dictionary)
-	if err == nil {
-		err := d.DictionaryService.Add(dictionary)
-		if err != nil {
-			ctx.ResponseError(err.Error(), http.StatusExpectationFailed)
-		}
-		ctx.ResponseBody("success", dictionary)
-	}
-
+func (c *DictionaryController) Init(dictionaryService *service.DictionaryService) {
+	c.dictionaryService = dictionaryService
 }
 
-func (d *DictionaryController) Get(ctx *web.Context) {
-	id := ctx.URLParam("id")
-	dictionary, err := d.DictionaryService.Get(id)
-	if err != nil {
-		ctx.ResponseError("Resource is not found", http.StatusNotFound)
-	} else {
-		ctx.ResponseBody("success", dictionary)
-	}
+func (c *DictionaryController) Before(ctx *web.Context) {
+	log.Debug("controller before:{}")
+	username := c.JwtProperty("username")
+	log.Info(username)
+	ctx.Next()
 }
 
-func (d *DictionaryController) Delete(ctx *web.Context) {
-	id := ctx.URLParam("id")
-	err := d.DictionaryService.Delete(id)
-	if err != nil {
-		ctx.ResponseError("Resource is not found", http.StatusNotFound)
-	} else {
-		ctx.ResponseBody("success", nil)
-	}
+//Get 获取字典
+func (c *DictionaryController) GetByType(id int32) (model.Response, error) {
+	dictionary, err := c.dictionaryService.GetType(id)
+	response := new(model.BaseResponse)
+	response.SetData(dictionary)
+	return response, err
 }

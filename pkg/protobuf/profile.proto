@@ -1,0 +1,68 @@
+// Copyright 2015 gRPC authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.devops.hiadmin.profile";
+option java_outer_classname = "ProfileProto";
+
+// target package name
+package protobuf;
+
+// The greeting service definition.
+service ProfileService {
+    // Sends a greeting
+    rpc Get (ProfileRequest) returns (ProfileResponse) {
+    }
+}
+
+message ProfileRequest {
+    string id = 1;
+    string name = 2;
+    string profileId = 3;
+    string namespace = 4;
+    string host = 5;
+    bool rebuild = 6;
+    bool deploy = 7;
+    string gateway = 8;
+    bool build_enable = 9;
+    bool remote_enable = 10;
+    bool tag_enable = 11;
+    repeated ImageTag image_tags = 12;
+    string scm_ref = 13;
+    bool istio_enable = 14;
+    string created_time = 15;
+    string created_by = 16;
+    string updated_time = 17;
+    string updated_by = 18;
+    int32 deleted = 19;
+}
+
+message ProfileResponse {
+    int32    code = 1;
+    string   message = 2;
+    ProfileRequest data = 3;
+}
+
+
+message ImageTag {
+    string id = 1;
+    string profile_id = 2;
+    string repository = 3;
+    string tag = 4;
+    string text = 5;
+    string value = 6;
+    string name = 7;
+}

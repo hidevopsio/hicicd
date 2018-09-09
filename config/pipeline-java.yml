@@ -9,6 +9,8 @@ pipeline:
   buildConfigs:
     imagestream: s2i-java:latest
     env:
+    - name: TZ
+      value: Asia/Shanghai
     - name: MAVEN_MIRROR_URL
       value: ${MAVEN_MIRROR_URL}
     - name: MAVEN_CLEAR_REPO
@@ -35,4 +37,8 @@ pipeline:
   - name: grpc-7575
     port: 7575
     containerPort: 7575
+    protocol: TCP
+  - name: http-8080
+    port: 8080
+    containerPort: 8080
     protocol: TCP

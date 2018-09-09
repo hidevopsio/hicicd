@@ -16,19 +16,19 @@ syntax = "proto3";
 
 option java_multiple_files = true;
 option java_package = "io.hidevops.hicicd";
-option java_outer_classname = "RemoteDeploymentProto";
+option java_outer_classname = "DeployProto";
 
 // target package name
 package protobuf;
 
 // The greeting service definition.
-service RemoteDeploymentService {
+service DeployService {
     // Sends a greeting
-    rpc Get (RemoteDeploymentRequest) returns (RemoteDeploymentResponse) {
+    rpc Run (DeployRequest) returns (DeployResponse) {
     }
 }
 
-message RemoteDeploymentRequest {
+message DeployRequest {
     string id = 1;
     string token = 2;
     string namespace = 3;
@@ -40,8 +40,8 @@ message RemoteDeploymentRequest {
     string dockerRegistry = 9;
 }
 
-message RemoteDeploymentResponse {
+message DeployResponse {
     int32 code = 1;
     string message = 2;
-    RemoteDeploymentRequest data = 3;
+    string data = 3;
 }

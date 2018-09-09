@@ -6,6 +6,8 @@ pipeline:
   buildConfigs:
     imagestream: s2i-java-war:1.0.6
     env:
+    - name: TZ
+      value: Asia/Shanghai
     - name: MAVEN_MIRROR_URL
       value: ${MAVEN_MIRROR_URL}
     - name: MAVEN_CLEAR_REPO

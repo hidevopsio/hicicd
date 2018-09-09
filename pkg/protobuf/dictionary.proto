@@ -15,33 +15,34 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "io.hidevops.hicicd";
-option java_outer_classname = "RemoteDeploymentProto";
+option java_package = "io.devops.hicicd.Dictionary";
+option java_outer_classname = "DictionaryProto";
 
 // target package name
 package protobuf;
 
 // The greeting service definition.
-service RemoteDeploymentService {
+service DictionaryService {
     // Sends a greeting
-    rpc Get (RemoteDeploymentRequest) returns (RemoteDeploymentResponse) {
+    rpc Get (DictionaryRequest) returns (DictionaryResponse) {
     }
 }
 
-message RemoteDeploymentRequest {
+message DictionaryRequest {
     string id = 1;
-    string token = 2;
-    string namespace = 3;
-    string project = 4;
-    string version = 5;
-    string profile = 6;
-    string registryUrl = 7;
-    string remoteUrl = 8;
-    string dockerRegistry = 9;
+    string name = 2;
+    int64 app_id = 3;
+    int32 type = 4;
+    string value = 5;
+    int64 created_by = 6;
+    int64 updated_by = 7;
+    int64 created_time = 8;
+    int64 update_time = 9;
+    int32 deleted = 10;
 }
 
-message RemoteDeploymentResponse {
+message DictionaryResponse {
     int32 code = 1;
     string message = 2;
-    RemoteDeploymentRequest data = 3;
+    repeated DictionaryRequest data = 3;
 }

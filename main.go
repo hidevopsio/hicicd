@@ -11,6 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// if protoc report command not found error, should install proto and protc-gen-go
+// go get -u -v github.com/golang/protobuf/{proto,protoc-gen-go}
+//go:generate protoc -I pkg/protobuf --go_out=plugins=grpc:pkg/protobuf pkg/protobuf/dictionary.proto
 
 package main
 
@@ -18,7 +21,6 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/app/web"
 	_ "github.com/hidevopsio/hiboot/pkg/starter/actuator"
 	_ "github.com/hidevopsio/hicicd/pkg/controllers"
-	//_ "github.com/hidevopsio/hicicd/pkg/rpc"
 )
 
 func main() {
