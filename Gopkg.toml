@@ -21,10 +21,6 @@
 #  version = "2.4.0"
 
 [[constraint]]
-  name = "github.com/dgrijalva/jwt-go"
-  version = "3.2.0"
-
-[[constraint]]
   name = "github.com/imdario/mergo"
   version = "0.3.4"
 
@@ -54,4 +50,8 @@
 
 [[constraint]]
   name = "github.com/hidevopsio/hioak"
-  version = "v0.0.1"
+  version = "v0.1.2"
+
+[[constraint]]
+  name = "github.com/hidevopsio/hiboot"
+  version = "v0.5.8"

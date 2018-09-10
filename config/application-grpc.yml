@@ -6,5 +6,5 @@ grpc:
       host: hiadmin
       port: 7575
     hiagent-client:
-      host: hiadmin
+      host: hiagent
       port: 7575
