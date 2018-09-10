@@ -6,7 +6,6 @@ import (
 	"github.com/hidevopsio/hioak/pkg/openshift"
 	"os"
 	"strings"
-	"github.com/hidevopsio/hioak/pkg/istio"
 	"github.com/hidevopsio/hicicd/pkg/auth"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hicicd/pkg/entity"
@@ -15,8 +14,7 @@ import (
 	authorization_v1 "github.com/openshift/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
-	"github.com/jinzhu/copier"
-	"github.com/hidevopsio/hioak/pkg"
+		"github.com/hidevopsio/hioak/pkg"
 			)
 
 type PipelineService struct {
@@ -151,7 +149,7 @@ func (p *PipelineService) Analysis() error {
 	return nil
 }
 
-func (p *PipelineService) CreateDeploymentConfig(force bool, injectSidecar func(in interface{}) (interface{}, error)) error {
+func (p *PipelineService) CreateDeploymentConfig(force bool) error {
 	log.Debug("Pipeline.CreateDeploymentConfig()")
 
 	// new dc instance
@@ -162,7 +160,7 @@ func (p *PipelineService) CreateDeploymentConfig(force bool, injectSidecar func(
 	var l map[string]string
 	labels, _ := json.Marshal(p.DeploymentConfigs.Labels)
 	err = json.Unmarshal(labels, &l)
-	err = dc.Create(&p.DeploymentConfigs.Env, l, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, p.NodeSelector, injectSidecar)
+	err = dc.Create(&p.DeploymentConfigs.Env, l, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, p.NodeSelector)
 	if err != nil {
 		log.Error("dc.Create ", err)
 		return err
@@ -296,14 +294,7 @@ func (p *PipelineService) Deploy() error {
 	if p.DeploymentConfigs.Enable {
 
 		// create dc - deployment config
-		err := p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate, func(in interface{}) (interface{}, error) {
-			if !p.IstioConfigs.Enable {
-				return in, nil
-			}
-			injector := &istio.Injector{}
-			copier.Copy(injector, p.IstioConfigs)
-			return injector.Inject(in)
-		})
+		err := p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate)
 		if err != nil {
 			log.Error(err.Error())
 			return fmt.Errorf("failed on CreateDeploymentConfig! %s", err.Error())
