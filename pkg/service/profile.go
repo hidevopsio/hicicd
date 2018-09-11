@@ -4,7 +4,7 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/starter/grpc"
 	"github.com/hidevopsio/hicicd/pkg/protobuf"
 	"time"
-		"golang.org/x/net/context"
+	"golang.org/x/net/context"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/jinzhu/copier"
 )
@@ -15,13 +15,15 @@ type Profile struct {
 	ProfileId    string      `json:"profile_id"`    //profileId
 	Namespace    string      `json:"namespace"`     //主键
 	Host         string      `json:"host"`          //kong 的host example  http://devcloud.vpclub.cn http://devgw.vpclub.cn
-	ReBuild      bool        `json:"re_build"`      // 是否重新获取最新镜像 true or false
+	Rebuild      bool        `json:"re_build"`      // 是否重新获取最新镜像 true or false
 	Deploy       bool        `json:"deploy"`        // 是否 重新部署 true or false
 	Gateway      bool        `json:"gateway"`       // 是否配置网关 true or false
 	BuildEnable  bool        `json:"build_enable"`  //是否重新build
 	RemoteEnable bool        `json:"remote_enable"` //是否远程部署
 	TagEnable    bool        `json:"tag_enable"`
 	ImageTags    []*ImageTag `json:"image_string_tags"`
+	ForceUpdate  bool        `json:"force_update"`
+	TagFrom      string      `json:"tag_from"`
 	ScmRef       string      `json:"scm_ref"`      //分支
 	IstioEnable  bool        `json:"istio_enable"` //istio
 	CreatedTime  int64       `json:"created_time"` //创建时间

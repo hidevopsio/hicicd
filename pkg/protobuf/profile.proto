@@ -36,7 +36,7 @@ message ProfileRequest {
     string host = 5;
     bool rebuild = 6;
     bool deploy = 7;
-    string gateway = 8;
+    bool gateway = 8;
     bool build_enable = 9;
     bool remote_enable = 10;
     bool tag_enable = 11;
@@ -48,6 +48,8 @@ message ProfileRequest {
     string updated_time = 17;
     string updated_by = 18;
     int32 deleted = 19;
+    bool force_update =20;
+    string tag_from = 21;
 }
 
 message ProfileResponse {

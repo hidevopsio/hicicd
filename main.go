@@ -13,7 +13,7 @@
 // limitations under the License.
 // if protoc report command not found error, should install proto and protc-gen-go
 // go get -u -v github.com/golang/protobuf/{proto,protoc-gen-go}
-//go:generate protoc -I pkg/protobuf --go_out=plugins=grpc:pkg/protobuf pkg/protobuf/dictionary.proto
+//go:generate protoc -I pkg/protobuf --go_out=plugins=grpc:pkg/protobuf pkg/protobuf/profile.proto
 
 package main
 
