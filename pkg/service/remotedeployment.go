@@ -9,6 +9,8 @@ import (
 	"github.com/prometheus/common/log"
 	"github.com/hidevopsio/hioak/pkg"
 	"net/http"
+	"github.com/hidevopsio/hicicd/pkg/entity"
+	"encoding/json"
 )
 
 type RemoteDeploymentConfigs struct {
@@ -25,6 +27,7 @@ type RemoteDeploymentConfigs struct {
 	ApplicationId  string `json:"application_id"`
 	DockerRegistry string `json:"docker_registry"` //svc 地址
 	Secret         string `json:"secret"`
+	Pipeline       string `json:"pipeline"`
 	CallBackUrl    string `json:"call_back_url"`
 	CreatedTime    int64  `json:"created_time"`
 	CreatedBy      string `json:"created_by"`
@@ -47,7 +50,7 @@ func init() {
 	grpc.RegisterClient("hiagent-client", protobuf.NewDeployServiceClient)
 }
 
-func (r *RemoteDeploymentConfigsService) InitRemote(id, namespace, profile, app, version string) (*RemoteDeploymentConfigs, error) {
+func (r *RemoteDeploymentConfigsService) InitRemote(pipeline entity.Pipeline, id, namespace, profile, app, version string) (*RemoteDeploymentConfigs, error) {
 	remote := &RemoteDeploymentConfigs{}
 	request := &protobuf.RemoteDeploymentRequest{
 		Id: id,
@@ -67,6 +70,9 @@ func (r *RemoteDeploymentConfigsService) InitRemote(id, namespace, profile, app,
 	remote.Namespace = namespace
 	remote.Version = version
 	remote.Project = app
+	data, _ := json.Marshal(pipeline)
+	log.Infof("pipeline remote deploy: %v", string(data))
+	remote.Pipeline= string(data)
 	return remote, nil
 }
 

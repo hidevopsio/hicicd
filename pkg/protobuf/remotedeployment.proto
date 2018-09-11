@@ -38,6 +38,7 @@ message RemoteDeploymentRequest {
     string registryUrl = 7;
     string remoteUrl = 8;
     string dockerRegistry = 9;
+    string pipeline = 10;
 }
 
 message RemoteDeploymentResponse {

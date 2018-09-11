@@ -94,7 +94,7 @@ func (p *PipelineController) PostRun(ctx *web.Context) {
 }
 
 func (p *PipelineController) RemoteDeploy(pipelineService *service.PipelineService) error {
-	remote, err := p.remoteService.InitRemote("211855812371415399", pipelineService.BuildConfigs.Namespace, pipelineService.Namespace, pipelineService.App, pipelineService.Version)
+	remote, err := p.remoteService.InitRemote(pipelineService.Pipeline,"211855812371415399", pipelineService.BuildConfigs.Namespace, pipelineService.Namespace, pipelineService.App, pipelineService.Version)
 	if err != nil {
 		return nil
 	}
