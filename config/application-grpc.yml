@@ -1,0 +1,8 @@
+grpc:
+  client:
+    hiadmin-client:
+      host: hiadmin.hidevopsio.svc
+      port: 7575
+    hiagent-client:
+      host: 172.16.13.2
+      port: 57575

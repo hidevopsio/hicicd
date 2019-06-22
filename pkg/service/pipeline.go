@@ -6,7 +6,6 @@ import (
 	"github.com/hidevopsio/hioak/pkg/openshift"
 	"os"
 	"strings"
-	"github.com/hidevopsio/hioak/pkg/istio"
 	"github.com/hidevopsio/hicicd/pkg/auth"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hicicd/pkg/entity"
@@ -15,8 +14,8 @@ import (
 	authorization_v1 "github.com/openshift/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
-	"github.com/jinzhu/copier"
-)
+		"github.com/hidevopsio/hioak/pkg"
+			)
 
 type PipelineService struct {
 	entity.Pipeline
@@ -95,6 +94,12 @@ func (p *PipelineService) CreateRoleBinding(username, metaName, roleRefName stri
 	return err
 }
 
+func (p *PipelineService) Token() string {
+	cli := orch.GetClientInstance()
+	token := cli.Config().BearerToken
+	return token
+}
+
 func (p *PipelineService) Build(secret string, completedHandler func() error) error {
 	log.Debug("Pipeline.Build()")
 
@@ -144,7 +149,7 @@ func (p *PipelineService) Analysis() error {
 	return nil
 }
 
-func (p *PipelineService) CreateDeploymentConfig(force bool, injectSidecar func(in interface{}) (interface{}, error)) error {
+func (p *PipelineService) CreateDeploymentConfig(force bool) error {
 	log.Debug("Pipeline.CreateDeploymentConfig()")
 
 	// new dc instance
@@ -155,7 +160,7 @@ func (p *PipelineService) CreateDeploymentConfig(force bool, injectSidecar func(
 	var l map[string]string
 	labels, _ := json.Marshal(p.DeploymentConfigs.Labels)
 	err = json.Unmarshal(labels, &l)
-	err = dc.Create(&p.DeploymentConfigs.Env, l, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, p.NodeSelector, injectSidecar)
+	err = dc.Create(&p.DeploymentConfigs.Env, l, &p.Ports, p.DeploymentConfigs.Replicas, force, p.DeploymentConfigs.HealthEndPoint, p.NodeSelector)
 	if err != nil {
 		log.Error("dc.Create ", err)
 		return err
@@ -289,14 +294,7 @@ func (p *PipelineService) Deploy() error {
 	if p.DeploymentConfigs.Enable {
 
 		// create dc - deployment config
-		err := p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate, func(in interface{}) (interface{}, error) {
-			if !p.IstioConfigs.Enable {
-				return in, nil
-			}
-			injector := &istio.Injector{}
-			copier.Copy(injector, p.IstioConfigs)
-			return injector.Inject(in)
-		})
+		err := p.CreateDeploymentConfig(p.DeploymentConfigs.ForceUpdate)
 		if err != nil {
 			log.Error(err.Error())
 			return fmt.Errorf("failed on CreateDeploymentConfig! %s", err.Error())
@@ -357,7 +355,7 @@ func (p *PipelineService) Run(username, password, token string, uid int, isToken
 		log.Error("Pipeline run Create RoleBinding err :", err)
 		return err
 	}
-	if p.BuildConfigs.TagFrom == p.Profile && p.BuildConfigs.Project == p.Project {
+	if p.BuildConfigs.TagEnable {
 
 		// create secret for building image
 		secret, err := p.CreateSecret(username, password, isToken)
@@ -387,10 +385,5 @@ func (p *PipelineService) Run(username, password, token string, uid int, isToken
 		return fmt.Errorf("failed on Build! %s", err.Error())
 	}
 
-	// interact with developer
-	// deploy to test ? yes/no
-
-	// finally, all steps are done well, let tell the client ...
 	return nil
 }
-

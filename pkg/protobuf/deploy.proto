@@ -1,0 +1,48 @@
+// Copyright 2015 gRPC authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.hidevops.hicicd";
+option java_outer_classname = "DeployProto";
+
+// target package name
+package protobuf;
+
+// The greeting service definition.
+service DeployService {
+    // Sends a greeting
+    rpc Run (DeployRequest) returns (DeployResponse) {
+    }
+}
+
+message DeployRequest {
+    string id = 1;
+    string token = 2;
+    string namespace = 3;
+    string project = 4;
+    string version = 5;
+    string profile = 6;
+    string registryUrl = 7;
+    string remoteUrl = 8;
+    string dockerRegistry = 9;
+    string pipeline = 10;
+}
+
+message DeployResponse {
+    int32 code = 1;
+    string message = 2;
+    string data = 3;
+}

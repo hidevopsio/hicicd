@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"github.com/hidevopsio/hicicd/pkg/app"
 	"net/http"
 	"github.com/hidevopsio/hiboot/pkg/log"
+	"strconv"
 )
 
 // Operations about object
@@ -13,7 +14,7 @@ type GroupController struct {
 }
 
 func init() {
-	web.Add(new(GroupController))
+	web.RestController(new(GroupController))
 }
 
 func (c *GroupController) Before(ctx *web.Context) {
@@ -27,8 +28,11 @@ func (c *GroupController) Get(ctx *web.Context) {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
 	}
+	scmToken := c.JwtProperty("scmToken")
+	url := c.JwtProperty("url")
+	uid, _ := strconv.Atoi(c.JwtProperty("uid"))
 	g := &app.Group{}
-	groupMember, err := g.ListGroups(c.ScmToken, c.Url, c.Uid, page)
+	groupMember, err := g.ListGroups(scmToken, url, uid, page)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return
@@ -40,8 +44,10 @@ func (c *GroupController) GetProjects(ctx *web.Context) {
 	log.Debug("GroupController.List Group Projects()")
 	page, err := ctx.URLParamInt("page")
 	gid, err := ctx.URLParamInt("gid")
+	scmToken := c.JwtProperty("scmToken")
+	url := c.JwtProperty("url")
 	g := &app.Group{}
-	projects, err := g.ListGroupProjects(c.ScmToken, c.Url, gid, page)
+	projects, err := g.ListGroupProjects(scmToken, url, gid, page)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusInternalServerError)
 		return

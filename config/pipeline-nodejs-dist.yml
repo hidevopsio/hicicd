@@ -8,6 +8,8 @@ pipeline:
   buildConfigs:
     imagestream: s2i-nodejs:6.1-alpine
     env:
+    - name: TZ
+      value: Asia/Shanghai
     - name: npm_config_registry
       value: ${npm_config_registry}
     - name: npm_config_disturl

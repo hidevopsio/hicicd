@@ -15,15 +15,14 @@
 package controllers
 
 import (
-	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/hidevopsio/hiboot/pkg/log"
+			"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hiboot/pkg/model"
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"os"
 	"strings"
 	"github.com/hidevopsio/hicicd/pkg/service"
 	"github.com/hidevopsio/hicicd/pkg/entity"
+	"strconv"
 )
 
 type PipelineResponse struct {
@@ -33,11 +32,11 @@ type PipelineResponse struct {
 // Operations about object
 type PipelineController struct {
 	BaseController
-	SelectorService *service.SelectorService
+	remoteService   *service.RemoteDeploymentConfigsService
 }
 
-func (p *PipelineController) Init(selectorService *service.SelectorService) {
-	p.SelectorService = selectorService
+func (p *PipelineController) Init(remoteService *service.RemoteDeploymentConfigsService) {
+	p.remoteService = remoteService
 }
 
 const (
@@ -49,7 +48,7 @@ const (
 )
 
 func init() {
-	web.Add(new(PipelineController))
+	web.RestController(new(PipelineController))
 }
 
 func (p *PipelineController) Before(ctx *web.Context) {
@@ -63,30 +62,27 @@ func (p *PipelineController) Before(ctx *web.Context) {
 // @Failure 403 body is empty
 // @router / [post]
 func (p *PipelineController) PostRun(ctx *web.Context) {
-	log.Debug("CicdController.Run()")
+	log.Debug("Cicd Controller.Run()")
 	var pl entity.Pipeline
 	err := ctx.RequestBody(&pl)
-	// replace pl.Scm.Url with c.Url if it is empty
-	if pl.Scm.Url == "" {
-		pl.Scm.Url = p.Url
-	}
 	if err != nil {
 		return
 	}
 	message := "success"
 	if err == nil {
-		selector, err := p.SelectorService.Get("1")
-		if err != nil {
-			return
-		}
 		pipelineService := &service.PipelineService{}
-		pipelineService.Initialize(&pl, selector)
-		go func() {
-			err = pipelineService.Run(p.Username, p.Password, p.ScmToken, p.Uid, false)
-			if err != nil {
-				message = err.Error()
-			}
-		}()
+		pipelineService.Initialize(&pl, p.JwtProperty("url"))
+		if pipelineService.DeploymentConfigs.RemoteEnable {
+			err = p.RemoteDeploy(pipelineService)
+		} else {
+			go func() {
+				uid, _ := strconv.Atoi(p.JwtProperty("uid"))
+				err = pipelineService.Run(p.JwtProperty("username"), p.JwtProperty("password"), p.JwtProperty("scmToken"), uid, false)
+				if err != nil {
+					message = err.Error()
+				}
+			}()
+		}
 	} else {
 		message = "failed, " + err.Error()
 	}
@@ -97,6 +93,11 @@ func (p *PipelineController) PostRun(ctx *web.Context) {
 	ctx.ResponseBody(message, bc)
 }
 
-func parseToken(claims jwt.MapClaims, prop string) string {
-	return fmt.Sprintf("%v", claims[prop])
+func (p *PipelineController) RemoteDeploy(pipelineService *service.PipelineService) error {
+	remote, err := p.remoteService.InitRemote(pipelineService.Pipeline,"211855812371415399", pipelineService.BuildConfigs.Namespace, pipelineService.Namespace, pipelineService.App, pipelineService.Version)
+	if err != nil {
+		return nil
+	}
+	err = p.remoteService.Run(remote)
+	return err
 }

@@ -7,8 +7,8 @@ logging:
 grpc:
   client:
     hiadmin-client:
-      host: localhost
-      port: 7576
-    hiagent-client:
-      host: localhost
+      host: hiadmin
       port: 7575
+    hiagent-client:
+      host: 172.16.13.2
+      port: 57575

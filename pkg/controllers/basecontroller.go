@@ -15,15 +15,13 @@
 package controllers
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"strings"
-	"github.com/hidevopsio/hiboot/pkg/log"
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
-	"strconv"
+		"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
+		"github.com/hidevopsio/hiboot/pkg/starter/jwt"
 )
 
 type BaseController struct {
-	web.JwtController
+	jwt.Controller
 	Username string
 	Password string
 	Url      string
@@ -33,7 +31,7 @@ type BaseController struct {
 
 func (c *BaseController) Before(ctx *web.Context) {
 	log.Debug("controller before:{}")
-	ti := ctx.Values().Get("jwt")
+/*	ti := ctx.Values().Get("jwt")
 	token := ti.(*jwt.Token)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		c.Username = parseToken(claims, ScmUsername)
@@ -45,6 +43,6 @@ func (c *BaseController) Before(ctx *web.Context) {
 	} else {
 		log.Debug("invalid token")
 		return
-	}
+	}*/
 	ctx.Next()
 }

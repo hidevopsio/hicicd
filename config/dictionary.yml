@@ -19,6 +19,3 @@ dictionary:
     - biz
     java_selector:
     - jdk8
-  profile:
-  - prod
-  - stage

@@ -2,13 +2,13 @@ package controllers
 
 import (
 	"testing"
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"time"
 	"fmt"
 	"github.com/magiconair/properties/assert"
 	"os"
 	"net/http"
-	"github.com/hidevopsio/hicicd/pkg/orch/k8s"
+	"github.com/hidevopsio/hioak/pkg/k8s"
 )
 
 func TestCreate(t *testing.T) {
@@ -44,7 +44,6 @@ func TestGet(t *testing.T)  {
 	assert.Equal(t, nil, err)
 	name := "demo"
 	namespace := "demo-stage"
-	//path := fmt.Sprintf("/configMap?name=%s&namespace=%s", url.QueryEscape(name), url.QueryEscape(namespace))
 	bt := fmt.Sprintf("Bearer %v", string(*jwtToken))
 	app.Get("/configMap").WithHeader("Authorization", bt).WithQuery("name", name).WithQuery("namespace", namespace).Expect().Status(http.StatusOK)
 }

@@ -4,9 +4,10 @@ import (
 	"github.com/hidevopsio/hiboot/pkg/system"
 	"github.com/hidevopsio/hioak/pkg"
 	"path/filepath"
-	"github.com/hidevopsio/hiboot/pkg/utils"
 	"github.com/imdario/mergo"
 	"github.com/hidevopsio/hiboot/pkg/log"
+	"github.com/hidevopsio/hiboot/pkg/utils/io"
+	"github.com/hidevopsio/hiboot/pkg/utils/replacer"
 )
 
 type Scm struct {
@@ -23,6 +24,7 @@ type DeploymentConfigs struct {
 	Env            []system.Env `json:"env"`
 	Labels         Labels       `json:"labels"`
 	Project        string       `json:"project"`
+	RemoteEnable   bool         `json:"remote_enable"`
 }
 
 type Labels struct {
@@ -32,6 +34,7 @@ type Labels struct {
 }
 
 type BuildConfigs struct {
+	TagEnable   bool         `json:"tag_enable"`
 	Enable      bool         `json:"enable"`
 	TagFrom     string       `json:"tag_from"`
 	ImageStream string       `json:"image_stream"`
@@ -91,20 +94,21 @@ type GatewayConfigs struct {
 	Uri         string `json:"uri"`
 	UpstreamUrl string `json:"upstream_url"`
 }
+
 // @Title Init
 // @Description set default value
 // @Param pipeline
 // @Return error
-func (p *Pipeline) Initialize(pl *Pipeline, selector *Selector) {
+func (p *Pipeline) Initialize(pl *Pipeline, url string) {
 	log.Debug("Pipeline.EnsureParam()")
 	// load config file
 	if pl != nil {
 		b := &system.Builder{
-			Path:       filepath.Join(utils.GetWorkDir(), "config"),
+			Path:       filepath.Join(io.GetWorkDir(), "config"),
 			Name:       "pipeline",
 			FileType:   "yaml",
 			Profile:    pl.Name,
-			ConfigType: Configuration{},
+			ConfigType: new(Configuration),
 		}
 		cp, err := b.Build()
 		if err != nil {
@@ -113,11 +117,8 @@ func (p *Pipeline) Initialize(pl *Pipeline, selector *Selector) {
 		c := cp.(*Configuration)
 		mergo.Merge(&c.Pipeline, pl, mergo.WithOverride)
 		mergo.Merge(p, c.Pipeline, mergo.WithOverride)
-
 	}
-
-	utils.Replace(p, p)
-
+	replacer.Replace(p, p)
 	if "" == p.Namespace {
 		if "" == pl.Profile {
 			p.Namespace = p.Project
@@ -130,7 +131,7 @@ func (p *Pipeline) Initialize(pl *Pipeline, selector *Selector) {
 		if "" == pl.Profile {
 			p.BuildConfigs.Namespace = p.BuildConfigs.Project
 		} else {
-			p.BuildConfigs.Namespace = p.BuildConfigs.Project + "-" + p.Profile
+			p.BuildConfigs.Namespace = p.BuildConfigs.Project + "-" + p.BuildConfigs.TagFrom
 		}
 	}
 
@@ -146,21 +147,8 @@ func (p *Pipeline) Initialize(pl *Pipeline, selector *Selector) {
 	} else {
 		p.BuildConfigs.Branch = pl.Scm.Ref
 	}
-	for _, node := range selector.Nodes {
-		if node.Profile == p.Profile {
-			p.NodeSelector = node.NodeSelector
-		}
-	}
 	p.GatewayConfigs.UpstreamUrl = p.App + "." + p.Namespace + ":8080"
-	if pl.DeploymentConfigs.Enable == false {
-		p.DeploymentConfigs.Enable = false
-	}
-	if pl.BuildConfigs.Enable == false {
-		p.BuildConfigs.Enable = false
-	}
-	if pl.GatewayConfigs.Enable == false {
-		p.GatewayConfigs.Enable = false
-	}
+	p.Scm.Url = url
 	log.Debug(p)
 
 }

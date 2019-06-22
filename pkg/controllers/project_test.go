@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"testing"
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"os"
 	"time"
 	"fmt"

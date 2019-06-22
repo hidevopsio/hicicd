@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/hidevopsio/hiboot/pkg/starter/web"
+	"github.com/hidevopsio/hiboot/pkg/app/web"
 	"net/http"
 	"github.com/hidevopsio/hiboot/pkg/log"
 	"github.com/hidevopsio/hicicd/pkg/scm"
@@ -17,7 +17,7 @@ type RepositoryController struct {
 }
 
 func init() {
-	web.Add(new(RepositoryController))
+	web.RestController(new(RepositoryController))
 }
 
 func (c *RepositoryController) Before(ctx *web.Context) {
@@ -32,7 +32,7 @@ func (c *RepositoryController) PostAppType(ctx *web.Context) {
 		return
 	}
 	t := new(info.TypeInfo)
-	err = t.RepositoryType(c.Url, c.ScmToken, project.Ref, project.ID)
+	err = t.RepositoryType(c.JwtProperty("url"), c.JwtProperty("scmToken"), project.Ref, project.ID)
 	if err != nil {
 		ctx.ResponseError(err.Error(), http.StatusPreconditionFailed)
 		return
@@ -46,7 +46,7 @@ func (c *RepositoryController) PostAppType(ctx *web.Context) {
 	api, err := gokong.NewClient(config).Apis().GetByName(name)
 	if api != nil {
 		t.Uri = api.Uris[0]
-	}else {
+	} else {
 		name := strings.Replace(project.Name, "-", "/", -1)
 		t.Uri = "/" + project.Namespace + "/" + name
 	}
